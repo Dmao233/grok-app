@@ -90,6 +90,28 @@ describe("shouldReleaseTreeRevealLock", () => {
       }),
     ).toBe(false);
   });
+
+  it("retargets when shorter content leaves the projects box taller than its rows", () => {
+    expect(
+      shouldReleaseTreeRevealLock({
+        open: true,
+        animatingOpen: false,
+        contentPx: 64,
+        boxPx: 480,
+      }),
+    ).toBe(true);
+  });
+
+  it("does not collapse an open box on a 0px measure glitch", () => {
+    expect(
+      shouldReleaseTreeRevealLock({
+        open: true,
+        animatingOpen: false,
+        contentPx: 0,
+        boxPx: 480,
+      }),
+    ).toBe(false);
+  });
 });
 
 describe("applyTreeRevealSize", () => {
