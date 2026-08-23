@@ -2782,6 +2782,7 @@ export function AppWorkbench() {
     sidebarCollapsed: layout.sidebarCollapsed,
     asideCollapsed: layout.asideCollapsed,
     phoneLayout,
+    sidebarOverlay,
     asideOverlay,
   });
   const asideFitGenRef = useRef(0);
