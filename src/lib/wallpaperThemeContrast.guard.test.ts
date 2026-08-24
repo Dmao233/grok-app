@@ -11,6 +11,14 @@ const sideWorkbenchCss = readFileSync(
   join(__dirname, "../styles/side-workbench.css"),
   "utf8",
 );
+const chatCss = readFileSync(
+  join(__dirname, "../styles/chat.part6.css"),
+  "utf8",
+);
+const app = readFileSync(
+  join(__dirname, "../app/AppWorkbench.tsx"),
+  "utf8",
+);
 
 describe("wallpaper theme contrast CSS", () => {
   it("maps light wallpaper to its own white veil and pane curves", () => {
@@ -168,6 +176,21 @@ describe("wallpaper theme contrast CSS", () => {
     );
     expect(sideWorkbenchCss).toMatch(
       /html\[data-wallpaper="1"\]\s+\.workbench--side-expanded\s+\.aside\s+:is\([^)]*\.rp-chrome[^)]*\.sw__empty[^)]*\)\s*\{[^}]*background:\s*transparent/s,
+    );
+  });
+
+  it("reuses the full-cover treatment for a narrow-window aside overlay", () => {
+    expect(app).toMatch(
+      /const hideMainForSidePane =\s*hideChatForSideExpand \|\| \(asideOverlay && !layout\.asideCollapsed\);/,
+    );
+    expect(app).toMatch(
+      /hideMainForSidePane \? " workbench--side-expanded" : ""/,
+    );
+    expect(app).toMatch(
+      /: hideMainForSidePane\s*\? \(\{[\s\S]*?calc\(100% - var\(--sw-sidebar-occupied, 0px\)\)/,
+    );
+    expect(chatCss).toMatch(
+      /\.aside\.aside--overlay\s*\{[^}]*top:\s*0;/s,
     );
   });
 });

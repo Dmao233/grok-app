@@ -115,6 +115,7 @@ import {
   bumpPaneSplitMotion,
   isPaneSplitMotionActive,
   paneSplitSizeStyle,
+  runAfterPaneSplitMotion,
 } from "@/lib/paneSplitMotion";
 import { usePaneSplitMotion } from "@/hooks/usePaneSplitMotion";
 import { acquireNativeWebviewCover } from "@/lib/nativeWebviewCover";
@@ -4129,24 +4130,31 @@ export function AppWorkbench() {
   useEffect(() => {
     if (phoneLayout) return;
     let resizeTimer: number | null = null;
+    let cancelled = false;
+    const applyResizeClamp = () => {
+      if (cancelled || isWindowFitSuppressed()) return;
+      if (runAfterPaneSplitMotion(applyResizeClamp)) return;
+      const opts = asideClampOpts();
+      setLayout((l) => {
+        if (l.asideCollapsed) return l;
+        const next = clampAsideWidth(l.asideWidth, opts);
+        if (next === l.asideWidth) return l;
+        const n = { ...l, asideWidth: next };
+        saveLayout(localStorage, n);
+        return n;
+      });
+    };
     const onResize = () => {
-      if (isWindowFitSuppressed() || isPaneSplitMotionActive()) return;
+      if (isWindowFitSuppressed()) return;
       if (resizeTimer != null) window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(() => {
-        if (isWindowFitSuppressed() || isPaneSplitMotionActive()) return;
-        const opts = asideClampOpts();
-        setLayout((l) => {
-          if (l.asideCollapsed) return l;
-          const next = clampAsideWidth(l.asideWidth, opts);
-          if (next === l.asideWidth) return l;
-          const n = { ...l, asideWidth: next };
-          saveLayout(localStorage, n);
-          return n;
-        });
+        resizeTimer = null;
+        applyResizeClamp();
       }, 150);
     };
     window.addEventListener("resize", onResize);
     return () => {
+      cancelled = true;
       window.removeEventListener("resize", onResize);
       if (resizeTimer != null) window.clearTimeout(resizeTimer);
     };
@@ -13199,6 +13207,8 @@ export function AppWorkbench() {
     expanded: sideWorkbench.expanded,
     phoneLayout,
   });
+  const hideMainForSidePane =
+    hideChatForSideExpand || (asideOverlay && !layout.asideCollapsed);
   const sidebarPaint =
     layout.sidebarCollapsed || sidebarOverlay
       ? 0
@@ -19153,7 +19163,7 @@ export function AppWorkbench() {
         className={
           "workbench" +
           (phoneLayout ? " workbench--phone" : "") +
-          (hideChatForSideExpand ? " workbench--side-expanded" : "") +
+          (hideMainForSidePane ? " workbench--side-expanded" : "") +
           (sideDockActive ? " workbench--side-dock" : "") +
           paneMotionClass
         }
@@ -19183,24 +19193,13 @@ export function AppWorkbench() {
             onClick={closePhoneDrawer}
           />
         ) : null}
-        {!phoneLayout &&
-        ((sidebarOverlay && !layout.sidebarCollapsed) ||
-          (asideOverlay && !layout.asideCollapsed)) ? (
+        {!phoneLayout && sidebarOverlay && !layout.sidebarCollapsed ? (
           <button
             type="button"
             className="workbench-pane-scrim"
-            aria-label={
-              sidebarOverlay && !layout.sidebarCollapsed
-                ? tr("phone.drawerClose")
-                : tr("main.rightPaneHide")
-            }
+            aria-label={tr("phone.drawerClose")}
             onClick={() => {
-              if (sidebarOverlay && !layout.sidebarCollapsed) {
-                closeSidebarPane();
-              }
-              if (asideOverlay && !layout.asideCollapsed) {
-                closeAsidePane();
-              }
+              closeSidebarPane();
             }}
           />
         ) : null}
@@ -20214,11 +20213,11 @@ export function AppWorkbench() {
             (layout.sidebarCollapsed ? " main--sidebar-hidden" : "") +
             (dragZone === "main" ? " is-drop-target" : "") +
             (dragZone === "sidebar" ? " is-drop-idle" : "") +
-            (hideChatForSideExpand ? " main--side-covered" : "")
+            (hideMainForSidePane ? " main--side-covered" : "")
           }
-          aria-hidden={hideChatForSideExpand ? true : undefined}
+          aria-hidden={hideMainForSidePane ? true : undefined}
           // Keep chat DOM mounted under the side overlay; block interaction.
-          inert={hideChatForSideExpand ? true : undefined}
+          inert={hideMainForSidePane ? true : undefined}
         >
           {dragZone === "main" && (
             <div className="drop-overlay drop-overlay--attach" aria-hidden>
@@ -22317,7 +22316,7 @@ export function AppWorkbench() {
             (layout.asideCollapsed ? "aside aside--hidden" : "aside") +
             (resizingAside ? " is-resizing" : "") +
             (phoneLayout ? " aside--phone-overlay" : "") +
-            (hideChatForSideExpand ? " aside--side-expanded" : "") +
+            (hideMainForSidePane ? " aside--side-expanded" : "") +
             (asideOverlay ? " aside--overlay" : "")
           }
           aria-label={tr("a11y.resourcesPane")}
@@ -22325,7 +22324,7 @@ export function AppWorkbench() {
           style={
             phoneLayout
               ? undefined
-              : hideChatForSideExpand
+              : hideMainForSidePane
                 ? ({
                     width:
                       "calc(100% - var(--sw-sidebar-occupied, 0px))",

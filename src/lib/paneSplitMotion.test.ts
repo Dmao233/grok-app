@@ -96,6 +96,19 @@ describe("desktop hidden CSS must not force width 0", () => {
     );
   });
 
+  it("replays a window resize clamp after pane motion settles", () => {
+    const app = readFileSync(
+      resolve(__dirname, "../app/AppWorkbench.tsx"),
+      "utf8",
+    );
+    expect(app).toMatch(
+      /const applyResizeClamp = \(\) => \{[\s\S]*?runAfterPaneSplitMotion\(applyResizeClamp\)[\s\S]*?clampAsideWidth/,
+    );
+    expect(app).not.toMatch(
+      /const onResize = \(\) => \{\s*if \(isWindowFitSuppressed\(\) \|\| isPaneSplitMotionActive\(\)\) return;/,
+    );
+  });
+
   it("drop-idle fade must not replace sidebar width interpolation", () => {
     const css = readFileSync(
       resolve(__dirname, "../styles/settings.part5.css"),
