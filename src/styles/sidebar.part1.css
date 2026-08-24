@@ -810,8 +810,8 @@ html.platform-mac[data-theme="light"] .settings-page__content {
 }
 
 .chrome-btn {
-  /* relative: rp-chrome__badge is position:absolute; without this it
-     anchors to .main / window and drifts to the top-right corner. */
+  /* relative: absolute-positioned children (e.g. sidebar-update-btn__dot)
+     anchor here; without this they anchor to .main / window and drift. */
   position: relative;
   width: 28px;
   height: 28px;

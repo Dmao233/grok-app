@@ -1,10 +1,7 @@
 /**
- * ResourceViewer public entry — re-exports shell + public types.
- * Implementation lives under `./resource-viewer/`.
+ * ResourceViewer public entry — type re-export only.
+ * The legacy shell component was removed; the live right pane is
+ * SideWorkbench + FilesWorkspace. Shared types live in `./resource-viewer/`.
  */
 
-export { ResourceViewer } from "./resource-viewer/ResourceViewer";
-export type {
-  ResourceOpenTarget,
-  ResourceViewerProps,
-} from "./resource-viewer/types";
+export type { ResourceOpenTarget } from "./resource-viewer/types";

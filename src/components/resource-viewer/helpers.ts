@@ -9,23 +9,14 @@ import {
   type ResourceTab,
 } from "@/lib/resourceTabs";
 import {
-  TREE_WIDTH_DEFAULT,
-  TREE_WIDTH_KEY,
-  TREE_WIDTH_MAX,
   TREE_WIDTH_MIN,
   clampTreeWidth as clampTreeWidthCore,
   loadTreeWidth as loadTreeWidthCore,
   persistTreeWidth as persistTreeWidthCore,
 } from "@/lib/resourceTree";
-import type { MessageKey } from "@/i18n";
-import type { DiffViewState, FileTab } from "./types";
+import type { FileTab } from "./types";
 
-export {
-  TREE_WIDTH_DEFAULT,
-  TREE_WIDTH_KEY,
-  TREE_WIDTH_MAX,
-  TREE_WIDTH_MIN,
-};
+export { TREE_WIDTH_MIN };
 
 export function loadTreeWidth(): number {
   return loadTreeWidthCore();
@@ -38,24 +29,6 @@ export function clampTreeWidth(w: number, containerWidth: number): number {
 /** Clamp + persist; use on tree resize pointerup (avoids stale width). */
 export function persistTreeWidth(w: number, containerWidth: number): number {
   return persistTreeWidthCore(w, containerWidth);
-}
-
-export function emptyDiffView(
-  path: string,
-  name: string,
-  loading: boolean,
-): DiffViewState {
-  return {
-    path,
-    name,
-    loading,
-    unified: null,
-    afterOnly: null,
-    error: null,
-    source: null,
-    beforeText: null,
-    afterText: null,
-  };
 }
 
 /** Slim strip model for pure open/close/LRU helpers. */
@@ -120,18 +93,4 @@ export function guessOfficeKind(name: string): string {
   if (lower.endsWith(".pptx") || lower.endsWith(".pptm")) return "pptx";
   if (lower.endsWith(".pdf")) return "pdf";
   return "docx";
-}
-
-/** Map session change status strings to i18n labels. */
-export function changeStatusLabel(
-  status: string,
-  tr: (key: MessageKey, vars?: Record<string, string>) => string,
-): string {
-  const s = (status || "").toLowerCase();
-  if (s === "completed") return tr("changes.status.completed");
-  if (s === "failed" || s === "error") return tr("changes.status.failed");
-  if (s === "in_progress" || s === "running")
-    return tr("changes.status.in_progress");
-  if (s === "pending") return tr("changes.status.pending");
-  return status || "";
 }
