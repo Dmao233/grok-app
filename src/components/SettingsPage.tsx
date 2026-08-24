@@ -30,10 +30,6 @@ import {
   type ThemeScheduleConfig,
 } from "@/lib/themeSchedule";
 import {
-  WallpaperPrepareError,
-  prepareWallpaperFromFile,
-} from "@/lib/themeSkin";
-import {
   applyChatFontScale,
   loadChatFontScale,
   saveChatFontScale,
@@ -87,7 +83,6 @@ import {
   saveSidebarDensity,
   type SidebarDensity,
 } from "@/lib/sidebarDensity";
-import type { WallpaperSourceTab } from "@/components/WallpaperSourceModal";
 import { detectAppPlatform } from "@/lib/appPlatform";
 import {
   tauriDragRegion,
@@ -185,10 +180,6 @@ import {
 } from "@/components/settings/shared";
 import { GeneralSection } from "@/components/settings/GeneralSection";
 import { AppearanceSection } from "@/components/settings/AppearanceSection";
-import {
-  acquireAppearanceWrite,
-  subscribeAppearanceWriteBusy,
-} from "@/lib/appearanceWriteLock";
 import { AccountSection } from "@/components/settings/AccountSection";
 import { ArchivedSection } from "@/components/settings/ArchivedSection";
 import { ExtensionsSection } from "@/components/settings/ExtensionsSection";
@@ -518,15 +509,6 @@ export function SettingsPage({
     confirmLabel: string;
     onConfirm: () => void;
   } | null>(null);
-  const wallpaperInputRef = useRef<HTMLInputElement>(null);
-  const [wallpaperBusy, setWallpaperBusy] = useState(false);
-  const [appearanceWriteBusy, setAppearanceWriteBusy] = useState(false);
-  useEffect(() => subscribeAppearanceWriteBusy(setAppearanceWriteBusy), []);
-  const [wallpaperError, setWallpaperError] = useState<string | null>(null);
-  const [wallpaperFocusOpen, setWallpaperFocusOpen] = useState(false);
-  const [wallpaperSourceOpen, setWallpaperSourceOpen] = useState(false);
-  const [wallpaperSourceTab, setWallpaperSourceTab] =
-    useState<WallpaperSourceTab>("x");
   /** Thinking block expand preference (localStorage; self-contained). */
   const [thinkingExpand, setThinkingExpand] = useState<ThinkingExpandPref>(
     () => loadThinkingExpandPref(),
@@ -880,47 +862,6 @@ export function SettingsPage({
     setExportLogo(null);
     if (exportLogoInputRef.current) exportLogoInputRef.current.value = "";
   }, []);
-
-  const wallpaperErrorMessage = useCallback(
-    (err: unknown): string => {
-      if (err instanceof WallpaperPrepareError) {
-        const key = `settings.wallpaper.err.${err.code}` as MessageKey;
-        const msg = t(key);
-        return msg === key ? t("settings.wallpaper.err.generic") : msg;
-      }
-      return t("settings.wallpaper.err.generic");
-    },
-    [t],
-  );
-
-  const openWallpaperSource = useCallback((tab: WallpaperSourceTab) => {
-    setWallpaperError(null);
-    setWallpaperSourceTab(tab);
-    setWallpaperSourceOpen(true);
-  }, []);
-
-  const onWallpaperFile = useCallback(
-    async (file: File | null | undefined) => {
-      if (!file || !onWallpaper) return;
-      const unlock = await acquireAppearanceWrite();
-      setWallpaperBusy(true);
-      setWallpaperError(null);
-      try {
-        const record = await prepareWallpaperFromFile(file);
-        await onWallpaper(record);
-      } catch (e) {
-        setWallpaperError(wallpaperErrorMessage(e));
-        // Re-throw so WallpaperSourceModal can show the same error inline
-        // instead of closing as if apply succeeded.
-        throw e;
-      } finally {
-        setWallpaperBusy(false);
-        unlock();
-        if (wallpaperInputRef.current) wallpaperInputRef.current.value = "";
-      }
-    },
-    [onWallpaper, wallpaperErrorMessage],
-  );
 
   useEffect(() => {
     if (!api.isTauri()) return;
@@ -1454,16 +1395,6 @@ export function SettingsPage({
     setMemoryBrowserEpoch,
     mirrorConfirm,
     setMirrorConfirm,
-    wallpaperInputRef,
-    wallpaperBusy: wallpaperBusy || appearanceWriteBusy,
-    wallpaperError,
-    setWallpaperError,
-    wallpaperFocusOpen,
-    setWallpaperFocusOpen,
-    wallpaperSourceOpen,
-    setWallpaperSourceOpen,
-    wallpaperSourceTab,
-    setWallpaperSourceTab,
     thinkingExpand,
     setThinkingExpand,
     toolStepsAutoCollapse,
@@ -1520,9 +1451,6 @@ export function SettingsPage({
     messageActionsVisibility,
     onMessageActionsVisibility,
     themeScheduleHonesty,
-    onWallpaperFile,
-    openWallpaperSource,
-    wallpaperErrorMessage,
   } as SettingsViewModel & Record<string, unknown>;
 
 

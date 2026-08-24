@@ -1,6 +1,8 @@
 /**
  * Settings → appearance section (consumes SettingsModel context).
+ * Owns the wallpaper upload/error/modal state (local UI only).
  */
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettingsModel } from "@/providers/SettingsModelContext";
 import type { SettingsViewModel } from "./types";
 
@@ -13,7 +15,14 @@ import {
   DEFAULT_WALLPAPER_FOCUS,
   THEME_SKINS,
   WALLPAPER_ACCEPT,
+  WallpaperPrepareError,
+  prepareWallpaperFromFile,
 } from "@/lib/themeSkin";
+import {
+  acquireAppearanceWrite,
+  subscribeAppearanceWriteBusy,
+} from "@/lib/appearanceWriteLock";
+import type { MessageKey } from "@/i18n";
 import { CHAT_FONT_SCALES } from "@/lib/chatFontScale";
 import { CODE_FONT_SCALES } from "@/lib/codeFontScalePref";
 import {
@@ -26,7 +35,10 @@ import { CHAT_WIDTHS } from "@/lib/chatWidthPref";
 import { SIDEBAR_DENSITIES } from "@/lib/sidebarDensity";
 import { WallpaperFocusEditor } from "@/components/WallpaperFocusEditor";
 import { WallpaperMediaLayer } from "@/components/WallpaperMediaLayer";
-import { WallpaperSourceModal } from "@/components/WallpaperSourceModal";
+import {
+  WallpaperSourceModal,
+  type WallpaperSourceTab,
+} from "@/components/WallpaperSourceModal";
 import { saveToolStepsAutoCollapsePref } from "@/lib/toolStepsAutoCollapsePref";
 import {
   saveTranscriptFilterPref,
@@ -100,11 +112,9 @@ export function AppearanceSection() {
     onWelcomeMotionEnabled,
     onWallpaper,
     onWallpaperAdjust,
-    onWallpaperFile,
     onWallpaperMediaSize,
     onWallpaperScrim,
     onZenMode,
-    openWallpaperSource,
     rowHighlight,
     sectionNav,
     sessionSearchRank,
@@ -117,9 +127,6 @@ export function AppearanceSection() {
     setThinkingExpand,
     setToolStepsAutoCollapse,
     setTranscriptFilter,
-    setWallpaperError,
-    setWallpaperFocusOpen,
-    setWallpaperSourceOpen,
     showMessageTimestamps,
     showReplyLength,
     replaceProviderBrandLogo,
@@ -133,21 +140,68 @@ export function AppearanceSection() {
     thinkingExpand,
     toolStepsAutoCollapse,
     transcriptFilter,
-    wallpaperBusy,
     wallpaperClip,
-    wallpaperError,
     wallpaperFocus,
-    wallpaperFocusOpen,
-    wallpaperInputRef,
     wallpaperKind,
     wallpaperMediaSize,
     wallpaperScrim = 100,
-    wallpaperSourceOpen,
-    wallpaperSourceTab,
     wallpaperUrl,
     welcomeMotionEnabled = true,
     zenMode,
   } = s;
+
+  const wallpaperInputRef = useRef<HTMLInputElement>(null);
+  const [wallpaperApplyBusy, setWallpaperApplyBusy] = useState(false);
+  const [appearanceWriteBusy, setAppearanceWriteBusy] = useState(false);
+  useEffect(() => subscribeAppearanceWriteBusy(setAppearanceWriteBusy), []);
+  /** Any appearance write in flight (own upload or skin/preset apply). */
+  const wallpaperBusy = wallpaperApplyBusy || appearanceWriteBusy;
+  const [wallpaperError, setWallpaperError] = useState<string | null>(null);
+  const [wallpaperFocusOpen, setWallpaperFocusOpen] = useState(false);
+  const [wallpaperSourceOpen, setWallpaperSourceOpen] = useState(false);
+  const [wallpaperSourceTab, setWallpaperSourceTab] =
+    useState<WallpaperSourceTab>("x");
+
+  const wallpaperErrorMessage = useCallback(
+    (err: unknown): string => {
+      if (err instanceof WallpaperPrepareError) {
+        const key = `settings.wallpaper.err.${err.code}` as MessageKey;
+        const msg = t(key);
+        return msg === key ? t("settings.wallpaper.err.generic") : msg;
+      }
+      return t("settings.wallpaper.err.generic");
+    },
+    [t],
+  );
+
+  const openWallpaperSource = useCallback((tab: WallpaperSourceTab) => {
+    setWallpaperError(null);
+    setWallpaperSourceTab(tab);
+    setWallpaperSourceOpen(true);
+  }, []);
+
+  const onWallpaperFile = useCallback(
+    async (file: File | null | undefined) => {
+      if (!file || !onWallpaper) return;
+      const unlock = await acquireAppearanceWrite();
+      setWallpaperApplyBusy(true);
+      setWallpaperError(null);
+      try {
+        const record = await prepareWallpaperFromFile(file);
+        await onWallpaper(record);
+      } catch (e) {
+        setWallpaperError(wallpaperErrorMessage(e));
+        // Re-throw so WallpaperSourceModal can show the same error inline
+        // instead of closing as if apply succeeded.
+        throw e;
+      } finally {
+        setWallpaperApplyBusy(false);
+        unlock();
+        if (wallpaperInputRef.current) wallpaperInputRef.current.value = "";
+      }
+    },
+    [onWallpaper, wallpaperErrorMessage],
+  );
 
   return (
     <>
