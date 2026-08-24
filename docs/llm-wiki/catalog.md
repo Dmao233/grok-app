@@ -49,14 +49,14 @@ Spawn：`--reasoning-effort <spawnId>`。Host **透传** catalog / 通道 id（�
 
 **产品默认（4.6）：** 官方冷启动与未设 prefs 时 model = **grok-4.6**、effort = **xhigh**。CLI cache 可能同时把 `xhigh` 和 `high` 标成 default，Host/前端归一为 **xhigh**。用户可在 Composer 降为 high/medium/low 以缩短 TTFT。旧安装若全局 model 仍为历史产品默认 `grok-4.5`，`load_settings` 一次性抬到 `grok-4.6`；官方路由上旧 effort `high` 一次性抬到 `xhigh`（显式 low/medium/max 不动）。**存量会话 / 项目行**同样在 `official_effort_xhigh_rows_migrated` 下把 `effort: high` 且 model 为空（继承官方 4.6）或 `grok-4.6` 的行抬到 `xhigh`；`grok-4.5` 与自定义 id 不动。切到无 xhigh 的 catalog 时 resolve 层钳到该模型最高档。旧 effort `medium` 仍一次性抬到 high（3 档兜底）。
 
-**Apply honesty（生效路径）**：Composer 改模型 / 推理后按下表生效（Host 侧行为）：
+**模型 / 推理生效路径（Host 现状）**：
 
 | 控制 | 无 live Agent | Live Agent |
 |------|---------------|------------|
-| 模型 | `next_message`（下条消息 spawn） | `session/set_model` → `immediate_rpc`；不支持则 `soft_respawn` |
-| 推理 | `next_message` | `soft_respawn`（无 set_effort） |
+| 模型 | prefs 保存，下条消息 spawn 生效 | `session/set_model` 即时 RPC；**RPC 失败仅 `tracing::warn!`（prefs 已存，下条消息兜底），无自动 soft_respawn、不回传 UI** |
+| 推理 | prefs 保存，下条消息生效 | 无 set_effort RPC → `soft_respawn`（busy 时挂起 pending，turn 结束 / connect 时 flush） |
 
-不得静默失败：prefs / set_model 错误必须 toast 呈现。（曾预埋的 UI helper `modelEffortApply.ts` 从未接线，已随 2026-08 瘦身作为孤儿删除。）
+已知缺口：set_model 失败无 toast——历史「Apply honesty」spec 的 UI helper 从未接线，已随 2026-08 瘦身作为孤儿删除；恢复 honesty toast 需重新立项接线（错误分类 + i18n 文案一并补）。
 
 ### 连接加速（Host）
 
