@@ -46,6 +46,7 @@ import {
   RimSwitch,
 } from "@/components/remoteIm/RimControls";
 import { GlassModal } from "@/components/GlassModal";
+import { SettingsStackRow } from "@/components/settings/shared";
 import {
   IconActivity,
   IconCopy,
@@ -349,15 +350,10 @@ export function RemoteImOverview({
           />
         </div>
 
-        <div className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">
-              {t("settings.remoteIm.bridge.lifecycle")}
-            </div>
-            <div className="settings-row__desc">
-              {t("settings.remoteIm.bridge.lifecycleDesc")}
-            </div>
-          </div>
+        <SettingsStackRow
+          label={t("settings.remoteIm.bridge.lifecycle")}
+          desc={t("settings.remoteIm.bridge.lifecycleDesc")}
+        >
           <RimChoiceRow
             value={lifecycle}
             disabled={!!busy}
@@ -373,7 +369,7 @@ export function RemoteImOverview({
               },
             ]}
           />
-        </div>
+        </SettingsStackRow>
 
         <div className="settings-row">
           <div className="settings-row__text">
@@ -392,7 +388,7 @@ export function RemoteImOverview({
           />
         </div>
 
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__label">
             {t("settings.remoteIm.bridge.actions")}
           </div>
@@ -427,7 +423,7 @@ export function RemoteImOverview({
               {t("settings.remoteIm.bridge.restart")}
             </button>
           </div>
-        </div>
+        </SettingsStackRow>
       </div>
 
       <h3 className="settings-page__h2">
@@ -436,7 +432,7 @@ export function RemoteImOverview({
       </h3>
       <div className="settings-card" data-rim-channels-empty={channelsEmpty?.kind ?? "none"}>
         {connected.length === 0 && configured.length === 0 ? (
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <p
               className="settings-page__lead"
               style={{ margin: 0 }}
@@ -445,9 +441,9 @@ export function RemoteImOverview({
             >
               {t(channelsEmpty?.messageKey ?? "settings.remoteIm.bridge.noneConnected")}
             </p>
-          </div>
+          </SettingsStackRow>
         ) : connected.length === 0 && channelsEmpty?.softFail ? (
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <p
               className="settings-page__lead"
               style={{ margin: 0 }}
@@ -478,7 +474,7 @@ export function RemoteImOverview({
                 ))}
               </ul>
             ) : null}
-          </div>
+          </SettingsStackRow>
         ) : (
           <ul className="rim-list">
             {connected.map((c) => (
@@ -596,15 +592,10 @@ export function RemoteImOverview({
           className="settings-card rim-resilience-notes"
           data-rim-resilience-notes="1"
         >
-          <div className="settings-row settings-row--stack">
-            <div className="settings-row__text">
-              <div className="settings-row__label">
-                {t("settings.remoteIm.resilience.notesTitle")}
-              </div>
-              <div className="settings-row__desc">
-                {t("settings.remoteIm.resilience.notesLead")}
-              </div>
-            </div>
+          <SettingsStackRow
+            label={t("settings.remoteIm.resilience.notesTitle")}
+            desc={t("settings.remoteIm.resilience.notesLead")}
+          >
             <ul className="rim-help-list" aria-label={t("settings.remoteIm.resilience.notesTitle")}>
               <li>
                 {t("settings.remoteIm.resilience.notes.rateLimit", {
@@ -622,7 +613,7 @@ export function RemoteImOverview({
               <li>{t("settings.remoteIm.resilience.notes.noSilentDrop")}</li>
               <li>{t("settings.remoteIm.resilience.notes.crashRecovery")}</li>
             </ul>
-          </div>
+          </SettingsStackRow>
         </div>
       ) : null}
 
@@ -637,7 +628,7 @@ export function RemoteImOverview({
         {t("settings.remoteIm.security.title")}
       </h3>
       <div className="settings-card rim-security" data-rim-security-risk={security.checklist.risk}>
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="rim-security__head">
             <div className="settings-row__text">
               <div className="settings-row__label">
@@ -730,7 +721,7 @@ export function RemoteImOverview({
           <p className="settings-row__desc" style={{ margin: 0 }}>
             {t("settings.remoteIm.security.honesty")}
           </p>
-        </div>
+        </SettingsStackRow>
       </div>
 
       <h3 className="settings-page__h2">
@@ -816,7 +807,7 @@ export function RemoteImOverview({
         {t("settings.remoteIm.bridge.commands")}
       </h3>
       <div className="settings-card">
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__desc">
             {t("settings.remoteIm.bridge.commandsDesc")}
           </div>
@@ -861,7 +852,7 @@ export function RemoteImOverview({
           <div className="settings-row__desc" style={{ marginTop: 8 }}>
             {t("settings.remoteIm.bridge.telegramNativeCommands")}
           </div>
-        </div>
+        </SettingsStackRow>
       </div>
 
       <GlassModal

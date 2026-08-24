@@ -60,6 +60,7 @@ import {
 import { IconAlertTriangle, IconDoctor, IconPlus } from "@/components/icons";
 import { Select } from "@/components/Select";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 export interface RemoteImChannelPanelProps {
   locale: string;
@@ -543,7 +544,7 @@ export function RemoteImChannelPanel({
         </div>
         {hasLegacy ? (
           <div className="settings-card">
-            <div className="settings-row settings-row--stack">
+            <SettingsStackRow>
               <div className="settings-row__label">
                 {t("settings.remoteIm.instance")}
               </div>
@@ -553,8 +554,8 @@ export function RemoteImChannelPanel({
                   ? ` · ${t("settings.remoteIm.retired.hasCredentials")}`
                   : ""}
               </div>
-            </div>
-            <div className="settings-row settings-row--stack">
+            </SettingsStackRow>
+            <SettingsStackRow>
               <div className="settings-row__label">
                 {t("settings.remoteIm.danger")}
               </div>
@@ -569,7 +570,7 @@ export function RemoteImChannelPanel({
               >
                 {t("settings.remoteIm.danger.delete")}
               </button>
-            </div>
+            </SettingsStackRow>
           </div>
         ) : (
           <div className="settings-card rim-disabled-form" aria-disabled>
@@ -608,10 +609,10 @@ export function RemoteImChannelPanel({
             .filter((f) => f.section === "bind")
             .slice(0, 3)
             .map((f) => (
-              <div key={f.key} className="settings-row settings-row--stack">
+              <SettingsStackRow key={f.key}>
                 <div className="settings-row__label">{t(f.labelKey)}</div>
                 <input className="settings-input" disabled />
-              </div>
+              </SettingsStackRow>
             ))}
           <div className="settings-row">
             <button type="button" className="btn btn--primary" disabled>
@@ -757,13 +758,11 @@ export function RemoteImChannelPanel({
 
     if (f.control === "select" && f.choices) {
       return (
-        <div key={f.key} className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">{t(f.labelKey)}</div>
-            {f.helpKey ? (
-              <div className="settings-row__desc">{t(f.helpKey)}</div>
-            ) : null}
-          </div>
+        <SettingsStackRow
+          key={f.key}
+          label={t(f.labelKey)}
+          desc={f.helpKey ? t(f.helpKey) : null}
+        >
           <Select
             className="rim-select"
             value={String(val ?? f.defaultValue ?? "")}
@@ -774,19 +773,17 @@ export function RemoteImChannelPanel({
               label: t(c.labelKey),
             }))}
           />
-        </div>
+        </SettingsStackRow>
       );
     }
 
     if (f.control === "radio" && f.choices) {
       return (
-        <div key={f.key} className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">{t(f.labelKey)}</div>
-            {f.helpKey ? (
-              <div className="settings-row__desc">{t(f.helpKey)}</div>
-            ) : null}
-          </div>
+        <SettingsStackRow
+          key={f.key}
+          label={t(f.labelKey)}
+          desc={f.helpKey ? t(f.helpKey) : null}
+        >
           <RimChoiceRow
             value={String(val ?? f.defaultValue ?? "")}
             onChange={(v) => setValue(f.key, v)}
@@ -795,27 +792,27 @@ export function RemoteImChannelPanel({
               label: t(c.labelKey),
             }))}
           />
-        </div>
+        </SettingsStackRow>
       );
     }
 
     if (isSecret) {
       const formVal = secretFormValue(f.key, secrets);
       return (
-        <div key={f.key} className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">
+        <SettingsStackRow
+          key={f.key}
+          label={
+            <>
               {t(f.labelKey)}
               {f.required ? (
                 <span className="rim-required" aria-hidden>
                   *
                 </span>
               ) : null}
-            </div>
-            {f.helpKey ? (
-              <div className="settings-row__desc">{t(f.helpKey)}</div>
-            ) : null}
-          </div>
+            </>
+          }
+          desc={f.helpKey ? t(f.helpKey) : null}
+        >
           <RimSecretField
             value={formVal}
             revealed={!!showSecret[f.key]}
@@ -835,25 +832,25 @@ export function RemoteImChannelPanel({
               (f.placeholderKey ? t(f.placeholderKey) : undefined)
             }
           />
-        </div>
+        </SettingsStackRow>
       );
     }
 
     return (
-      <div key={f.key} className="settings-row settings-row--stack">
-        <div className="settings-row__text">
-          <div className="settings-row__label">
+      <SettingsStackRow
+        key={f.key}
+        label={
+          <>
             {t(f.labelKey)}
             {f.required ? (
               <span className="rim-required" aria-hidden>
                 *
               </span>
             ) : null}
-          </div>
-          {f.helpKey ? (
-            <div className="settings-row__desc">{t(f.helpKey)}</div>
-          ) : null}
-        </div>
+          </>
+        }
+        desc={f.helpKey ? t(f.helpKey) : null}
+      >
         <input
           className="settings-input"
           type={f.control === "number" ? "number" : "text"}
@@ -870,7 +867,7 @@ export function RemoteImChannelPanel({
             );
           }}
         />
-      </div>
+      </SettingsStackRow>
     );
   };
 
@@ -971,7 +968,7 @@ export function RemoteImChannelPanel({
       ) : null}
 
       <div className="settings-card rim-instance-card">
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__label">
             {t("settings.remoteIm.instance")}
           </div>
@@ -998,7 +995,7 @@ export function RemoteImChannelPanel({
               {t("settings.remoteIm.addInstance")}
             </button>
           </div>
-        </div>
+        </SettingsStackRow>
       </div>
 
       {/* Bind */}
@@ -1083,7 +1080,7 @@ export function RemoteImChannelPanel({
       ) : null}
       <div className="settings-card">
         {schema.scanSupport ? (
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <SegmentedControl
               value={bindTab}
               role="tablist"
@@ -1101,11 +1098,11 @@ export function RemoteImChannelPanel({
                 },
               ]}
             />
-          </div>
+          </SettingsStackRow>
         ) : null}
 
         {schema.scanSupport && bindTab === "scan" ? (
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <div
               className={
                 "rim-scan__box" +
@@ -1171,19 +1168,14 @@ export function RemoteImChannelPanel({
                 </button>
               ) : null}
             </div>
-          </div>
+          </SettingsStackRow>
         ) : (
           <>
             {(channelId === "feishu" || channelId === "lark") && (
-              <div className="settings-row settings-row--stack">
-                <div className="settings-row__text">
-                  <div className="settings-row__label">
-                    {t("settings.remoteIm.pairPaste")}
-                  </div>
-                  <div className="settings-row__desc">
-                    {t("settings.remoteIm.pairPasteDesc")}
-                  </div>
-                </div>
+              <SettingsStackRow
+                label={t("settings.remoteIm.pairPaste")}
+                desc={t("settings.remoteIm.pairPasteDesc")}
+              >
                 <div className="rim-pair-paste">
                   <RimSecretField
                     value={pairPaste}
@@ -1205,7 +1197,7 @@ export function RemoteImChannelPanel({
                     {t("settings.remoteIm.pairPasteApply")}
                   </button>
                 </div>
-              </div>
+              </SettingsStackRow>
             )}
             {bindFields.map(renderField)}
           </>
@@ -1244,21 +1236,16 @@ export function RemoteImChannelPanel({
 
       {/* Minimal ACL on main path */}
       <div className="settings-card">
-        <div className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">
-              {t("settings.remoteIm.field.allowFrom")}
-            </div>
-            <div className="settings-row__desc">
-              {t("settings.remoteIm.field.allowFromHelp")}
-            </div>
-          </div>
+        <SettingsStackRow
+          label={t("settings.remoteIm.field.allowFrom")}
+          desc={t("settings.remoteIm.field.allowFromHelp")}
+        >
           <input
             className="settings-input"
             value={acl.allowFrom}
             onChange={(e) => setAcl({ ...acl, allowFrom: e.target.value })}
           />
-        </div>
+        </SettingsStackRow>
       </div>
 
       {/* Advanced: extra options, ACL detail, project scope, presenter */}
@@ -1275,7 +1262,7 @@ export function RemoteImChannelPanel({
         {advancedOpen ? (
           <div className="rim-collapse__body">
             {advancedFields.map(renderField)}
-            <div className="settings-row settings-row--stack">
+            <SettingsStackRow>
               <div className="settings-row__label">
                 {t("settings.remoteIm.field.allowChat")}
               </div>
@@ -1284,7 +1271,7 @@ export function RemoteImChannelPanel({
                 value={acl.allowChat ?? ""}
                 onChange={(e) => setAcl({ ...acl, allowChat: e.target.value })}
               />
-            </div>
+            </SettingsStackRow>
             <div className="settings-row">
               <div className="settings-row__label">
                 {t("settings.remoteIm.field.requireMention")}
@@ -1305,7 +1292,7 @@ export function RemoteImChannelPanel({
                 onChange={(next) => setAcl({ ...acl, groupOnly: next })}
               />
             </div>
-            <div className="settings-row settings-row--stack">
+            <SettingsStackRow>
               <div className="settings-row__label">
                 {t("settings.remoteIm.field.adminFrom")}
               </div>
@@ -1314,7 +1301,7 @@ export function RemoteImChannelPanel({
                 value={acl.adminFrom ?? ""}
                 onChange={(e) => setAcl({ ...acl, adminFrom: e.target.value })}
               />
-            </div>
+            </SettingsStackRow>
             <div className="settings-row">
               <div className="settings-row__label">
                 {t("settings.remoteIm.field.shareSession")}
@@ -1327,7 +1314,7 @@ export function RemoteImChannelPanel({
                 }
               />
             </div>
-            <div className="settings-row settings-row--stack">
+            <SettingsStackRow>
               <div className="settings-row__label">
                 {t("settings.remoteIm.projectScope")}
               </div>
@@ -1379,8 +1366,8 @@ export function RemoteImChannelPanel({
                   </div>
                 )
               ) : null}
-            </div>
-            <div className="settings-row settings-row--stack">
+            </SettingsStackRow>
+            <SettingsStackRow>
               <div className="settings-row__label">
                 {t("settings.remoteIm.field.presenter")}
               </div>
@@ -1605,7 +1592,7 @@ export function RemoteImChannelPanel({
                       ]
                 }
               />
-            </div>
+            </SettingsStackRow>
           </div>
         ) : null}
       </div>
@@ -1631,7 +1618,7 @@ export function RemoteImChannelPanel({
           </button>
         </div>
         {doctorOpen ? (
-          <div className="settings-row settings-row--stack rim-doctor">
+          <SettingsStackRow className="rim-doctor">
             <ul className="rim-help-list">
               <li>
                 channel: <code>{channelId}</code>
@@ -1662,7 +1649,7 @@ export function RemoteImChannelPanel({
                 ? t("message.copied")
                 : t("settings.remoteIm.doctor.copyCmd")}
             </button>
-          </div>
+          </SettingsStackRow>
         ) : null}
       </div>
 
