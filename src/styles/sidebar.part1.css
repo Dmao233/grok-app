@@ -833,7 +833,7 @@ html.platform-mac[data-theme="light"] .settings-page__content {
   color: var(--text-primary);
 }
 
-/* Match mac traffic light vertical center (~18px y + half button) */
+/* Share the 40px titlebar center line with the native mac traffic lights. */
 .chrome-btn--traffic {
   width: 28px;
   height: 28px;
