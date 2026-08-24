@@ -5471,8 +5471,6 @@ export function AppWorkbench() {
     setActiveProject(proj);
     if (proj) {
       setExpandedProjects((e) => ({ ...e, [proj.id]: true }));
-    } else {
-      setHistoryOpen(true);
     }
     // User navigation: a connect/send still in flight for the previous chat must
     // not drag the workbench back here once it resolves.
@@ -7853,8 +7851,6 @@ export function AppWorkbench() {
               ...e,
               [connectProject.id]: true,
             }));
-          } else {
-            setHistoryOpen(true);
           }
         }
         await refreshSessions();

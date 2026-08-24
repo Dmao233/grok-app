@@ -233,6 +233,20 @@ describe("Other sessions tree wrap", () => {
     "utf8",
   );
 
+  it("preserves the user's Other-sessions fold state for a new orphan chat", () => {
+    const newChat = src.slice(
+      src.indexOf("  const newChat = async ("),
+      src.indexOf("  const sessionsForProject = ("),
+    );
+    const ensureConnected = src.slice(
+      src.indexOf("  const ensureConnected = async ("),
+      src.indexOf("  const retryAgentConnect = ("),
+    );
+
+    expect(newChat).not.toContain("setHistoryOpen(true)");
+    expect(ensureConnected).not.toContain("setHistoryOpen(true)");
+  });
+
   it("wraps the Other-sessions reveal in a block .tree-orphan like .tree-project", () => {
     expect(src).toContain('className="tree-orphan"');
     expect(src).toMatch(
