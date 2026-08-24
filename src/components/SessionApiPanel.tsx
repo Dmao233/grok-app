@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api";
 import { isDesktopHost } from "@/lib/api";
 import type { MessageKey, Vars } from "@/i18n";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 type TFn = (key: MessageKey, vars?: Vars) => string;
 
@@ -77,11 +78,10 @@ export function SessionApiPanel({ t }: { t: TFn }) {
 
   return (
     <div className="settings-card" id="settings-anchor-sessionApi">
-      <div className="settings-row settings-row--stack">
-        <div className="settings-row__text">
-          <div className="settings-row__label">{t("settings.sessionApi.title")}</div>
-          <div className="settings-row__desc">{t("settings.sessionApi.desc")}</div>
-        </div>
+      <SettingsStackRow
+        label={t("settings.sessionApi.title")}
+        desc={t("settings.sessionApi.desc")}
+      >
         <div className="settings-row__hint">
           {listening
             ? t("settings.sessionApi.listening")
@@ -159,7 +159,7 @@ export function SessionApiPanel({ t }: { t: TFn }) {
         </code>
         <div className="settings-row__hint">{t("settings.sessionApi.httpHint")}</div>
         <div className="settings-row__hint">{t("settings.sessionApi.busyHint")}</div>
-      </div>
+      </SettingsStackRow>
     </div>
   );
 }

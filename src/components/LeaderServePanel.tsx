@@ -31,6 +31,7 @@ import {
   sandboxLeaderMutexActive,
   sandboxLeaderMutexMessageKey,
 } from "@/lib/sandboxProfile";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 function formatAge(
   secs: number | null | undefined,
@@ -358,11 +359,10 @@ export function LeaderServePanel({
   return (
     <div className="settings-card" id="settings-anchor-leaderServe">
       {/* ── Leader ─────────────────────────────────────────────────────── */}
-      <div className="settings-row settings-row--stack">
-        <div className="settings-row__text">
-          <div className="settings-row__label">{t("settings.leader.title")}</div>
-          <div className="settings-row__desc">{t("settings.leader.desc")}</div>
-        </div>
+      <SettingsStackRow
+        label={t("settings.leader.title")}
+        desc={t("settings.leader.desc")}
+      >
         <div className="rim-btn-row" style={{ alignItems: "center", gap: 8 }}>
           <span className={leaderConnectBadgeClass(connect.tone)}>{stateLabel}</span>
           {connect.errorKind && connect.phase !== "running" ? (
@@ -382,10 +382,10 @@ export function LeaderServePanel({
             {t("settings.leader.refresh")}
           </button>
         </div>
-      </div>
+      </SettingsStackRow>
 
       {honesty.severity !== "none" && honesty.messageKey ? (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div
             className={
               "settings-row__hint" + (honesty.severity === "warn" ? " is-danger" : "")
@@ -411,11 +411,11 @@ export function LeaderServePanel({
               </button>
             ) : null}
           </div>
-        </div>
+        </SettingsStackRow>
       ) : null}
 
       {sandboxLeaderMutexActive(sandboxProfile, !!useLeader) ? (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__hint is-danger" role="status">
             {t(sandboxLeaderMutexMessageKey())}
           </div>
@@ -431,11 +431,11 @@ export function LeaderServePanel({
               </button>
             ) : null}
           </div>
-        </div>
+        </SettingsStackRow>
       ) : null}
 
       {unsupported ? (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__hint is-danger" role="status">
             {status?.message || t("settings.leader.unsupportedBody")}
           </div>
@@ -447,31 +447,32 @@ export function LeaderServePanel({
               {t("settings.leader.openUseLeader")}
             </button>
           ) : null}
-        </div>
+        </SettingsStackRow>
       ) : (
         <>
-          <div className="settings-row settings-row--stack">
-            <div className="settings-row__text">
-              <div className="settings-row__label">{t("settings.leader.socket")}</div>
-              <div className="settings-row__desc">
-                {status?.socketPath || t("settings.leader.socketDefault")}
-              </div>
-              <div className="settings-row__hint">
-                {status?.socketExists
-                  ? t("settings.leader.socketExists", {
-                      age: formatAge(status.socketAgeSecs, t),
-                    })
-                  : t("settings.leader.socketMissing")}
-                {status?.pid != null ? ` · PID ${status.pid}` : ""}
-                {status?.version ? ` · v${status.version}` : ""}
-                {status?.classification ? ` · ${status.classification}` : ""}
-              </div>
-              {connect.phase === "stale_socket" ? (
-                <div className="settings-row__hint is-danger" role="status">
-                  {t("settings.leader.hint.socketStale")}
+          <SettingsStackRow
+            label={t("settings.leader.socket")}
+            desc={status?.socketPath || t("settings.leader.socketDefault")}
+            hint={
+              <>
+                <div className="settings-row__hint">
+                  {status?.socketExists
+                    ? t("settings.leader.socketExists", {
+                        age: formatAge(status.socketAgeSecs, t),
+                      })
+                    : t("settings.leader.socketMissing")}
+                  {status?.pid != null ? ` · PID ${status.pid}` : ""}
+                  {status?.version ? ` · v${status.version}` : ""}
+                  {status?.classification ? ` · ${status.classification}` : ""}
                 </div>
-              ) : null}
-            </div>
+                {connect.phase === "stale_socket" ? (
+                  <div className="settings-row__hint is-danger" role="status">
+                    {t("settings.leader.hint.socketStale")}
+                  </div>
+                ) : null}
+              </>
+            }
+          >
             <div className="rim-btn-row">
               <button
                 type="button"
@@ -482,16 +483,13 @@ export function LeaderServePanel({
                 {copied ? t("settings.leader.copied") : t("settings.leader.copySocket")}
               </button>
             </div>
-          </div>
+          </SettingsStackRow>
 
           {/* Fleet list from grok leader list */}
-          <div className="settings-row settings-row--stack">
-            <div className="settings-row__text">
-              <div className="settings-row__label">
-                {t("settings.leader.fleetTitle", { n: fleetCount })}
-              </div>
-              <div className="settings-row__desc">{t("settings.leader.fleetDesc")}</div>
-            </div>
+          <SettingsStackRow
+            label={t("settings.leader.fleetTitle", { n: fleetCount })}
+            desc={t("settings.leader.fleetDesc")}
+          >
             {hasLeaderFleet(leaders) ? (
               <ul
                 className="settings-row__list"
@@ -563,9 +561,9 @@ export function LeaderServePanel({
                 {t(leaderFleetEmptyMessageKey(emptyReason) as MessageKey)}
               </div>
             )}
-          </div>
+          </SettingsStackRow>
 
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <div className="settings-row__label">{t("settings.leader.actions")}</div>
             <div className="rim-btn-row">
               <button
@@ -596,7 +594,7 @@ export function LeaderServePanel({
               ) : null}
             </div>
             <div className="settings-row__hint">{t("settings.leader.startHint")}</div>
-          </div>
+          </SettingsStackRow>
 
           {onOpenUseLeader ? (
             <div className="settings-row">
@@ -614,7 +612,7 @@ export function LeaderServePanel({
 
       {/* Soft-fail / hard diagnostics — honest: show stopped+message too */}
       {showDiagnostic && diagnosticText ? (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div
             className={
               "settings-row__hint" +
@@ -634,23 +632,20 @@ export function LeaderServePanel({
               {t(leaderErrorKindHintKey(panelErrorKind) as MessageKey)}
             </div>
           ) : null}
-        </div>
+        </SettingsStackRow>
       ) : null}
 
       {/* ── Serve (WebSocket) ──────────────────────────────────────────── */}
-      <div
-        className="settings-row settings-row--stack"
-        id="settings-anchor-agentServe"
+      <SettingsStackRow
+        anchorId="settings-anchor-agentServe"
         style={{
           marginTop: 12,
           paddingTop: 12,
           borderTop: "1px solid var(--border, rgba(128,128,128,0.25))",
         }}
+        label={t("settings.serve.title")}
+        desc={t("settings.serve.desc")}
       >
-        <div className="settings-row__text">
-          <div className="settings-row__label">{t("settings.serve.title")}</div>
-          <div className="settings-row__desc">{t("settings.serve.desc")}</div>
-        </div>
         <div className="rim-btn-row" style={{ alignItems: "center", gap: 8 }}>
           <span
             className={
@@ -673,39 +668,38 @@ export function LeaderServePanel({
             {t("settings.serve.refresh")}
           </button>
         </div>
-      </div>
+      </SettingsStackRow>
 
       {serveUnsupported ? (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__hint is-danger" role="status">
             {serve?.message || t("settings.serve.unsupportedBody")}
           </div>
-        </div>
+        </SettingsStackRow>
       ) : (
         <>
-          <div className="settings-row settings-row--stack">
-            <div className="settings-row__text">
-              <div className="settings-row__label">{t("settings.serve.bind")}</div>
-              <div className="settings-row__desc">
-                {serve?.bind || t("settings.serve.bindDefault")}
-              </div>
+          <SettingsStackRow
+            label={t("settings.serve.bind")}
+            desc={serve?.bind || t("settings.serve.bindDefault")}
+            hint={
               <div className="settings-row__hint">
                 {serve?.portOpen
                   ? t("settings.serve.portOpen")
                   : t("settings.serve.portClosed")}
                 {serve?.pid != null ? ` · PID ${serve.pid}` : ""}
               </div>
-            </div>
-          </div>
+            }
+          />
 
-          <div className="settings-row settings-row--stack">
-            <div className="settings-row__text">
-              <div className="settings-row__label">{t("settings.serve.secret")}</div>
-              <div className="settings-row__desc">
-                {secretDisplay || t("settings.serve.secretNone")}
+          <SettingsStackRow
+            label={t("settings.serve.secret")}
+            desc={secretDisplay || t("settings.serve.secretNone")}
+            hint={
+              <div className="settings-row__hint">
+                {t("settings.serve.secretHint")}
               </div>
-              <div className="settings-row__hint">{t("settings.serve.secretHint")}</div>
-            </div>
+            }
+          >
             <div className="rim-btn-row">
               <button
                 type="button"
@@ -721,9 +715,9 @@ export function LeaderServePanel({
                 {serveCopied ? t("settings.serve.copied") : t("settings.serve.copyUrl")}
               </button>
             </div>
-          </div>
+          </SettingsStackRow>
 
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <div className="settings-row__label">{t("settings.serve.actions")}</div>
             <div className="rim-btn-row">
               <button
@@ -744,16 +738,16 @@ export function LeaderServePanel({
               </button>
             </div>
             <div className="settings-row__hint">{t("settings.serve.startHint")}</div>
-          </div>
+          </SettingsStackRow>
         </>
       )}
 
       {(serveError || (serve?.message && serveState === "error")) && (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__hint is-danger" role="alert">
             {serveError || serve?.message}
           </div>
-        </div>
+        </SettingsStackRow>
       )}
 
       <GlassModal

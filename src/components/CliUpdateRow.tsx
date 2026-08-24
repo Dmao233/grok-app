@@ -16,6 +16,7 @@ import {
   type CliSwitchableChannel,
 } from "@/lib/cliUpdateChannel";
 import { GlassModal } from "@/components/GlassModal";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 type BusyKind =
   | "check"
@@ -217,17 +218,11 @@ export function CliUpdateRow({
         : "";
 
   return (
-    <div
-      className={
-        compact
-          ? "settings-row settings-row--stack settings-cli-update--compact"
-          : "settings-row settings-row--stack"
-      }
+    <SettingsStackRow
+      className={compact ? "settings-cli-update--compact" : undefined}
+      label={t("settings.cliUpdate")}
+      desc={t("settings.cliUpdateDesc")}
     >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.cliUpdate")}</div>
-        <div className="settings-row__desc">{t("settings.cliUpdateDesc")}</div>
-      </div>
       <div className="settings-cli-update">
         {status ? (
           <div className="settings-cli-update__meta" role="status">
@@ -453,6 +448,6 @@ export function CliUpdateRow({
           {confirmBody}
         </p>
       </GlassModal>
-    </div>
+    </SettingsStackRow>
   );
 }

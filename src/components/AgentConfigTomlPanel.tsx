@@ -7,6 +7,7 @@ import * as api from "@/lib/api";
 import type { AgentConfigTomlReadResult } from "@/lib/api";
 import { createT, type Locale, type MessageKey } from "@/i18n";
 import { GlassModal } from "@/components/GlassModal";
+import { SettingsStackRow } from "@/components/settings/shared";
 import {
   extractTomlSections,
   redactConfigToml,
@@ -130,14 +131,12 @@ export function AgentConfigTomlPanel({ locale }: { locale: Locale }) {
       : "settings.configTomlView.mode.independent";
 
   return (
-    <div
-      className={"settings-row settings-row--stack" + " settings-config-toml"}
-      id="settings-anchor-configTomlView"
+    <SettingsStackRow
+      className="settings-config-toml"
+      anchorId="settings-anchor-configTomlView"
+      label={t("settings.configTomlView")}
+      desc={t("settings.configTomlViewDesc")}
     >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.configTomlView")}</div>
-        <div className="settings-row__desc">{t("settings.configTomlViewDesc")}</div>
-      </div>
       <div className="settings-row__actions">
         <button
           type="button"
@@ -316,6 +315,6 @@ export function AgentConfigTomlPanel({ locale }: { locale: Locale }) {
           </>
         ) : null}
       </GlassModal>
-    </div>
+    </SettingsStackRow>
   );
 }

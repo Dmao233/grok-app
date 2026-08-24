@@ -1,7 +1,7 @@
 /**
  * Shared Settings UI primitives (nav icons, tab strip, checks, marquee helpers).
  */
-import { type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 import {
   IconArchive,
   IconAppearance,
@@ -225,6 +225,7 @@ export function SettingsStackRow({
   highlight,
   highlightId,
   className,
+  style,
   children,
 }: {
   label?: ReactNode;
@@ -238,6 +239,7 @@ export function SettingsStackRow({
   /** Highlight anchor when it differs from `anchorId` (grouped rows). */
   highlightId?: string;
   className?: string;
+  style?: CSSProperties;
   children?: ReactNode;
 }) {
   const highlightAnchor = highlightId ?? anchorId;
@@ -250,6 +252,7 @@ export function SettingsStackRow({
         (highlight && highlightAnchor ? highlight(highlightAnchor) : "")
       }
       id={anchorId}
+      style={style}
     >
       {hasText ? (
         <div className="settings-row__text">

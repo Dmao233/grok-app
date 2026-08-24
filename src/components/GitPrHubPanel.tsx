@@ -13,6 +13,7 @@ import {
 } from "react";
 import * as api from "@/lib/api";
 import { createT, type Locale, type MessageKey } from "@/i18n";
+import { SettingsStackRow } from "@/components/settings/shared";
 import {
   classifyPrHubReason,
   formatChecksSummaryLine,
@@ -789,15 +790,11 @@ export function GitPrHubPanel({
   return (
     <div className="pr-hub-panel" data-testid="git-pr-hub-panel">
       {!hideHeader ? (
-        <div
-          className="settings-row settings-row--stack"
+        <SettingsStackRow
           style={{ borderBottom: "none", paddingBottom: 0 }}
-        >
-          <div className="settings-row__text">
-            <div className="settings-row__label">{tr("prHub.title")}</div>
-            <div className="settings-row__desc">{tr("prHub.desc")}</div>
-          </div>
-        </div>
+          label={tr("prHub.title")}
+          desc={tr("prHub.desc")}
+        />
       ) : null}
 
       <div className="pr-hub__toolbar">

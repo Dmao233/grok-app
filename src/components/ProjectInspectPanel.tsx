@@ -28,6 +28,7 @@ import {
   INSPECT_SECTION_IDS,
 } from "@/lib/projectInspect";
 import { isCliMissingError, shortPathLabel } from "@/lib/extensionsUi";
+import { SettingsStackRow } from "@/components/settings/shared";
 import {
   IconChevronDown,
   IconChevronRight,
@@ -340,15 +341,11 @@ export function ProjectInspectPanel({
   return (
     <div className="pi-panel" data-testid="project-inspect-panel">
       {!hideHeader ? (
-        <div
-          className="settings-row settings-row--stack"
+        <SettingsStackRow
           style={{ borderBottom: "none", paddingBottom: 0 }}
-        >
-          <div className="settings-row__text">
-            <div className="settings-row__label">{tr("inspect.title")}</div>
-            <div className="settings-row__desc">{tr("inspect.desc")}</div>
-          </div>
-        </div>
+          label={tr("inspect.title")}
+          desc={tr("inspect.desc")}
+        />
       ) : null}
 
       {!cwd && (

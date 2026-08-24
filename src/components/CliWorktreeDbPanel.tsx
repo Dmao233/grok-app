@@ -16,6 +16,7 @@ import {
   cliWorktreeDbStatsHasData,
   formatCliWorktreeDbStatsSummary,
 } from "@/lib/cliWorktrees";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 export function CliWorktreeDbPanel({
   t,
@@ -209,15 +210,10 @@ export function CliWorktreeDbPanel({
         className="settings-card"
         id="settings-anchor-cliWorktreeDb"
       >
-        <div className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">
-              {t("settings.cliWorktreeDb.title")}
-            </div>
-            <div className="settings-row__desc">
-              {t("settings.cliWorktreeDb.desc")}
-            </div>
-          </div>
+        <SettingsStackRow
+          label={t("settings.cliWorktreeDb.title")}
+          desc={t("settings.cliWorktreeDb.desc")}
+        >
           <div className="rim-btn-row" style={{ alignItems: "center", gap: 8 }}>
             <span
               className={
@@ -242,35 +238,34 @@ export function CliWorktreeDbPanel({
                 : t("settings.cliWorktreeDb.refresh")}
             </button>
           </div>
-        </div>
+        </SettingsStackRow>
 
         {unsupported ? (
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <div className="settings-row__hint" role="status">
               {t("settings.cliWorktreeDb.unsupportedBody")}
             </div>
-          </div>
+          </SettingsStackRow>
         ) : (
           <>
-            <div className="settings-row settings-row--stack">
-              <div className="settings-row__text">
-                <div className="settings-row__label">
-                  {t("settings.cliWorktreeDb.path")}
-                </div>
-                <div className="settings-row__desc">
-                  {path ||
-                    (loading
-                      ? t("settings.cliWorktreeDb.loading")
-                      : t("settings.cliWorktreeDb.pathUnknown"))}
-                </div>
-                {path ? (
+            <SettingsStackRow
+              label={t("settings.cliWorktreeDb.path")}
+              desc={
+                path ||
+                (loading
+                  ? t("settings.cliWorktreeDb.loading")
+                  : t("settings.cliWorktreeDb.pathUnknown"))
+              }
+              hint={
+                path ? (
                   <div className="settings-row__hint">
                     {pathOk
                       ? t("settings.cliWorktreeDb.pathExists")
                       : t("settings.cliWorktreeDb.pathMissing")}
                   </div>
-                ) : null}
-              </div>
+                ) : null
+              }
+            >
               <div className="rim-btn-row">
                 <button
                   type="button"
@@ -291,20 +286,18 @@ export function CliWorktreeDbPanel({
                   {t("settings.cliWorktreeDb.revealPath")}
                 </button>
               </div>
-            </div>
+            </SettingsStackRow>
 
-            <div className="settings-row settings-row--stack">
-              <div className="settings-row__text">
-                <div className="settings-row__label">
-                  {t("settings.cliWorktreeDb.stats")}
-                </div>
-                <div className="settings-row__desc">
-                  {summary ||
-                    (loading
-                      ? t("settings.cliWorktreeDb.loading")
-                      : t("settings.cliWorktreeDb.statsEmpty"))}
-                </div>
-                {hasStats && statsRes?.stats ? (
+            <SettingsStackRow
+              label={t("settings.cliWorktreeDb.stats")}
+              desc={
+                summary ||
+                (loading
+                  ? t("settings.cliWorktreeDb.loading")
+                  : t("settings.cliWorktreeDb.statsEmpty"))
+              }
+              hint={
+                hasStats && statsRes?.stats ? (
                   <div className="settings-row__hint">
                     {[
                       statsRes.stats.total != null
@@ -331,19 +324,14 @@ export function CliWorktreeDbPanel({
                       .filter(Boolean)
                       .join(" · ")}
                   </div>
-                ) : null}
-              </div>
-            </div>
+                ) : null
+              }
+            />
 
-            <div className="settings-row settings-row--stack">
-              <div className="settings-row__text">
-                <div className="settings-row__label">
-                  {t("settings.cliWorktreeDb.rebuild")}
-                </div>
-                <div className="settings-row__desc">
-                  {t("settings.cliWorktreeDb.rebuildDesc")}
-                </div>
-              </div>
+            <SettingsStackRow
+              label={t("settings.cliWorktreeDb.rebuild")}
+              desc={t("settings.cliWorktreeDb.rebuildDesc")}
+            >
               <div className="rim-btn-row">
                 <button
                   type="button"
@@ -361,12 +349,12 @@ export function CliWorktreeDbPanel({
                   {lastRebuild.message}
                 </div>
               ) : null}
-            </div>
+            </SettingsStackRow>
           </>
         )}
 
         {(error || note) && (
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             {error ? (
               <div className="settings-row__hint is-danger" role="alert">
                 {error}
@@ -377,7 +365,7 @@ export function CliWorktreeDbPanel({
                 {note}
               </div>
             ) : null}
-          </div>
+          </SettingsStackRow>
         )}
       </div>
 

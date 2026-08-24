@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import * as api from "@/lib/api";
 import type { AgentConfigEditSnapshot } from "@/lib/api";
 import { Select } from "@/components/Select";
-import { UiCheck } from "@/components/settings/shared";
+import { SettingsStackRow, UiCheck } from "@/components/settings/shared";
 import { createT, type Locale, type MessageKey } from "@/i18n";
 import {
   buildConfigEditPatch,
@@ -133,24 +133,19 @@ export function AgentConfigEditPanel({
   const reset = () => setDraft(baseline);
 
   return (
-    <div
-      className="settings-row settings-row--stack settings-config-edit"
-      id="settings-anchor-configTomlEdit"
-    >
-      <div className="settings-row__text">
-        <div className="settings-row__label">
-          {t("settings.configTomlEdit")}
-        </div>
-        <div className="settings-row__desc">
-          {t("settings.configTomlEditDesc")}
-        </div>
-        {snap?.path ? (
+    <SettingsStackRow
+      className="settings-config-edit"
+      anchorId="settings-anchor-configTomlEdit"
+      label={t("settings.configTomlEdit")}
+      desc={t("settings.configTomlEditDesc")}
+      hint={
+        snap?.path ? (
           <div className="settings-row__hint" title={snap.path}>
             {t("settings.configTomlEdit.path", { path: snap.path })}
           </div>
-        ) : null}
-      </div>
-
+        ) : null
+      }
+    >
       {loading && !snap ? (
         <p className="ext-field-hint">{t("settings.configTomlEdit.loading")}</p>
       ) : null}
@@ -197,15 +192,10 @@ export function AgentConfigEditPanel({
           </div>
 
           <div className="settings-config-edit__fields">
-            <div className="settings-row settings-row--stack">
-              <div className="settings-row__text">
-                <div className="settings-row__label">
-                  {t("settings.configTomlEdit.uiPermission")}
-                </div>
-                <div className="settings-row__desc">
-                  {t("settings.configTomlEdit.uiPermissionDesc")}
-                </div>
-              </div>
+            <SettingsStackRow
+              label={t("settings.configTomlEdit.uiPermission")}
+              desc={t("settings.configTomlEdit.uiPermissionDesc")}
+            >
               <Select
                 value={draft.permissionMode || ""}
                 disabled={disabled}
@@ -226,7 +216,7 @@ export function AgentConfigEditPanel({
                   })),
                 ]}
               />
-            </div>
+            </SettingsStackRow>
 
             <div className="settings-row">
               <div className="settings-row__text">
@@ -469,6 +459,6 @@ export function AgentConfigEditPanel({
           </div>
         </>
       ) : null}
-    </div>
+    </SettingsStackRow>
   );
 }

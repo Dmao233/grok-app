@@ -24,6 +24,7 @@ import {
   parseServeConnectUrl,
   resolveServeProbeTarget,
 } from "@/lib/serveConnect";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 type CopyKind = "ws" | "curl" | "websocat" | "grok" | null;
 
@@ -256,11 +257,11 @@ export function SdkConnectWizard({
 
   return (
     <div className="settings-card" id="settings-anchor-sdkConnect">
-      <div className="settings-row settings-row--stack" id="settings-anchor-agentServe">
-        <div className="settings-row__text">
-          <div className="settings-row__label">{t("settings.sdkConnect.title")}</div>
-          <div className="settings-row__desc">{t("settings.sdkConnect.desc")}</div>
-        </div>
+      <SettingsStackRow
+        anchorId="settings-anchor-agentServe"
+        label={t("settings.sdkConnect.title")}
+        desc={t("settings.sdkConnect.desc")}
+      >
         <div className="rim-btn-row" style={{ alignItems: "center", gap: 8 }}>
           <span
             className={
@@ -283,18 +284,18 @@ export function SdkConnectWizard({
             {t("settings.serve.refresh")}
           </button>
         </div>
-      </div>
+      </SettingsStackRow>
 
       {unsupported ? (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__hint is-danger" role="status">
             {serve?.message || t("settings.serve.unsupportedBody")}
           </div>
-        </div>
+        </SettingsStackRow>
       ) : (
         <>
           {/* ── 1. Local serve start ─────────────────────────────────────── */}
-          <div className="settings-row settings-row--stack sdk-connect-step">
+          <SettingsStackRow className="sdk-connect-step">
             <div className="sdk-connect-step__label">
               <span className="sdk-connect-step__n" aria-hidden>
                 1
@@ -322,10 +323,10 @@ export function SdkConnectWizard({
               </button>
             </div>
             <div className="settings-row__hint">{t("settings.sdkConnect.step1Hint")}</div>
-          </div>
+          </SettingsStackRow>
 
           {/* ── 2. Masked secret + ws URL ────────────────────────────────── */}
-          <div className="settings-row settings-row--stack sdk-connect-step">
+          <SettingsStackRow className="sdk-connect-step">
             <div className="sdk-connect-step__label">
               <span className="sdk-connect-step__n" aria-hidden>
                 2
@@ -353,10 +354,10 @@ export function SdkConnectWizard({
               </div>
               <div className="settings-row__hint">{t("settings.serve.secretHint")}</div>
             </div>
-          </div>
+          </SettingsStackRow>
 
           {/* ── 3. TCP health ────────────────────────────────────────────── */}
-          <div className="settings-row settings-row--stack sdk-connect-step">
+          <SettingsStackRow className="sdk-connect-step">
             <div className="sdk-connect-step__label">
               <span className="sdk-connect-step__n" aria-hidden>
                 3
@@ -417,10 +418,10 @@ export function SdkConnectWizard({
                 </span>
               </div>
             ) : null}
-          </div>
+          </SettingsStackRow>
 
           {/* ── 4. Client examples ───────────────────────────────────────── */}
-          <div className="settings-row settings-row--stack sdk-connect-step">
+          <SettingsStackRow className="sdk-connect-step">
             <div className="sdk-connect-step__label">
               <span className="sdk-connect-step__n" aria-hidden>
                 4
@@ -531,10 +532,10 @@ export function SdkConnectWizard({
                   : examplesDisplay.grokRemote}
               </code>
             </div>
-          </div>
+          </SettingsStackRow>
 
           {/* ── 5. Remote serve URL + probe ──────────────────────────────── */}
-          <div className="settings-row settings-row--stack sdk-connect-step">
+          <SettingsStackRow className="sdk-connect-step">
             <div className="sdk-connect-step__label">
               <span className="sdk-connect-step__n" aria-hidden>
                 5
@@ -615,16 +616,16 @@ export function SdkConnectWizard({
                 </span>
               </div>
             ) : null}
-          </div>
+          </SettingsStackRow>
         </>
       )}
 
       {(error || (serve?.message && state === "error")) && (
-        <div className="settings-row settings-row--stack">
+        <SettingsStackRow>
           <div className="settings-row__hint is-danger" role="alert">
             {error || serve?.message}
           </div>
-        </div>
+        </SettingsStackRow>
       )}
     </div>
   );

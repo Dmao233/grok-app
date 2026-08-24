@@ -28,6 +28,7 @@ import {
 import { isCliMissingError } from "@/lib/extensionsUi";
 import { GlassModal } from "@/components/GlassModal";
 import { IconRefresh } from "@/components/icons";
+import { SettingsStackRow } from "@/components/settings/shared";
 
 export interface ManagedSetupPanelProps {
   locale: Locale;
@@ -365,11 +366,11 @@ export function ManagedSetupPanel({
 
   return (
     <div className="managed-setup" data-testid="managed-setup-panel">
-      <div className="settings-row settings-row--stack" style={{ borderBottom: "none" }}>
-        <div className="settings-row__text">
-          <div className="settings-row__label">{tr("managedSetup.title")}</div>
-          <div className="settings-row__desc">{tr("managedSetup.desc")}</div>
-        </div>
+      <SettingsStackRow
+        style={{ borderBottom: "none" }}
+        label={tr("managedSetup.title")}
+        desc={tr("managedSetup.desc")}
+      >
         <div className="settings-row__hint">{tr("managedSetup.authHint")}</div>
 
         {/* Guided steps */}
@@ -551,7 +552,7 @@ export function ManagedSetupPanel({
             </button>
           )}
         </div>
-      </div>
+      </SettingsStackRow>
 
       {status && !error && (
         <p className="settings-row__hint" role="status">
