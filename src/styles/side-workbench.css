@@ -18,11 +18,6 @@
   visibility: hidden;
 }
 
-/* Keep chat painted only while the full-width aside is covering it. */
-.workbench--side-expanded.workbench--side-expand-motion .main {
-  visibility: visible;
-}
-
 /*
  * Expand WITHOUT dock: completely remove in-main composer.
  * (visibility alone can still leave a painted strip under some themes;

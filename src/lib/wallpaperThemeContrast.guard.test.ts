@@ -128,6 +128,9 @@ describe("wallpaper theme contrast CSS", () => {
     expect(sideWorkbenchCss).toMatch(
       /\.workbench--side-expanded \.main\s*\{[^}]*visibility:\s*hidden/s,
     );
+    expect(sideWorkbenchCss).not.toMatch(
+      /\.workbench--side-expanded\.workbench--side-expand-motion \.main\s*\{[^}]*visibility:\s*visible/s,
+    );
     expect(sideWorkbenchCss).toMatch(
       /html:not\(\[data-wallpaper="1"\]\)\s+\.workbench--side-expanded\s+\.aside:not\(\.aside--hidden\)\s*\{[^}]*background:\s*var\(--bg-aside\)/s,
     );

@@ -262,7 +262,7 @@ describe("desktop hidden CSS must not force width 0", () => {
     expect(side).toMatch(
       /\.workbench--side-expanded \.aside:not\(\.aside--hidden\)\s*\{[^}]*right:\s*0;[^}]*left:\s*auto;/s,
     );
-    expect(side).toMatch(
+    expect(side).not.toMatch(
       /\.workbench--side-expanded\.workbench--side-expand-motion \.main\s*\{[^}]*visibility:\s*visible/s,
     );
   });
