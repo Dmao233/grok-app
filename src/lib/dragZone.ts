@@ -74,10 +74,7 @@ export function querySidebarEl(
     (root.querySelector(".workbench > .sidebar") as HTMLElement | null) ??
     (root.querySelector(".sidebar") as HTMLElement | null);
   if (!el) return null;
-  if (
-    el.classList.contains("sidebar--hidden") ||
-    el.classList.contains("sidebar--collapsed")
-  ) {
+  if (el.classList.contains("sidebar--hidden")) {
     return null;
   }
   return el;

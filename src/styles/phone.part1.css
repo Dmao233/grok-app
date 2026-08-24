@@ -88,8 +88,7 @@
     display: none;
   }
 
-  .app-shell--phone .sidebar.sidebar--hidden,
-  .app-shell--phone .sidebar.sidebar--collapsed {
+  .app-shell--phone .sidebar.sidebar--hidden {
     width: min(85vw, 320px) !important;
     max-width: 320px !important;
     min-width: 0 !important;

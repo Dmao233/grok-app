@@ -48,16 +48,10 @@ describe("snapBounds", () => {
 });
 
 describe("isAsideWebviewSuppressed", () => {
-  it("is true for hidden / collapsed / aria-hidden aside", () => {
+  it("is true for hidden / aria-hidden aside", () => {
     expect(
       isAsideWebviewSuppressed({
         classList: { contains: (n) => n === "aside--hidden" },
-        getAttribute: () => null,
-      }),
-    ).toBe(true);
-    expect(
-      isAsideWebviewSuppressed({
-        classList: { contains: (n) => n === "aside--collapsed" },
         getAttribute: () => null,
       }),
     ).toBe(true);

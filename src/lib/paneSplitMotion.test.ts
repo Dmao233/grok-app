@@ -119,7 +119,7 @@ describe("desktop hidden CSS must not force width 0", () => {
     );
   });
 
-  it("sidebar--hidden / collapsed do not set width !important", () => {
+  it("sidebar--hidden does not set width !important", () => {
     const css = readFileSync(
       resolve(__dirname, "../styles/sidebar.part1.css"),
       "utf8",
@@ -178,7 +178,7 @@ describe("desktop hidden CSS must not force width 0", () => {
     expect(aside).toMatch(
       /\.workbench--sidebar-motion \.main__top\s*\{[^}]*transition:\s*padding-left var\(--motion-pane\) var\(--motion-pane-ease\)/s,
     );
-    const hidden = ruleBody(aside, ".aside--collapsed");
+    const hidden = ruleBody(aside, "\n.aside--hidden");
     expect(hidden).not.toMatch(/width\s*:\s*0\s*!important/);
     const bt = readFileSync(
       resolve(__dirname, "../styles/bottom-terminal.css"),

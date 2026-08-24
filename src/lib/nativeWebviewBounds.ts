@@ -90,7 +90,6 @@ export function isAsideWebviewSuppressed(
   if (!aside) return false;
   return (
     aside.classList.contains("aside--hidden") ||
-    aside.classList.contains("aside--collapsed") ||
     aside.getAttribute("aria-hidden") === "true"
   );
 }

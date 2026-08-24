@@ -452,8 +452,7 @@ html.platform-win .window-edge-n {
     filter 180ms ease;
 }
 
-.sidebar.sidebar--overlay.sidebar--hidden,
-.sidebar.sidebar--overlay.sidebar--collapsed {
+.sidebar.sidebar--overlay.sidebar--hidden {
   transform: translateX(-105%);
   box-shadow: none;
   pointer-events: none;
@@ -534,7 +533,6 @@ html.platform-win .window-edge-n {
 }
 
 .workbench:has(> .sidebar.sidebar--hidden) .main,
-.workbench:has(> .sidebar.sidebar--collapsed) .main,
 .workbench:has(> .sidebar.sidebar--overlay) .main,
 .app-shell--phone .main {
   box-shadow: none;
@@ -573,7 +571,6 @@ html.platform-mac[data-theme="light"] .main {
 }
 
 html.platform-mac[data-theme="light"] .workbench:has(> .sidebar.sidebar--hidden) .main,
-html.platform-mac[data-theme="light"] .workbench:has(> .sidebar.sidebar--collapsed) .main,
 html.platform-mac[data-theme="light"] .workbench:has(> .sidebar.sidebar--overlay) .main,
 html.platform-mac[data-theme="light"] .app-shell--phone .main {
   box-shadow: none;
@@ -622,8 +619,7 @@ html.platform-mac[data-theme="light"] .settings-page__content {
 
 /* Fully closed left pane (no icon rail) — reopen from main top icons.
  * Width stays on the inline style. !important:0 here is a hard cut. */
-.sidebar--hidden,
-.sidebar--collapsed {
+.sidebar--hidden {
   padding: 0 !important;
   border-right-color: transparent;
   overflow: hidden;
@@ -640,8 +636,7 @@ html.platform-mac[data-theme="light"] .settings-page__content {
   transition: opacity var(--motion-pane) ease;
 }
 
-.sidebar--hidden .sidebar__clip,
-.sidebar--collapsed .sidebar__clip {
+.sidebar--hidden .sidebar__clip {
   opacity: 0;
 }
 

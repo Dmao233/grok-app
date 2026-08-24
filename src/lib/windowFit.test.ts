@@ -38,7 +38,7 @@ describe("measureWorkbenchFitNeed", () => {
     const map: Record<string, ReturnType<typeof el>> = {
       ".main": el("main", 500),
       ".sidebar": el("sidebar", 268),
-      ".aside:not(.aside--hidden):not(.aside--collapsed)": el("aside", 400),
+      ".aside:not(.aside--hidden)": el("aside", 400),
     };
     vi.stubGlobal("document", {
       querySelector: (sel: string) => map[sel] ?? null,
@@ -50,7 +50,7 @@ describe("measureWorkbenchFitNeed", () => {
     const map: Record<string, ReturnType<typeof el>> = {
       ".main": el("main", 200),
       ".sidebar": el("sidebar", 268),
-      ".aside:not(.aside--hidden):not(.aside--collapsed)": el("aside", 400),
+      ".aside:not(.aside--hidden)": el("aside", 400),
     };
     vi.stubGlobal("document", {
       querySelector: (sel: string) => map[sel] ?? null,

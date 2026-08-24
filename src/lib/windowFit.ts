@@ -210,16 +210,14 @@ export function measureWorkbenchFitNeed(
 
   const sidebar = document.querySelector(".sidebar") as HTMLElement | null;
   const aside = document.querySelector(
-    ".aside:not(.aside--hidden):not(.aside--collapsed)",
+    ".aside:not(.aside--hidden)",
   ) as HTMLElement | null;
 
   let sideW = 0;
   if (sidebar) {
     const r = sidebar.getBoundingClientRect();
     const hidden =
-      sidebar.classList.contains("sidebar--hidden") ||
-      sidebar.classList.contains("sidebar--collapsed") ||
-      r.width < 2;
+      sidebar.classList.contains("sidebar--hidden") || r.width < 2;
     if (!hidden) sideW = Math.round(r.width);
   }
 
