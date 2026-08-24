@@ -2284,7 +2284,7 @@ export function ExtensionsPanel({
         </span>
       </h2>
       <div
-        className="settings-card ext-card"
+        className="ext-card"
         id="settings-anchor-ext-skills-discover"
       >
         <div className="ext-ref-row ext-ref-row--dense">
@@ -2322,7 +2322,7 @@ export function ExtensionsPanel({
           </div>
         </div>
       </div>
-      <div className="settings-card ext-card">
+      <div className="ext-card">
         {loading && (
           <p className="ext-empty">{tr("ext.skills.loading")}</p>
         )}
