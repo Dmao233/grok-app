@@ -13,6 +13,7 @@ import {
   parseSessionDropId,
   sessionIdsForDrag,
 } from "@/lib/sessionMoveProject";
+import { moveDragGhost } from "@/lib/sidebarDragGhost";
 
 /** Click jitter on trackpads often exceeds 8px; only a real drag should arm. */
 export const SESSION_DRAG_THRESHOLD_PX = 16;
@@ -134,17 +135,6 @@ function clearDraggingClasses() {
   document.querySelectorAll(`.${SIDEBAR_MOVING}`).forEach((el) => {
     el.classList.remove(SIDEBAR_MOVING);
   });
-}
-
-function moveGhost(
-  ghost: HTMLElement,
-  clientX: number,
-  clientY: number,
-  offsetX: number,
-  offsetY: number,
-) {
-  ghost.style.left = `${clientX - offsetX}px`;
-  ghost.style.top = `${clientY - offsetY}px`;
 }
 
 function createSessionDragGhost(
@@ -365,7 +355,7 @@ export function useSidebarSessionMoveDrag(opts: {
             /* ignore */
           }
           if (s.ghost) {
-            moveGhost(
+            moveDragGhost(
               s.ghost,
               ev.clientX,
               ev.clientY,

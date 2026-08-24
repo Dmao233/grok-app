@@ -16,6 +16,7 @@ import {
   resolveProjectDropIndex,
   type PinableProject,
 } from "@/lib/app/projectOrder";
+import { moveDragGhost } from "@/lib/sidebarDragGhost";
 
 const DRAG_THRESHOLD_PX = 4;
 
@@ -151,17 +152,6 @@ function createProjectDragGhost(
 
   document.body.appendChild(ghost);
   return { ghost, offsetX, offsetY };
-}
-
-function moveGhost(
-  ghost: HTMLElement,
-  clientX: number,
-  clientY: number,
-  offsetX: number,
-  offsetY: number,
-) {
-  ghost.style.left = `${clientX - offsetX}px`;
-  ghost.style.top = `${clientY - offsetY}px`;
 }
 
 export type SidebarProjectReorderApi = {
@@ -314,7 +304,7 @@ export function useSidebarProjectReorder<T extends PinableProject>(opts: {
             /* ignore */
           }
           if (s.ghost) {
-            moveGhost(
+            moveDragGhost(
               s.ghost,
               ev.clientX,
               ev.clientY,
