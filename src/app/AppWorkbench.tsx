@@ -938,6 +938,7 @@ import {
 } from "@/lib/sideWorkbench";
 import {
   isSideDockComposerActive,
+  observeComposerBoxHeight,
   shouldHideChatForSideExpand,
 } from "@/lib/sideFloatComposer";
 import { applySideContextOpen } from "@/lib/sideContextOpen";
@@ -13179,17 +13180,7 @@ export function AppWorkbench() {
     if (mainPane !== "chat") return;
     const el = composerWrapRef.current;
     if (!el) return;
-    const measure = () => {
-      const h = Math.ceil(el.getBoundingClientRect().height);
-      if (h <= 0) return;
-      // Ignore 1px subpixel flicker — pad thrash reflows chat scrollHeight
-      // and looks like the transcript bouncing while you type/scroll.
-      setComposerFloatPad((prev) => (Math.abs(prev - h) <= 1 ? prev : h));
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
+    return observeComposerBoxHeight(el, setComposerFloatPad);
   }, [
     mainPane,
     attachments.length,
@@ -13240,24 +13231,10 @@ export function AppWorkbench() {
       setSideDockComposerH(0);
       return;
     }
-    const measure = () => {
-      const h = Math.ceil(el.getBoundingClientRect().height);
-      if (h <= 0) return;
-      setSideDockComposerH((prev) => (Math.abs(prev - h) <= 1 ? prev : h));
-    };
-    measure();
     // Double rAF: portal + dock CSS settle before first measure.
-    let raf2 = 0;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(measure);
+    return observeComposerBoxHeight(el, setSideDockComposerH, {
+      doubleRafSettle: true,
     });
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => {
-      cancelAnimationFrame(raf1);
-      cancelAnimationFrame(raf2);
-      ro.disconnect();
-    };
   }, [
     sideDockActive,
     mainPane,
