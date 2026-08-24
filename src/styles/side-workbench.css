@@ -1162,7 +1162,7 @@ html[data-theme="light"] .sw-terminal--pty {
   opacity: 0.45;
 }
 
-/* Match .rp-changes-row +/− chips (green / red). */
+/* +/− chips (green / red), mono tabular nums. */
 .sw-env-menu__delta {
   display: inline-flex;
   align-items: baseline;
