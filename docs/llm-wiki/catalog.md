@@ -53,7 +53,7 @@ Spawn：`--reasoning-effort <spawnId>`。Host **透传** catalog / 通道 id（�
 
 | 控制 | 无 live Agent | Live Agent |
 |------|---------------|------------|
-| 模型 | prefs 保存，下条消息 spawn 生效 | `session/set_model` 即时 RPC；**RPC 失败仅 `tracing::warn!`（prefs 已存，下条消息兜底），无自动 soft_respawn、不回传 UI** |
+| 模型 | prefs 保存，下条消息 spawn 生效 | `session/set_model` 即时 RPC；**RPC 失败仅 `tracing::warn!`：prefs 已存、待后续重新 spawn / 冷启动才生效，无自动 soft_respawn、不回传 UI** |
 | 推理 | prefs 保存，下条消息生效 | 无 set_effort RPC → `soft_respawn`（busy 时挂起 pending，turn 结束 / connect 时 flush） |
 
 已知缺口：set_model 失败无 toast——历史「Apply honesty」spec 的 UI helper 从未接线，已随 2026-08 瘦身作为孤儿删除；恢复 honesty toast 需重新立项接线（错误分类 + i18n 文案一并补）。
