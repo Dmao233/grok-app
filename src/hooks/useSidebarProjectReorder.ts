@@ -16,7 +16,7 @@ import {
   resolveProjectDropIndex,
   type PinableProject,
 } from "@/lib/app/projectOrder";
-import { moveDragGhost } from "@/lib/sidebarDragGhost";
+import { moveDragGhost, removeDragGhost } from "@/lib/sidebarDragGhost";
 
 const DRAG_THRESHOLD_PX = 4;
 
@@ -37,15 +37,6 @@ function isReorderIgnoredTarget(target: EventTarget | null): boolean {
     return true;
   }
   return false;
-}
-
-function removeGhost(ghost: HTMLElement | null) {
-  if (!ghost) return;
-  try {
-    ghost.remove();
-  } catch {
-    /* ignore */
-  }
 }
 
 function clearDropClasses() {
@@ -202,7 +193,7 @@ export function useSidebarProjectReorder<T extends PinableProject>(opts: {
     sessionRef.current = null;
     cleanupWindow.current?.();
     cleanupWindow.current = null;
-    removeGhost(s?.ghost ?? null);
+    removeDragGhost(s?.ghost ?? null);
     clearDropClasses();
     clearDraggingClasses();
     if (s?.captureEl) {

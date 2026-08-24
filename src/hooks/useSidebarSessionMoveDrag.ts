@@ -13,7 +13,7 @@ import {
   parseSessionDropId,
   sessionIdsForDrag,
 } from "@/lib/sessionMoveProject";
-import { moveDragGhost } from "@/lib/sidebarDragGhost";
+import { moveDragGhost, removeDragGhost } from "@/lib/sidebarDragGhost";
 
 /** Click jitter on trackpads often exceeds 8px; only a real drag should arm. */
 export const SESSION_DRAG_THRESHOLD_PX = 16;
@@ -113,15 +113,6 @@ export function sessionDragDropFromPoint(
   return sessionDragDropFromElements(document.elementsFromPoint(clientX, clientY));
 }
 
-function removeGhost(ghost: HTMLElement | null) {
-  if (!ghost) return;
-  try {
-    ghost.remove();
-  } catch {
-    /* ignore */
-  }
-}
-
 function clearDropClasses() {
   document.querySelectorAll(`.${DROP_TARGET}`).forEach((el) => {
     el.classList.remove(DROP_TARGET);
@@ -214,7 +205,7 @@ export function useSidebarSessionMoveDrag(opts: {
       sessionRef.current = null;
       cleanupRef.current?.();
       cleanupRef.current = null;
-      removeGhost(s?.ghost ?? null);
+      removeDragGhost(s?.ghost ?? null);
       clearDropClasses();
       clearDraggingClasses();
       if (s?.captureEl) {
