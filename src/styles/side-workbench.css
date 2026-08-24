@@ -18,6 +18,12 @@
   visibility: hidden;
 }
 
+/* Let the main column grow from zero while a full-width side pane contracts. */
+.workbench--side-expand-motion .main {
+  min-width: 0;
+  overflow: hidden;
+}
+
 /*
  * Expand WITHOUT dock: completely remove in-main composer.
  * (visibility alone can still leave a painted strip under some themes;

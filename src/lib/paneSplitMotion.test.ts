@@ -267,6 +267,17 @@ describe("desktop hidden CSS must not force width 0", () => {
     );
   });
 
+  it("lets the main pane yield while the full-width side workbench contracts", () => {
+    const side = readFileSync(
+      resolve(__dirname, "../styles/side-workbench.css"),
+      "utf8",
+    );
+
+    expect(side).toMatch(
+      /\.workbench--side-expand-motion \.main\s*\{[^}]*min-width:\s*0;[^}]*overflow:\s*hidden/s,
+    );
+  });
+
   it("mac sidebar seam is not a 1px layout border on vibrancy", () => {
     const sidebar = readFileSync(
       resolve(__dirname, "../styles/sidebar.part1.css"),
