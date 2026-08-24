@@ -172,16 +172,22 @@ export function SettingsTabStrip({
   onChange,
   ariaLabel,
   t,
+  id,
+  hint,
 }: {
   tabs: readonly { id: SettingsTabId; labelKey: MessageKey }[];
   active: SettingsTabId | null;
   onChange: (id: SettingsTabId) => void;
   ariaLabel: string;
   t: (k: MessageKey) => string;
+  /** Settings-search anchor id on the strip container (scroll target). */
+  id?: string;
+  /** One-line helper copy under the tabs (account tabs style). */
+  hint?: string;
 }) {
   if (tabs.length === 0) return null;
   return (
-    <div className="settings-account-tabs settings-page__tabs">
+    <div className="settings-account-tabs settings-page__tabs" id={id}>
       <SegmentedControl
         value={active}
         role="tablist"
@@ -198,6 +204,7 @@ export function SettingsTabStrip({
           onChange(id);
         }}
       />
+      {hint ? <p className="settings-account-tabs__hint">{hint}</p> : null}
     </div>
   );
 }

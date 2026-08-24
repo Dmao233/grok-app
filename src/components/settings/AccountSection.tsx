@@ -7,7 +7,7 @@ import type { SettingsViewModel } from "./types";
 import { AccountPanel } from "@/components/AccountPanel";
 import { OfficialAuxPanel } from "@/components/OfficialAuxPanel";
 import { ProvidersPanel } from "@/components/ProvidersPanel";
-import { SegmentedControl } from "@/components/ui/SegmentedControl";
+import { SettingsTabStrip } from "./shared";
 import { resolveLocale } from "@/i18n";
 
 
@@ -40,15 +40,21 @@ export function AccountSection() {
     onSaveAccount,
     onSwitchAccount,
     savedAccounts,
+    sectionNav,
     setSectionTab,
     t,
+    title,
   } = s;
 
   return (
     <>
 <>
-            <div
-              className="settings-account-tabs"
+            <SettingsTabStrip
+              tabs={sectionNav?.tabs ?? []}
+              active={activeTab ?? "official"}
+              onChange={setSectionTab}
+              ariaLabel={title}
+              t={(k) => t(k)}
               id={
                 activeTab === "providers"
                   ? "settings-anchor-account-providers"
@@ -56,36 +62,14 @@ export function AccountSection() {
                     ? "settings-anchor-account-extras"
                     : "settings-anchor-account-official"
               }
-            >
-              <SegmentedControl
-                value={activeTab ?? "official"}
-                role="tablist"
-                large
-                options={[
-                  { value: "official", label: t("settings.tabOfficial") },
-                  { value: "providers", label: t("settings.tabProviders") },
-                  { value: "extras", label: t("settings.tabExtras") },
-                ]}
-                onChange={(tab, event) => {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  setSectionTab(tab);
-                }}
-              />
-              {activeTab === "providers" ? (
-                <p className="settings-account-tabs__hint">
-                  {t("settings.tabProvidersHint")}
-                </p>
-              ) : activeTab === "extras" ? (
-                <p className="settings-account-tabs__hint">
-                  {t("settings.tabExtrasHint")}
-                </p>
-              ) : (
-                <p className="settings-account-tabs__hint">
-                  {t("settings.tabOfficialHint")}
-                </p>
-              )}
-            </div>
+              hint={
+                activeTab === "providers"
+                  ? t("settings.tabProvidersHint")
+                  : activeTab === "extras"
+                    ? t("settings.tabExtrasHint")
+                    : t("settings.tabOfficialHint")
+              }
+            />
             {activeTab === "providers" ? (
               <ProvidersPanel
                 locale={resolveLocale(locale)}
