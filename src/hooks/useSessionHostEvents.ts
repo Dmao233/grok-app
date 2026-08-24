@@ -1136,8 +1136,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
               );
               const auto = !isManual;
               if (auto) {
-                c.setToast(c.tr("compact.toastAuto"));
-                window.setTimeout(() => c.setToast(null), 3200);
+                c.showToast(c.tr("compact.toastAuto"), 3200);
               }
             }
           }),
@@ -1336,8 +1335,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
               if (cancelled || !p) return;
               const key = forkTrimmedToastKey(p.outcome);
               if (!key) return;
-              c.setToast(c.tr(key));
-              window.setTimeout(() => c.setToast(null), 4200);
+              c.showToast(c.tr(key), 4200);
             },
           ),
         );
@@ -1357,8 +1355,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
                 // chat so this spawn could proceed. Reporting it as "process
                 // limit reached" made a successful connect look broken, and
                 // claimed every slot was running a task when none was.
-                c.setToast(c.tr("agent.capacityRecycledToast"));
-                window.setTimeout(() => c.setToast(null), 4200);
+                c.showToast(c.tr("agent.capacityRecycledToast"), 4200);
                 return;
               }
               // Toast when the focused (or unknown) session was idle-recycled.
@@ -1366,8 +1363,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
                 !p.sessionId ||
                 p.sessionId === c.viewingSessionIdRef.current
               ) {
-                c.setToast(c.tr("agent.idleRecycledToast"));
-                window.setTimeout(() => c.setToast(null), 4200);
+                c.showToast(c.tr("agent.idleRecycledToast"), 4200);
               }
             },
           ),
@@ -1381,13 +1377,11 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
               // Mid-turn hard ends also journal turn_cancelled|<reason> chips; toast is a
               // short global hint (transcript chip is the durable source of truth).
               if (p.reason === "cli_upgrade") {
-                c.setToast(c.tr("endOfTurn.cliUpgrade"));
-                window.setTimeout(() => c.setToast(null), 4800);
+                c.showToast(c.tr("endOfTurn.cliUpgrade"), 4800);
                 return;
               }
               if (p.reason === "app_update") {
-                c.setToast(c.tr("endOfTurn.appUpdate"));
-                window.setTimeout(() => c.setToast(null), 4800);
+                c.showToast(c.tr("endOfTurn.appUpdate"), 4800);
                 return;
               }
               if (p.reason === "provider_route" || p.reason === "account_auth") {
@@ -1400,8 +1394,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
                 p.reason === "session_data_mode" ||
                 (p.killed != null && p.killed > 0)
               ) {
-                c.setToast(c.tr("agent.dataModeRecycledToast"));
-                window.setTimeout(() => c.setToast(null), 4800);
+                c.showToast(c.tr("agent.dataModeRecycledToast"), 4800);
               }
             },
           ),
@@ -1477,8 +1470,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
             (p) => {
               if (cancelled || !p) return;
               // Spawn flags / extensions changed while an agent was live.
-              c.setToast(c.tr("agent.softRespawnToast"));
-              window.setTimeout(() => c.setToast(null), 3600);
+              c.showToast(c.tr("agent.softRespawnToast"), 3600);
             },
           ),
         );
@@ -1520,8 +1512,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
             ) {
               return;
             }
-            c.setToast(c.tr("session.emptyRunToast"));
-            window.setTimeout(() => c.setToast(null), 7200);
+            c.showToast(c.tr("session.emptyRunToast"), 7200);
           }),
         );
        track(
@@ -1535,8 +1526,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
             // Remember for process-budget UI (Settings pool / Reliability).
             const ev = parseProcessLimitEvent(p, Date.now());
             if (ev) c.setLastProcessLimit(ev);
-            c.setToast(c.tr("agent.processLimitToast"));
-            window.setTimeout(() => c.setToast(null), 5200);
+            c.showToast(c.tr("agent.processLimitToast"), 5200);
             if (
               !p.sessionId ||
               p.sessionId === c.viewingSessionIdRef.current
@@ -1679,8 +1669,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
               !p.sessionId ||
               p.sessionId === c.viewingSessionIdRef.current
             ) {
-              c.setToast(c.tr("agent.streamStallHardEndToast"));
-              window.setTimeout(() => c.setToast(null), 4200);
+              c.showToast(c.tr("agent.streamStallHardEndToast"), 4200);
             }
           }),
         );
@@ -1737,8 +1726,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
               p.sessionId !== c.viewingSessionIdRef.current
             ) {
               // Multi-session stream: another chat needs approval — nudge user.
-              c.setToast(c.trRef.current("session.backgroundPermission"));
-              window.setTimeout(() => c.setToast(null), 4200);
+              c.showToast(c.trRef.current("session.backgroundPermission"), 4200);
               if (
                 shouldShowDesktopNotify(
                   "permission",
@@ -1786,8 +1774,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
               p.sessionId !== c.viewingSessionIdRef.current
             ) {
               // Background chat asked a question — answer it on reopen.
-              c.setToast(c.trRef.current("session.backgroundPermission"));
-              window.setTimeout(() => c.setToast(null), 4200);
+              c.showToast(c.trRef.current("session.backgroundPermission"), 4200);
               if (
                 shouldShowDesktopNotify("ask_user", c.notifyPrefsRef.current)
               ) {
@@ -1923,8 +1910,7 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
                 next.visible &&
                 !next.userClosed;
               if (becameReview) {
-                c.setToast(c.trRef.current("session.backgroundPlan"));
-                window.setTimeout(() => c.setToast(null), 4200);
+                c.showToast(c.trRef.current("session.backgroundPlan"), 4200);
                 if (
                   shouldShowDesktopNotify(
                     "permission",

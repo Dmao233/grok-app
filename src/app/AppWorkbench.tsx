@@ -2477,6 +2477,13 @@ export function AppWorkbench() {
   /** Live drag-drop target for zone overlays (null = not dragging). */
   const [dragZone, setDragZone] = useState<"sidebar" | "main" | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  /** Auto-dismiss clears by message so a later toast survives earlier timers. */
+  const showToast = useCallback((msg: string, ms = 3200) => {
+    setToast(msg);
+    window.setTimeout(() => {
+      setToast((cur) => (cur === msg ? null : cur));
+    }, ms);
+  }, []);
   const dragPathsRef = useRef<string[]>([]);
   /** Tauri OS drop timestamp — HTML5 fallback must not double-attach. */
   const lastNativeDropAtRef = useRef(0);
@@ -3811,8 +3818,7 @@ export function AppWorkbench() {
             "store.quarantineNotice",
             { path },
           );
-          setToast(msg);
-          window.setTimeout(() => setToast(null), 9000);
+          showToast(msg, 9000);
         })
         .catch(() => {});
 
@@ -4021,22 +4027,22 @@ export function AppWorkbench() {
                   : (prev?.effort ?? null),
             });
             automationSetupSessionsRef.current.delete(sessionId);
-            setToast(
+            showToast(
               tr("automations.updatedToast", { title: input.title }),
+              4200,
             );
           } else {
             await api.automationCreate(input);
             automationSetupSessionsRef.current.delete(sessionId);
-            setToast(
+            showToast(
               tr("automations.createdToast", { title: input.title }),
+              4200,
             );
           }
-          window.setTimeout(() => setToast(null), 4200);
         } catch {
           automationAppliedRef.current.delete(applyKey);
           automationAppliedRef.current.delete(payloadKey);
-          setToast(tr("automations.createFailed"));
-          window.setTimeout(() => setToast(null), 4200);
+          showToast(tr("automations.createFailed"), 4200);
         }
       };
 
@@ -4062,12 +4068,11 @@ export function AppWorkbench() {
         },
         onDismiss: () => {
           automationAppliedRef.current.add(payloadKey);
-          setToast(tr("automations.confirmUnexpected.dismissed"));
-          window.setTimeout(() => setToast(null), 3600);
+          showToast(tr("automations.confirmUnexpected.dismissed"), 3600);
         },
       });
     },
-    [patchSessionMessages, setAppDialog, tr],
+    [patchSessionMessages, setAppDialog, showToast, tr],
   );
 
   // Phone mirror chrome: track WS + host account from hello (DESIGN §4.3).
@@ -4281,7 +4286,7 @@ export function AppWorkbench() {
     setStopLatch,
     stopLatchRef,
     setLocalError,
-    setToast,
+    showToast,
     setSessions,
     sessionsRef,
     projectsRef,
@@ -9038,12 +9043,7 @@ export function AppWorkbench() {
         }
       }
       // 4. Nothing usable — honest feedback instead of a silent no-op.
-      const msg = tr("chat.selectionPasteEmpty");
-      setToast(msg);
-      window.setTimeout(
-        () => setToast((cur) => (cur === msg ? null : cur)),
-        2200,
-      );
+      showToast(tr("chat.selectionPasteEmpty"), 2200);
     })();
   }, [
     setDraft,
@@ -9051,7 +9051,7 @@ export function AppWorkbench() {
     addAttachmentsFromFiles,
     addAttachmentsFromPaths,
     tr,
-    setToast,
+    showToast,
   ]);
 
   const composerCtxItems = useMemo<ContextMenuItem[]>(
@@ -9079,8 +9079,7 @@ export function AppWorkbench() {
   const pickComposerFiles = useCallback(async () => {
     closeComposerMenu();
     if (isMirrorClient()) {
-      setToast(tr("mirror.desktopOnly"));
-      window.setTimeout(() => setToast(null), 3200);
+      showToast(tr("mirror.desktopOnly"), 3200);
       return;
     }
     if (!api.isTauri()) {
@@ -9100,15 +9099,14 @@ export function AppWorkbench() {
     } catch (e) {
       const resolved = resolveAttachError(e, "pick");
       if (resolved.kind === "unsupported") {
-        setToast(tr("mirror.unsupported"));
-        window.setTimeout(() => setToast(null), 3200);
+        showToast(tr("mirror.unsupported"), 3200);
         return;
       }
       if (resolved.silent) return;
       const msg = formatAttachErrorMessage(resolved, tr);
       if (msg) setLocalError(msg);
     }
-  }, [addAttachmentsFromPaths, closeComposerMenu, tr]);
+  }, [addAttachmentsFromPaths, closeComposerMenu, showToast, tr]);
 
   const addProjectsFromPaths = useCallback(
     async (paths: string[]) => {
@@ -10121,13 +10119,6 @@ export function AppWorkbench() {
     },
     [],
   );
-
-  const showToast = useCallback((msg: string, ms = 3200) => {
-    setToast(msg);
-    window.setTimeout(() => {
-      setToast((cur) => (cur === msg ? null : cur));
-    }, ms);
-  }, []);
 
   const promptCreateSpace = useCallback(
     (afterCreate?: (id: string) => void) => {
@@ -19122,10 +19113,10 @@ export function AppWorkbench() {
           /* soft-fail voice gate */
           });
         } catch (e) {
-          setToast(
+          showToast(
           tr("prov.savedApplyFailed", { detail: String(e) }),
+          4800,
           );
-          window.setTimeout(() => setToast(null), 4800);
           }
           })();
           }}
@@ -20593,8 +20584,7 @@ export function AppWorkbench() {
               switchToChat: true,
               automationSetup: true,
               });
-              setToast(tr("automations.aiComposerHint"));
-              window.setTimeout(() => setToast(null), 4200);
+              showToast(tr("automations.aiComposerHint"), 4200);
               }}
               onRunNow={(auto) => void runAutomation(auto)}
               />            </Suspense>
