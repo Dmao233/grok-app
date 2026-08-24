@@ -19,7 +19,6 @@ pub enum SessionState {
 
 /// Pure FSM transitions. No I/O.
 #[derive(Debug, Clone, PartialEq, Eq)]
-#[allow(dead_code)] // full transition set for PR3+ (crash/reattach/permission)
 pub struct SessionFsm {
     state: SessionState,
     last_error: Option<AgentError>,
@@ -31,7 +30,6 @@ impl Default for SessionFsm {
     }
 }
 
-#[allow(dead_code)] // full transition set for PR3+ (crash/reattach/permission)
 impl SessionFsm {
     pub fn new() -> Self {
         Self {
@@ -46,10 +44,6 @@ impl SessionFsm {
 
     pub fn last_error(&self) -> Option<&AgentError> {
         self.last_error.as_ref()
-    }
-
-    pub fn clear_error(&mut self) {
-        self.last_error = None;
     }
 
     /// start/attach → Connecting (from Idle or Disconnected).
@@ -159,21 +153,6 @@ impl SessionFsm {
             other => Err(FsmError::InvalidTransition {
                 from: other,
                 event: "fail_with",
-            }),
-        }
-    }
-
-    /// reattach path → Ready from Disconnected.
-    pub fn reattach_ok(&mut self) -> Result<(), FsmError> {
-        match self.state {
-            SessionState::Disconnected => {
-                self.state = SessionState::Ready;
-                self.last_error = None;
-                Ok(())
-            }
-            other => Err(FsmError::InvalidTransition {
-                from: other,
-                event: "reattach_ok",
             }),
         }
     }
