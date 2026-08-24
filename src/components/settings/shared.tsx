@@ -212,6 +212,40 @@ export function SettingsTabStrip({
 /**
  * Module title + optional "?" help tip (description no longer inline under the label).
  */
+/**
+ * Round help icon button that reveals `tip` in a delayed tooltip.
+ * The single implementation behind every `.settings-label-help` in the app
+ * (settings rows, wallpaper scrim, account heatmap, compact modal).
+ */
+export function SettingsHelpTip({
+  tip,
+  placement = "top",
+  tipClassName = "ui-tip--wrap",
+  ariaLabel,
+}: {
+  tip: string;
+  placement?: "top" | "bottom";
+  tipClassName?: string;
+  /** Defaults to `tip`; pass when the visible tip is longer than the a11y name. */
+  ariaLabel?: string;
+}) {
+  return (
+    <Tip label={tip} placement={placement} className={tipClassName} delayMs={280}>
+      <button
+        type="button"
+        className="settings-label-help"
+        aria-label={ariaLabel ?? tip}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <IconHelp size={14} stroke={1.75} />
+      </button>
+    </Tip>
+  );
+}
+
 export function SettingsLabelWithTip({
   label,
   tip,
@@ -225,21 +259,7 @@ export function SettingsLabelWithTip({
     <div className="settings-row__label">
       {leading}
       <span className="settings-row__label-text">{label}</span>
-      {tip ? (
-        <Tip label={tip} placement="top" className="ui-tip--wrap" delayMs={280}>
-          <button
-            type="button"
-            className="settings-label-help"
-            aria-label={tip}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
-          >
-            <IconHelp size={14} stroke={1.75} />
-          </button>
-        </Tip>
-      ) : null}
+      {tip ? <SettingsHelpTip tip={tip} /> : null}
     </div>
   );
 }

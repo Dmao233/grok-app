@@ -45,7 +45,8 @@ import {
 } from "@/lib/heatmapStats";
 import { GlassModal } from "@/components/GlassModal";
 import { Tip } from "@/components/ui/tooltip";
-import { IconHelp, IconPlus, IconTrash, IconUser } from "@/components/icons";
+import { IconPlus, IconTrash, IconUser } from "@/components/icons";
+import { SettingsHelpTip } from "@/components/settings/shared";
 
 export interface AccountPanelLabels {
   signedIn: string;
@@ -922,24 +923,7 @@ export function AccountPanel({
             <div className="account-section__title account-section__title--row">
               <span className="account-heatmap-title">
                 <span>{labels.heatmap}</span>
-                <Tip
-                  label={labels.heatmapHint}
-                  placement="top"
-                  className="ui-tip--wrap"
-                  delayMs={280}
-                >
-                  <button
-                    type="button"
-                    className="settings-label-help"
-                    aria-label={labels.heatmapHint}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }}
-                  >
-                    <IconHelp size={14} stroke={1.75} />
-                  </button>
-                </Tip>
+                <SettingsHelpTip tip={labels.heatmapHint} />
               </span>
               <div className="account-heatmap-title-meta">
                 {heatErrChip ? (

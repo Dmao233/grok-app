@@ -162,4 +162,29 @@ describe("appearance wallpaper behavior (SettingsPage shell)", () => {
     fireEvent.change(slider, { target: { value: "40" } });
     expect(onWallpaperScrim).toHaveBeenCalledWith(40);
   });
+
+  it("scrim help button lives in the slider label and shows its tooltip", async () => {
+    // Scrim block only renders when both wallpaperUrl and onWallpaperScrim exist.
+    const props = baseProps({ ...withWallpaper, onWallpaperScrim: vi.fn() });
+    const { container } = render(<SettingsPage {...(props as any)} />);
+    const label = container.querySelector(
+      'label[for="settings-wallpaper-scrim"]',
+    );
+    const help = label?.querySelector<HTMLButtonElement>(
+      "button.settings-label-help",
+    );
+    if (!help) throw new Error("scrim help button not rendered");
+    expect(help.getAttribute("aria-label") ?? "").toContain(
+      "How strongly the dimming layers",
+    );
+
+    fireEvent.focus(help);
+    await waitFor(() => {
+      const tip = document.querySelector('[role="tooltip"]');
+      expect(tip?.textContent ?? "").toContain(
+        "How strongly the dimming layers",
+      );
+      expect(tip?.className ?? "").toContain("ui-tip--wrap");
+    });
+  });
 });

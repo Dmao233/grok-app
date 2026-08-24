@@ -8,9 +8,8 @@ import type { SettingsViewModel } from "./types";
 
 import { Select } from "@/components/Select";
 import { FontFamilySelect } from "./FontFamilySelect";
-import { IconAppearance, IconCrop, IconHelp } from "@/components/icons";
+import { IconAppearance, IconCrop } from "@/components/icons";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
-import { Tip } from "@/components/ui/tooltip";
 import {
   DEFAULT_WALLPAPER_FOCUS,
   THEME_SKINS,
@@ -57,7 +56,12 @@ import { saveConfirmExternalLinksPref } from "@/lib/externalLinkPref";
 import { MESSAGE_ACTIONS_VISIBILITIES } from "@/lib/messageActionsPref";
 import { MESSAGE_TIME_FORMATS } from "@/lib/messageTimeFormatPref";
 import { normalizeHHmm } from "@/lib/notifyQuietHours";
-import { SettingsTabStrip, SettingsLabelWithTip, UiCheck } from "./shared";
+import {
+  SettingsHelpTip,
+  SettingsLabelWithTip,
+  SettingsTabStrip,
+  UiCheck,
+} from "./shared";
 import { SkinPresetsCard } from "./SkinPresetsCard";
 import { AppIconPicker } from "./AppIconPicker";
 
@@ -625,26 +629,9 @@ export function AppearanceSection() {
                                     htmlFor="settings-wallpaper-scrim"
                                   >
                                     <span>{t("settings.wallpaperScrim")}</span>
-                                    <Tip
-                                      label={t("settings.wallpaperScrimDesc")}
-                                      placement="top"
-                                      className="ui-tip--wrap"
-                                      delayMs={280}
-                                    >
-                                      <button
-                                        type="button"
-                                        className="settings-label-help"
-                                        aria-label={t(
-                                          "settings.wallpaperScrimDesc",
-                                        )}
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          e.stopPropagation();
-                                        }}
-                                      >
-                                        <IconHelp size={14} stroke={1.75} />
-                                      </button>
-                                    </Tip>
+                                    <SettingsHelpTip
+                                      tip={t("settings.wallpaperScrimDesc")}
+                                    />
                                   </label>
                                   <span
                                     className="settings-wallpaper__scrim-value"

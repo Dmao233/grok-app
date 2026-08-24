@@ -1,8 +1,8 @@
 import type { Ref } from "react";
 import { createT, type Locale } from "@/i18n";
-import { IconClose, IconHelp } from "@/components/icons";
+import { IconClose } from "@/components/icons";
 import { Select } from "@/components/Select";
-import { Tip } from "@/components/ui/tooltip";
+import { SettingsHelpTip } from "@/components/settings/shared";
 import {
   COMPACTION_DETAILS,
   COMPACTION_MODES,
@@ -63,24 +63,12 @@ export function CompactModal(props: {
             <h2 id="compact-modal-title" className="modal-title">
               {tr("slash.compact")}
             </h2>
-            <Tip
-              label={tr("slash.compactHelpTip")}
+            <SettingsHelpTip
+              tip={tr("slash.compactHelpTip")}
               placement="bottom"
-              delayMs={280}
-              className="ui-tip--wrap ui-tip--modal"
-            >
-              <button
-                type="button"
-                className="settings-label-help"
-                aria-label={tr("slash.compactHelp")}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-              >
-                <IconHelp size={14} stroke={1.75} />
-              </button>
-            </Tip>
+              tipClassName="ui-tip--wrap ui-tip--modal"
+              ariaLabel={tr("slash.compactHelp")}
+            />
           </div>
           <button
             type="button"
