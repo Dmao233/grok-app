@@ -11,7 +11,6 @@ import {
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { nextIndex } from "@/lib/a11yFocus";
 import { memoryClearErrorMessageKey } from "@/lib/agentMemory";
@@ -20,10 +19,6 @@ import {
   IconChevronRight,
   IconSearch,
 } from "@/components/icons";
-import {
-  listArchiveAgeOptionPreviews,
-  hasAnyArchiveAgeMatches,
-} from "@/lib/sessionArchiveAge";
 import {
   loadThinkingExpandPref,
   type ThinkingExpandPref,
@@ -187,10 +182,7 @@ import { SettingsModelProvider } from "@/providers/SettingsModelContext";
 import {
   NavIcon,
   formatSessionWhen,
-  marqueeClientRect,
-  rectsOverlap,
 } from "@/components/settings/shared";
-import type { MarqueeBox } from "@/components/settings/types";
 import { GeneralSection } from "@/components/settings/GeneralSection";
 import { AppearanceSection } from "@/components/settings/AppearanceSection";
 import {
@@ -526,13 +518,6 @@ export function SettingsPage({
     confirmLabel: string;
     onConfirm: () => void;
   } | null>(null);
-  /** Selected archived session ids (settings → archived multi-select). */
-  const [archivedSelected, setArchivedSelected] = useState<Set<string>>(
-    () => new Set(),
-  );
-  /** Rubber-band marquee (client coords) while dragging on the list surface. */
-  const [marquee, setMarquee] = useState<MarqueeBox | null>(null);
-  const archivedSurfaceRef = useRef<HTMLDivElement>(null);
   const wallpaperInputRef = useRef<HTMLInputElement>(null);
   const [wallpaperBusy, setWallpaperBusy] = useState(false);
   const [appearanceWriteBusy, setAppearanceWriteBusy] = useState(false);
@@ -772,14 +757,6 @@ export function SettingsPage({
     [],
   );
 
-  const marqueeRef = useRef<{
-    active: boolean;
-    dragging: boolean;
-    additive: boolean;
-    base: Set<string>;
-    box: MarqueeBox;
-    pointerId: number;
-  } | null>(null);
   // Full catalog via createT — do not depend on App's partial `labels` whitelist
   // (missing keys used to render raw "settings.acpServer" etc.).
   // `locale` is the resolved catalog locale (never "system").
@@ -1135,199 +1112,6 @@ export function SettingsPage({
   /** Searching with zero hits: show an explicit empty state, never bare headers. */
   const searchEmpty = trimmedQuery.length > 0 && nav.length === 0;
 
-  const archivedAllIds = useMemo(
-    () => archivedGroups.flatMap((g) => g.sessions.map((s) => s.id)),
-    [archivedGroups],
-  );
-
-  const archivedTotal = archivedAllIds.length;
-
-  /** Live preview counts for archive-by-age day chips (pure helpers). */
-  const archiveAgePreviews = useMemo(
-    () => listArchiveAgeOptionPreviews(archiveAgeSessions),
-    [archiveAgeSessions],
-  );
-  const archiveAgeAnyMatch = useMemo(
-    () => hasAnyArchiveAgeMatches(archiveAgeSessions),
-    [archiveAgeSessions],
-  );
-  const archiveAgeMaxMatch = useMemo(
-    () =>
-      archiveAgePreviews.reduce(
-        (max, p) => (p.count > max ? p.count : max),
-        0,
-      ),
-    [archiveAgePreviews],
-  );
-
-  // Drop stale selection when list changes (restore/delete/refresh).
-  useEffect(() => {
-    setArchivedSelected((prev) => {
-      if (prev.size === 0) return prev;
-      const live = new Set(archivedAllIds);
-      let changed = false;
-      const next = new Set<string>();
-      for (const id of prev) {
-        if (live.has(id)) next.add(id);
-        else changed = true;
-      }
-      return changed ? next : prev;
-    });
-  }, [archivedAllIds]);
-
-  const archivedSelectedCount = archivedSelected.size;
-  const archivedAllSelected =
-    archivedTotal > 0 && archivedSelectedCount === archivedTotal;
-  const archivedSomeSelected =
-    archivedSelectedCount > 0 && !archivedAllSelected;
-
-  const toggleArchivedId = (id: string) => {
-    setArchivedSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleArchivedAll = () => {
-    if (archivedAllSelected) {
-      setArchivedSelected(new Set());
-    } else {
-      setArchivedSelected(new Set(archivedAllIds));
-    }
-  };
-
-  const toggleArchivedGroup = (ids: string[]) => {
-    setArchivedSelected((prev) => {
-      const next = new Set(prev);
-      const allOn = ids.length > 0 && ids.every((id) => next.has(id));
-      if (allOn) {
-        for (const id of ids) next.delete(id);
-      } else {
-        for (const id of ids) next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const collectMarqueeHits = useCallback((box: MarqueeBox): string[] => {
-    const root = archivedSurfaceRef.current;
-    if (!root) return [];
-    const r = marqueeClientRect(box);
-    // Ignore tiny jitter before true drag.
-    if (r.width < 4 && r.height < 4) return [];
-    const hits: string[] = [];
-    root.querySelectorAll<HTMLElement>("[data-archived-id]").forEach((el) => {
-      const id = el.dataset.archivedId;
-      if (!id) return;
-      if (rectsOverlap(r, el.getBoundingClientRect())) hits.push(id);
-    });
-    return hits;
-  }, []);
-
-  const applyMarqueeSelection = useCallback(
-    (box: MarqueeBox, additive: boolean, base: Set<string>) => {
-      const hits = collectMarqueeHits(box);
-      if (hits.length === 0 && !additive) {
-        // Still dragging — keep empty if not additive.
-        setArchivedSelected(new Set());
-        return;
-      }
-      if (additive) {
-        const next = new Set(base);
-        for (const id of hits) next.add(id);
-        setArchivedSelected(next);
-      } else {
-        setArchivedSelected(new Set(hits));
-      }
-    },
-    [collectMarqueeHits],
-  );
-
-  const onArchivedPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (e.button !== 0) return;
-    const target = e.target as HTMLElement;
-    // Don't start marquee from action controls / custom checks.
-    if (
-      target.closest("button") ||
-      target.closest("a") ||
-      target.closest(".ui-check") ||
-      target.closest(".settings-archived-toolbar")
-    ) {
-      return;
-    }
-    const additive = e.metaKey || e.ctrlKey || e.shiftKey;
-    const box: MarqueeBox = {
-      x0: e.clientX,
-      y0: e.clientY,
-      x1: e.clientX,
-      y1: e.clientY,
-    };
-    marqueeRef.current = {
-      active: true,
-      dragging: false,
-      additive,
-      base: new Set(archivedSelected),
-      box,
-      pointerId: e.pointerId,
-    };
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const onArchivedPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const st = marqueeRef.current;
-    if (!st?.active || st.pointerId !== e.pointerId) return;
-    const box: MarqueeBox = {
-      ...st.box,
-      x1: e.clientX,
-      y1: e.clientY,
-    };
-    st.box = box;
-    const r = marqueeClientRect(box);
-    if (!st.dragging && (r.width > 5 || r.height > 5)) {
-      st.dragging = true;
-      setMarquee(box);
-    }
-    if (st.dragging) {
-      setMarquee(box);
-      applyMarqueeSelection(box, st.additive, st.base);
-    }
-  };
-
-  const onArchivedPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const st = marqueeRef.current;
-    if (!st?.active || st.pointerId !== e.pointerId) return;
-    marqueeRef.current = null;
-    setMarquee(null);
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch {
-      /* ignore */
-    }
-    if (st.dragging) {
-      applyMarqueeSelection(st.box, st.additive, st.base);
-      return;
-    }
-    // Click without drag: toggle row under pointer (if any).
-    const el = (e.target as HTMLElement).closest<HTMLElement>(
-      "[data-archived-id]",
-    );
-    const id = el?.dataset.archivedId;
-    if (id) toggleArchivedId(id);
-  };
-
-  const onArchivedPointerCancel = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const st = marqueeRef.current;
-    if (!st || st.pointerId !== e.pointerId) return;
-    marqueeRef.current = null;
-    setMarquee(null);
-  };
-
   const title = sectionNav
     ? t(sectionNav.labelKey)
     : t("settings.nav.general");
@@ -1670,10 +1454,6 @@ export function SettingsPage({
     setMemoryBrowserEpoch,
     mirrorConfirm,
     setMirrorConfirm,
-    archivedSelected,
-    setArchivedSelected,
-    marquee,
-    archivedSurfaceRef,
     wallpaperInputRef,
     wallpaperBusy: wallpaperBusy || appearanceWriteBusy,
     wallpaperError,
@@ -1743,21 +1523,6 @@ export function SettingsPage({
     onWallpaperFile,
     openWallpaperSource,
     wallpaperErrorMessage,
-    archiveAgePreviews,
-    archiveAgeAnyMatch,
-    archiveAgeMaxMatch,
-    archivedAllIds,
-    archivedTotal,
-    archivedSelectedCount,
-    archivedAllSelected,
-    archivedSomeSelected,
-    toggleArchivedId,
-    toggleArchivedAll,
-    toggleArchivedGroup,
-    onArchivedPointerDown,
-    onArchivedPointerMove,
-    onArchivedPointerUp,
-    onArchivedPointerCancel,
   } as SettingsViewModel & Record<string, unknown>;
 
 
