@@ -59,6 +59,7 @@ import { normalizeHHmm } from "@/lib/notifyQuietHours";
 import {
   SettingsHelpTip,
   SettingsLabelWithTip,
+  SettingsStackRow,
   SettingsTabStrip,
   UiCheck,
 } from "./shared";
@@ -284,7 +285,7 @@ export function AppearanceSection() {
                         />
                       </div>
                       {themeSchedule.enabled ? (
-                        <div className="settings-row settings-row--stack settings-quiet-hours">
+                        <SettingsStackRow className="settings-quiet-hours">
                           <div className="settings-quiet-hours__times">
                             <label className="settings-quiet-hours__field">
                               <span className="settings-quiet-hours__label">
@@ -359,7 +360,7 @@ export function AppearanceSection() {
                                 : t(themeScheduleHonesty.statusKey)}
                             </div>
                           ) : null}
-                        </div>
+                        </SettingsStackRow>
                       ) : null}
                     </>
                   ) : null}
@@ -374,13 +375,14 @@ export function AppearanceSection() {
                         }
                         id="settings-anchor-skin"
                       >
-                        <div className="settings-row settings-row--stack">
-                          <div className="settings-row__text">
+                        <SettingsStackRow
+                          hint={
                             <SettingsLabelWithTip
                               label={t("settings.skin")}
                               tip={t("settings.skinDesc")}
                             />
-                          </div>
+                          }
+                        >
                           <div
                             className="settings-skin-grid"
                             role="listbox"
@@ -417,7 +419,7 @@ export function AppearanceSection() {
                               );
                             })}
                           </div>
-                        </div>
+                        </SettingsStackRow>
                       </div>
                     ) : null}
                     {onWallpaper ? (
@@ -428,13 +430,14 @@ export function AppearanceSection() {
                         }
                         id="settings-anchor-wallpaper"
                       >
-                        <div className="settings-row settings-row--stack">
-                          <div className="settings-row__text">
+                        <SettingsStackRow
+                          hint={
                             <SettingsLabelWithTip
                               label={t("settings.wallpaper")}
                               tip={t("settings.wallpaperDesc")}
                             />
-                          </div>
+                          }
+                        >
                           <div className="settings-wallpaper">
                             <input
                               ref={wallpaperInputRef}
@@ -667,7 +670,7 @@ export function AppearanceSection() {
                               </p>
                             ) : null}
                           </div>
-                        </div>
+                        </SettingsStackRow>
                       </div>
                     ) : null}
                   </div>
@@ -836,13 +839,14 @@ export function AppearanceSection() {
                   }
                   id="settings-anchor-uiFont"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
+                  <SettingsStackRow
+                    hint={
                       <SettingsLabelWithTip
                         label={t("settings.uiFont")}
                         tip={t("settings.uiFontDesc")}
                       />
-                    </div>
+                    }
+                  >
                     <div className="settings-row__controls settings-row__controls--grow">
                       <FontFamilySelect
                         value={uiFontFamily}
@@ -864,7 +868,7 @@ export function AppearanceSection() {
                     <p className="settings-hint muted">
                       {t("settings.uiFontHint")}
                     </p>
-                  </div>
+                  </SettingsStackRow>
                 </div>
                 <div
                   className={
@@ -873,13 +877,14 @@ export function AppearanceSection() {
                   }
                   id="settings-anchor-terminalFont"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
+                  <SettingsStackRow
+                    hint={
                       <SettingsLabelWithTip
                         label={t("settings.terminalFont")}
                         tip={t("settings.terminalFontDesc")}
                       />
-                    </div>
+                    }
+                  >
                     <div className="settings-row__controls settings-row__controls--grow">
                       <FontFamilySelect
                         value={terminalFontFamily}
@@ -926,7 +931,7 @@ export function AppearanceSection() {
                     >
                       {t("settings.terminalFontPreview")}
                     </p>
-                  </div>
+                  </SettingsStackRow>
                 </div>
                 <div
                   className={
@@ -1300,13 +1305,14 @@ export function AppearanceSection() {
                   }
                   id="settings-anchor-exportLogo"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
+                  <SettingsStackRow
+                    hint={
                       <SettingsLabelWithTip
                         label={t("settings.exportLogo")}
                         tip={t("settings.exportLogoDesc")}
                       />
-                    </div>
+                    }
+                  >
                     <div
                       className="settings-export-logo"
                       style={{
@@ -1376,7 +1382,7 @@ export function AppearanceSection() {
                         {t("settings.exportLogoClear")}
                       </button>
                     </div>
-                  </div>
+                  </SettingsStackRow>
                 </div>
                 {onShowReplyLength ? (
                   <div

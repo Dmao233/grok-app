@@ -34,7 +34,7 @@ import {
   resolveCodeGraphMode,
 } from "@/lib/codeGraphProduct";
 import { IconRefresh } from "@/components/icons";
-import { UiCheck } from "@/components/settings/shared";
+import { SettingsStackRow, UiCheck } from "@/components/settings/shared";
 
 function PresenceBadge({
   values,
@@ -244,23 +244,19 @@ export function CodebaseIndexingPanel({
   const reset = () => setDraft(baseline);
 
   return (
-    <div
-      className="settings-row settings-row--stack settings-codebase-indexing"
-      id="settings-anchor-codebaseIndexing"
-    >
-      <div className="settings-row__text">
-        <div className="settings-row__label">
-          {t("settings.codebaseIndexing")}
-        </div>
-        <div className="settings-row__desc">
-          {t("settings.codebaseIndexingDesc")}
-        </div>
-        {snap?.path ? (
+    <SettingsStackRow
+      className="settings-codebase-indexing"
+      anchorId="settings-anchor-codebaseIndexing"
+      label={t("settings.codebaseIndexing")}
+      desc={t("settings.codebaseIndexingDesc")}
+      hint={
+        snap?.path ? (
           <div className="settings-row__hint" title={snap.path}>
             {t("settings.codebaseIndexing.path", { path: snap.path })}
           </div>
-        ) : null}
-      </div>
+        ) : null
+      }
+    >
 
       {loading && !snap ? (
         <p className="ext-field-hint">
@@ -474,6 +470,6 @@ export function CodebaseIndexingPanel({
           </div>
         </>
       ) : null}
-    </div>
+    </SettingsStackRow>
   );
 }

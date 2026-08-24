@@ -18,7 +18,7 @@ import {
   listArchiveAgeOptionPreviews,
   hasAnyArchiveAgeMatches,
 } from "@/lib/sessionArchiveAge";
-import { UiCheck, marqueeClientRect, rectsOverlap } from "./shared";
+import { SettingsStackRow, UiCheck, marqueeClientRect, rectsOverlap } from "./shared";
 
 
 export function ArchivedSection() {
@@ -254,7 +254,7 @@ export function ArchivedSection() {
                 className="settings-card settings-archived-age"
                 id="settings-anchor-archive-older"
               >
-                <div className="settings-row settings-row--stack">
+                <SettingsStackRow>
                   <div className="settings-row__meta">
                     <div className="settings-row__label">
                       {t("settings.archived.archiveOlder")}
@@ -307,7 +307,7 @@ export function ArchivedSection() {
                         })
                       : t("settings.archived.archiveOlderNoneHint")}
                   </div>
-                </div>
+                </SettingsStackRow>
               </div>
             ) : null}
             {archivedTotal === 0 ? (

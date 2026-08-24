@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as api from "@/lib/api";
 import { createT, intlLocale, type Locale, type MessageKey } from "@/i18n";
+import { SettingsStackRow } from "@/components/settings/shared";
 import {
   IconExternalLink,
   IconFolder,
@@ -316,18 +317,13 @@ export function CodebaseSearchPanel({
     queryActive && searching && hits.length > 0 && !emptyState;
 
   return (
-    <div
-      className="settings-row settings-row--stack settings-codebase-search"
-      id="settings-anchor-codebaseSearch"
-    >
-      <div className="settings-row__text">
-        <div className="settings-row__label">
-          {t("settings.codebaseSearch")}
-        </div>
-        <div className="settings-row__desc">
-          {t("settings.codebaseSearchDesc")}
-        </div>
-        {resolvedRoot || cwd ? (
+    <SettingsStackRow
+      className="settings-codebase-search"
+      anchorId="settings-anchor-codebaseSearch"
+      label={t("settings.codebaseSearch")}
+      desc={t("settings.codebaseSearchDesc")}
+      hint={
+        resolvedRoot || cwd ? (
           <div
             className="settings-row__hint"
             title={resolvedRoot || cwd || undefined}
@@ -336,8 +332,9 @@ export function CodebaseSearchPanel({
               path: resolvedRoot || cwd || "",
             })}
           </div>
-        ) : null}
-      </div>
+        ) : null
+      }
+    >
 
       <div
         className="settings-codebase-search__badges settings-code-graph__chips"
@@ -552,6 +549,6 @@ export function CodebaseSearchPanel({
           })}
         </ul>
       )}
-    </div>
+    </SettingsStackRow>
   );
 }

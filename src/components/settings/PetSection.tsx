@@ -3,7 +3,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSettingsModel } from "@/providers/SettingsModelContext";
-import { SettingsLabelWithTip, SettingsTabStrip, UiSwitch } from "./shared";
+import { SettingsLabelWithTip, SettingsStackRow, SettingsTabStrip, UiSwitch } from "./shared";
 import { PetMark } from "@/components/pet/PetMark";
 import { Select } from "@/components/Select";
 import { listen } from "@/lib/api/host";
@@ -435,13 +435,11 @@ export function PetSection() {
             className={"settings-card" + rowHighlight("settings-anchor-pet-bubble-look")}
             id="settings-anchor-pet-bubble-look"
           >
-            <div className="settings-row settings-row--stack">
-              <div className="settings-row__text">
-                <div className="settings-row__label">{t("settings.pet.bubbleLook")}</div>
-                <div className="settings-row__desc">{t("settings.pet.bubbleLookDesc")}</div>
-              </div>
-            </div>
-            <div className="settings-row settings-row--stack">
+            <SettingsStackRow
+              label={t("settings.pet.bubbleLook")}
+              desc={t("settings.pet.bubbleLookDesc")}
+            />
+            <SettingsStackRow>
               <div className="settings-row__label">{t("settings.pet.bubbleShape")}</div>
               <div className="pet-settings-grid" role="group" aria-label={t("settings.pet.bubbleShape")}>
                 {PET_BUBBLE_SHAPES.map((sh) => (
@@ -463,8 +461,8 @@ export function PetSection() {
                   </button>
                 ))}
               </div>
-            </div>
-            <div className="settings-row settings-row--stack">
+            </SettingsStackRow>
+            <SettingsStackRow>
               <div className="settings-row__label">{t("settings.pet.bubbleStyle")}</div>
               <div className="pet-settings-grid" role="group" aria-label={t("settings.pet.bubbleStyle")}>
                 {PET_BUBBLE_STYLES.map((st) => (
@@ -486,7 +484,7 @@ export function PetSection() {
                   </button>
                 ))}
               </div>
-            </div>
+            </SettingsStackRow>
           </div>
         </>
       )}

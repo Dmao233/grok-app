@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Select } from "@/components/Select";
 import { IconBolt } from "@/components/icons";
-import { UiCheck } from "./shared";
+import { SettingsStackRow, UiCheck } from "./shared";
 import {
   DEVELOPER_MODE_CHANGE_EVENT,
   loadDeveloperModePref,
@@ -88,21 +88,12 @@ export function DeveloperModeSection({
       </div>
 
       {devMode ? (
-        <div
-          className={
-            "settings-row settings-row--stack" +
-            rowHighlight("settings-anchor-updateSim")
-          }
-          id="settings-anchor-updateSim"
+        <SettingsStackRow
+          anchorId="settings-anchor-updateSim"
+          highlight={rowHighlight}
+          label={t("settings.updateSim")}
+          desc={t("settings.updateSimDesc", { version: UPDATE_SIM_VERSION })}
         >
-          <div className="settings-row__text">
-            <div className="settings-row__label">
-              {t("settings.updateSim")}
-            </div>
-            <div className="settings-row__desc">
-              {t("settings.updateSimDesc", { version: UPDATE_SIM_VERSION })}
-            </div>
-          </div>
           <div className="settings-about-update__actions">
             <Select
               value={simMode}
@@ -126,7 +117,7 @@ export function DeveloperModeSection({
               })}
             </div>
           ) : null}
-        </div>
+        </SettingsStackRow>
       ) : null}
     </div>
   );

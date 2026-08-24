@@ -21,7 +21,7 @@ import {
   type MemoryEmbedValues,
 } from "@/lib/memoryEmbedConfig";
 import { IconRefresh } from "@/components/icons";
-import { UiCheck } from "@/components/settings/shared";
+import { SettingsStackRow, UiCheck } from "@/components/settings/shared";
 
 function PresenceBadge({
   value,
@@ -130,17 +130,21 @@ function NumberField({
   t: (k: MessageKey, vars?: Record<string, string | number>) => string;
 }) {
   return (
-    <div className="settings-row settings-row--stack" id={id}>
-      <div className="settings-row__text">
-        <div className="settings-row__label">
+    <SettingsStackRow
+      anchorId={id}
+      label={
+        <>
           {t(labelKey)}{" "}
           <ScalarPresence set={value != null} t={t} />
-        </div>
-        <div className="settings-row__desc">{t(descKey)}</div>
+        </>
+      }
+      desc={t(descKey)}
+      hint={
         <div className="settings-row__hint" title={configKey}>
           {configKey}
         </div>
-      </div>
+      }
+    >
       <input
         type="number"
         className="settings-input"
@@ -151,7 +155,7 @@ function NumberField({
         onChange={(e) => onChange(parseOptionalNumber(e.target.value))}
         aria-label={t(labelKey)}
       />
-    </div>
+    </SettingsStackRow>
   );
 }
 
@@ -278,19 +282,19 @@ export function MemoryEmbedPanel({
   const reset = () => setDraft(baseline);
 
   return (
-    <div
-      className="settings-row settings-row--stack settings-memory-embed"
-      id="settings-anchor-memoryEmbed"
-    >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.memoryEmbed")}</div>
-        <div className="settings-row__desc">{t("settings.memoryEmbedDesc")}</div>
-        {snap?.path ? (
+    <SettingsStackRow
+      className="settings-memory-embed"
+      anchorId="settings-anchor-memoryEmbed"
+      label={t("settings.memoryEmbed")}
+      desc={t("settings.memoryEmbedDesc")}
+      hint={
+        snap?.path ? (
           <div className="settings-row__hint" title={snap.path}>
             {t("settings.memoryEmbed.path", { path: snap.path })}
           </div>
-        ) : null}
-      </div>
+        ) : null
+      }
+    >
 
       {loading && !snap ? (
         <p className="ext-field-hint">{t("settings.memoryEmbed.loading")}</p>
@@ -362,22 +366,21 @@ export function MemoryEmbedPanel({
           </div>
 
           <div className="settings-config-edit__fields" style={{ marginTop: 8 }}>
-            <div
-              className="settings-row settings-row--stack"
-              id="settings-anchor-memoryEmbed-model"
-            >
-              <div className="settings-row__text">
-                <div className="settings-row__label">
+            <SettingsStackRow
+              anchorId="settings-anchor-memoryEmbed-model"
+              label={
+                <>
                   {t("settings.memoryEmbed.model")}{" "}
                   <ScalarPresence set={!!draft.embeddingModel} t={t} />
-                </div>
-                <div className="settings-row__desc">
-                  {t("settings.memoryEmbed.modelDesc")}
-                </div>
+                </>
+              }
+              desc={t("settings.memoryEmbed.modelDesc")}
+              hint={
                 <div className="settings-row__hint" title="[memory.embedding] model">
                   [memory.embedding] model
                 </div>
-              </div>
+              }
+            >
               <input
                 type="text"
                 className="settings-input"
@@ -396,7 +399,7 @@ export function MemoryEmbedPanel({
                 spellCheck={false}
                 aria-label={t("settings.memoryEmbed.model")}
               />
-            </div>
+            </SettingsStackRow>
 
             <NumberField
               id="settings-anchor-memoryEmbed-dimensions"
@@ -597,6 +600,6 @@ export function MemoryEmbedPanel({
           </div>
         </>
       ) : null}
-    </div>
+    </SettingsStackRow>
   );
 }

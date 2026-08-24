@@ -6,6 +6,7 @@
  */
 import { useState } from "react";
 import { UpdateInstallConfirmModal } from "@/components/UpdateInstallConfirmModal";
+import { SettingsStackRow } from "./shared";
 import { useUpdaterContext } from "@/hooks/UpdaterProvider";
 import * as api from "@/lib/api";
 import {
@@ -111,29 +112,32 @@ export function AboutUpdateRow({
       : null;
 
   return (
-    <div className="settings-row settings-row--stack">
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.checkUpdate")}</div>
-        <div className="settings-row__desc">{t("settings.checkUpdateDesc")}</div>
-        <div
-          className="settings-row__hint"
-          data-updater-channel={channel}
-          data-updater-host-channel={channelInfo.channel}
-        >
-          {t(channelLabelKey)}
-          {channelInfo.endpoint && isAutoUpdatePath(channel)
-            ? ` · ${channelInfo.endpoint.replace(/^https:\/\//, "")}`
-            : ""}
-        </div>
-        {channelExtraKey ? (
+    <SettingsStackRow
+      label={t("settings.checkUpdate")}
+      desc={t("settings.checkUpdateDesc")}
+      hint={
+        <>
           <div
-            className="settings-row__hint settings-about-update__channel-note"
-            data-update-channel-note={channelExtraKey}
+            className="settings-row__hint"
+            data-updater-channel={channel}
+            data-updater-host-channel={channelInfo.channel}
           >
-            {t(channelExtraKey)}
+            {t(channelLabelKey)}
+            {channelInfo.endpoint && isAutoUpdatePath(channel)
+              ? ` · ${channelInfo.endpoint.replace(/^https:\/\//, "")}`
+              : ""}
           </div>
-        ) : null}
-      </div>
+          {channelExtraKey ? (
+            <div
+              className="settings-row__hint settings-about-update__channel-note"
+              data-update-channel-note={channelExtraKey}
+            >
+              {t(channelExtraKey)}
+            </div>
+          ) : null}
+        </>
+      }
+    >
       <div className="settings-about-update">
         <div className="settings-about-update__actions">
           <button
@@ -255,6 +259,6 @@ export function AboutUpdateRow({
           void installAndRelaunch();
         }}
       />
-    </div>
+    </SettingsStackRow>
   );
 }

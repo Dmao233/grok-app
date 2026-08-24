@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useState } from "react";
 import * as api from "@/lib/api";
 import { Select } from "@/components/Select";
-import { UiCheck } from "./shared";
+import { SettingsStackRow, UiCheck } from "./shared";
 import type { Vars } from "@/i18n";
 
 type Props = {
@@ -94,9 +94,9 @@ export function WslBackendField({ t, onSaved }: Props) {
 
   if (loading) {
     return (
-      <div className="settings-row settings-row--stack" id="settings-anchor-wslBackend">
+      <SettingsStackRow anchorId="settings-anchor-wslBackend">
         <div className="settings-row__hint">{t("settings.wsl.loading")}</div>
-      </div>
+      </SettingsStackRow>
     );
   }
 
@@ -113,14 +113,11 @@ export function WslBackendField({ t, onSaved }: Props) {
   const probeOk = !!probe?.found && !!probe?.version;
 
   return (
-    <div
-      className="settings-row settings-row--stack"
-      id="settings-anchor-wslBackend"
+    <SettingsStackRow
+      anchorId="settings-anchor-wslBackend"
+      label={t("settings.wsl.title")}
+      desc={t("settings.wsl.desc")}
     >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.wsl.title")}</div>
-        <div className="settings-row__desc">{t("settings.wsl.desc")}</div>
-      </div>
 
       {!status?.available ? (
         <div className="settings-row__hint settings-row__hint--warn">
@@ -154,7 +151,7 @@ export function WslBackendField({ t, onSaved }: Props) {
 
       {enabled ? (
         <>
-          <div className="settings-row settings-row--stack">
+          <SettingsStackRow>
             <div className="settings-row__label">{t("settings.wsl.distro")}</div>
             <div className="settings-row__desc">{t("settings.wsl.distroDesc")}</div>
             <Select
@@ -166,8 +163,8 @@ export function WslBackendField({ t, onSaved }: Props) {
               disabled={saving}
               aria-label={t("settings.wsl.distro")}
             />
-          </div>
-          <div className="settings-row settings-row--stack">
+          </SettingsStackRow>
+          <SettingsStackRow>
             <div className="settings-row__label">{t("settings.wsl.cliPath")}</div>
             <div className="settings-row__desc">{t("settings.wsl.cliPathDesc")}</div>
             <input
@@ -185,7 +182,7 @@ export function WslBackendField({ t, onSaved }: Props) {
                 }
               }}
             />
-          </div>
+          </SettingsStackRow>
           <div className="settings-row">
             <button
               type="button"
@@ -221,6 +218,6 @@ export function WslBackendField({ t, onSaved }: Props) {
       ) : (
         <div className="settings-row__hint">{t("settings.wsl.nativeHint")}</div>
       )}
-    </div>
+    </SettingsStackRow>
   );
 }

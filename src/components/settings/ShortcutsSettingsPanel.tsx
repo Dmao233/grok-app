@@ -54,7 +54,7 @@ import {
   loadVoiceHotkeyEnabled,
 } from "@/lib/voiceHotkeyPref";
 import type { MessageKey, Vars } from "@/i18n";
-import { UiCheck } from "./shared";
+import { SettingsStackRow, UiCheck } from "./shared";
 
 export function ShortcutsSettingsPanel({
   t,
@@ -260,14 +260,15 @@ export function ShortcutsSettingsPanel({
 
   return (
     <div className="settings-card">
-      <div className="settings-row settings-row--stack">
-        <div className="settings-row__text">
-          <div className="settings-row__label">
+      <SettingsStackRow
+        label={
+          <>
             <IconKeyboard size={16} />
             {t("settings.shortcuts.title")}
-          </div>
-          <div className="settings-row__desc">{t("settings.shortcuts.desc")}</div>
-        </div>
+          </>
+        }
+        desc={t("settings.shortcuts.desc")}
+      >
         <div className="settings-shortcuts-header-actions">
           {onOpenHelp ? (
             <button
@@ -294,7 +295,7 @@ export function ShortcutsSettingsPanel({
             ) : null}
           </button>
         </div>
-      </div>
+      </SettingsStackRow>
       <div className="settings-row settings-shortcuts-scope-pref">
         <div className="settings-row__text">
           <div className="settings-row__label">

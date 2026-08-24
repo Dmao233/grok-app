@@ -6,7 +6,7 @@ import pixelGlitch from "@/assets/app-icons/pixel-glitch.png";
 import minimalLine from "@/assets/app-icons/minimal-line.png";
 import terminalCode from "@/assets/app-icons/terminal-code.png";
 import whiteHole from "@/assets/app-icons/white-hole.png";
-import { SettingsLabelWithTip } from "./shared";
+import { SettingsLabelWithTip, SettingsStackRow } from "./shared";
 
 const DEFAULT_APP_ICON = "default-black";
 
@@ -107,13 +107,14 @@ export function AppIconPicker({
       className={`settings-card${rowHighlight("settings-anchor-app-icon")}`}
       id="settings-anchor-app-icon"
     >
-      <div className="settings-row settings-row--stack">
-        <div className="settings-row__text">
+      <SettingsStackRow
+        hint={
           <SettingsLabelWithTip
             label={t("settings.appIcon")}
             tip={t("settings.appIconDesc")}
           />
-        </div>
+        }
+      >
         <div
           className="settings-skin-grid settings-app-icon-grid"
           role="listbox"
@@ -168,7 +169,7 @@ export function AppIconPicker({
             {t("settings.appIconError")}
           </div>
         ) : null}
-      </div>
+      </SettingsStackRow>
     </div>
   );
 }

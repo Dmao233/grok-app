@@ -33,6 +33,7 @@ import {
 import { subscribeAppearanceWriteBusy } from "@/lib/appearanceWriteLock";
 import { useThemeShell } from "@/providers/ThemeProvider";
 import { useSkinShare } from "@/providers/SkinShareProvider";
+import { SettingsStackRow } from "./shared";
 import { useSettingsModel } from "@/providers/SettingsModelContext";
 import { GlassModal } from "@/components/GlassModal";
 import { SkinCatalogModal } from "./SkinCatalogModal";
@@ -182,11 +183,14 @@ export function SkinPresetsCard() {
       className="settings-card settings-card--appearance-col"
       id="settings-anchor-skin-presets"
     >
-      <div className="settings-row settings-row--stack">
-        <div className="settings-row__text">
-          <div className="settings-label">{t("settings.skinPresets.title")}</div>
-          <p className="settings-desc">{t("settings.skinPresets.desc")}</p>
-        </div>
+      <SettingsStackRow
+        hint={
+          <>
+            <div className="settings-label">{t("settings.skinPresets.title")}</div>
+            <p className="settings-desc">{t("settings.skinPresets.desc")}</p>
+          </>
+        }
+      >
         <div className="skin-presets__actions">
           <button
             type="button"
@@ -366,7 +370,7 @@ export function SkinPresetsCard() {
             )}
           </p>
         ) : null}
-      </div>
+      </SettingsStackRow>
 
       <GlassModal
         open={!!nameOpen}

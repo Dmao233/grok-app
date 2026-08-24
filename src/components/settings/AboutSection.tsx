@@ -8,6 +8,7 @@ import { IconHelp, IconInfo } from "@/components/icons";
 import { CliUpdateRow } from "@/components/CliUpdateRow";
 import { AboutUpdateRow } from "./AboutUpdateRow";
 import { DeveloperModeSection } from "./DeveloperModeSection";
+import { SettingsStackRow } from "./shared";
 
 export function AboutSection() {
   const s = useSettingsModel() as SettingsViewModel & Record<string, any>;
@@ -25,25 +26,22 @@ export function AboutSection() {
         className={"settings-card" + rowHighlight("settings-anchor-about")}
         id="settings-anchor-about"
       >
-        <div className="settings-row settings-row--stack">
-          <div className="settings-row__text">
-            <div className="settings-row__label">
+        <SettingsStackRow
+          label={
+            <>
               <IconInfo size={16} />
               {t("settings.aboutApp")}
-            </div>
-            <div className="settings-row__desc">{versionFooter}</div>
-          </div>
-        </div>
-        <AboutUpdateRow t={t} />
-        <div
-          className={
-            "settings-row settings-row--stack" +
-            rowHighlight("settings-anchor-aboutCli")
+            </>
           }
-          id="settings-anchor-aboutCli"
+          desc={versionFooter}
+        />
+        <AboutUpdateRow t={t} />
+        <SettingsStackRow
+          anchorId="settings-anchor-aboutCli"
+          highlight={rowHighlight}
         >
           <CliUpdateRow t={t} cliFound={cliInfo.found} autoCheck />
-        </div>
+        </SettingsStackRow>
       </div>
       <DeveloperModeSection t={t} rowHighlight={rowHighlight} />
       {onOpenProductTutorial ? (

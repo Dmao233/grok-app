@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconCopy, IconSearch, IconTrash } from "@/components/icons";
 import { GlassModal } from "@/components/GlassModal";
+import { SettingsStackRow } from "./shared";
 import {
   countUnlinkedCliSessions,
   filterCliSessions,
@@ -237,14 +238,11 @@ export function CliSessionsPanel({
       busyId === deleteConfirm.row.agentSessionId);
 
   return (
-    <div
-      className="settings-row settings-row--stack"
-      id="settings-anchor-cliSessions"
+    <SettingsStackRow
+      anchorId="settings-anchor-cliSessions"
+      label={t("settings.cliSessions")}
+      desc={t("settings.cliSessionsDesc")}
     >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.cliSessions")}</div>
-        <div className="settings-row__desc">{t("settings.cliSessionsDesc")}</div>
-      </div>
       <div className="settings-cli-sessions">
         {isIndependent ? (
           <div className="settings-cli-sessions__note" role="note">
@@ -522,6 +520,6 @@ export function CliSessionsPanel({
               })}
         </p>
       </GlassModal>
-    </div>
+    </SettingsStackRow>
   );
 }

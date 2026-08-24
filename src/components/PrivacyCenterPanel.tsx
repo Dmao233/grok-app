@@ -43,7 +43,7 @@ import {
   resolveExternalOtelStatus,
 } from "@/lib/externalOtelHonesty";
 import { IconRefresh } from "@/components/icons";
-import { UiCheck } from "@/components/settings/shared";
+import { SettingsStackRow, UiCheck } from "@/components/settings/shared";
 
 function PresenceBadge({
   value,
@@ -297,19 +297,19 @@ export function PrivacyCenterPanel({
   const hardFail = probe != null && probe.outcome === "error" && !snap;
 
   return (
-    <div
-      className="settings-row settings-row--stack settings-privacy"
-      id="settings-anchor-privacy"
-    >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.privacy")}</div>
-        <div className="settings-row__desc">{t("settings.privacyDesc")}</div>
-        {snap?.path ? (
+    <SettingsStackRow
+      className="settings-privacy"
+      anchorId="settings-anchor-privacy"
+      label={t("settings.privacy")}
+      desc={t("settings.privacyDesc")}
+      hint={
+        snap?.path ? (
           <div className="settings-row__hint" title={snap.path}>
             {t("settings.privacy.path", { path: snap.path })}
           </div>
-        ) : null}
-      </div>
+        ) : null
+      }
+    >
 
       {loading && !snap ? (
         <p className="ext-field-hint">{t("settings.privacy.loading")}</p>
@@ -465,24 +465,19 @@ export function PrivacyCenterPanel({
             />
           </div>
 
-          <div
-            className="settings-row settings-row--stack"
-            id="settings-anchor-privacy-codingData"
+          <SettingsStackRow
+            anchorId="settings-anchor-privacy-codingData"
             style={{ marginTop: 12 }}
-          >
-            <div className="settings-row__text">
-              <div className="settings-row__label">
-                {t("settings.privacy.codingData")}
-              </div>
-              <div className="settings-row__desc">
-                {t("settings.privacy.codingDataDesc")}
-              </div>
+            label={t("settings.privacy.codingData")}
+            desc={t("settings.privacy.codingDataDesc")}
+            hint={
               <div className="settings-row__hint">
                 {t("settings.privacy.codingDataHint", {
                   cmd: snap.cliPrivacyCommand || CLI_PRIVACY_COMMAND,
                 })}
               </div>
-            </div>
+            }
+          >
             <div
               className="settings-row__actions"
             >
@@ -498,7 +493,7 @@ export function PrivacyCenterPanel({
                     })}
               </button>
             </div>
-          </div>
+          </SettingsStackRow>
 
           {snap.redactedPreview?.trim() ? (
             <div className="settings-config-edit__preview">
@@ -561,22 +556,16 @@ export function PrivacyCenterPanel({
       ) : null}
 
       {/* External OTEL: always visible (env template + dual opt-in honesty). */}
-      <div
+      <SettingsStackRow
         className={
-          "settings-row settings-row--stack settings-privacy__external-otel " +
+          "settings-privacy__external-otel " +
           externalOtelToneClass(externalOtel.tone)
         }
-        id="settings-anchor-privacy-externalOtel"
+        anchorId="settings-anchor-privacy-externalOtel"
         style={{ marginTop: 16 }}
+        label={t("settings.privacy.externalOtel")}
+        desc={t("settings.privacy.externalOtelDesc")}
       >
-        <div className="settings-row__text">
-          <div className="settings-row__label">
-            {t("settings.privacy.externalOtel")}
-          </div>
-          <div className="settings-row__desc">
-            {t("settings.privacy.externalOtelDesc")}
-          </div>
-        </div>
 
         <div
           className={
@@ -685,7 +674,7 @@ export function PrivacyCenterPanel({
         >
           {formatExternalOtelEnvHints()}
         </pre>
-      </div>
-    </div>
+      </SettingsStackRow>
+    </SettingsStackRow>
   );
 }

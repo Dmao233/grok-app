@@ -10,6 +10,7 @@ import * as api from "@/lib/api";
 import type { MemoryFileEntry, MemorySearchHit } from "@/lib/api";
 import { createT, intlLocale, type Locale, type MessageKey } from "@/i18n";
 import { GlassModal } from "@/components/GlassModal";
+import { SettingsStackRow } from "@/components/settings/shared";
 import {
   IconExternalLink,
   IconFolder,
@@ -528,14 +529,12 @@ export function MemoryBrowserPanel({
   const anyClearBusy = clearBusy || clearAllBusy;
 
   return (
-    <div
-      className={"settings-row settings-row--stack" + " settings-memory-browser"}
-      id="settings-anchor-memoryBrowser"
+    <SettingsStackRow
+      className="settings-memory-browser"
+      anchorId="settings-anchor-memoryBrowser"
+      label={t("settings.memoryOps")}
+      desc={t("settings.memoryOpsDesc")}
     >
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.memoryOps")}</div>
-        <div className="settings-row__desc">{t("settings.memoryOpsDesc")}</div>
-      </div>
 
       <div
         className="settings-memory-ops"
@@ -971,6 +970,6 @@ export function MemoryBrowserPanel({
             : t("settings.memoryOps.clear.confirmMsg.workspace")}
         </p>
       </GlassModal>
-    </div>
+    </SettingsStackRow>
   );
 }

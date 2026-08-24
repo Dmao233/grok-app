@@ -8,6 +8,7 @@ import {
   parseAcpServerAddr,
 } from "@/lib/acpServerAddr";
 import type { Vars } from "@/i18n";
+import { SettingsStackRow } from "./shared";
 
 /**
  * ACP API-mode field: validate on blur, TCP health probe, status chip.
@@ -96,11 +97,10 @@ export function AcpServerField({
     }
   };
   return (
-    <div className="settings-row settings-row--stack">
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.acpServer")}</div>
-        <div className="settings-row__desc">{t("settings.acpServerDesc")}</div>
-      </div>
+    <SettingsStackRow
+      label={t("settings.acpServer")}
+      desc={t("settings.acpServerDesc")}
+    >
       <div className="settings-row__hint">{t("settings.acpServerModeHelp")}</div>
       <div className="settings-acp-field">
         <input
@@ -186,6 +186,6 @@ export function AcpServerField({
       ) : (
         <div className="settings-row__hint">{t("settings.acpServerLocalHint")}</div>
       )}
-    </div>
+    </SettingsStackRow>
   );
 }

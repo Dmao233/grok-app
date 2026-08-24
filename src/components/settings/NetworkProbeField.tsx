@@ -10,6 +10,7 @@ import {
   type ClassifiedProbeResult,
 } from "@/lib/networkProxy";
 import { formatProbeSummary } from "@/lib/networkProxyPro";
+import { SettingsStackRow } from "./shared";
 import type { MessageKey, Vars } from "@/i18n";
 
 const SOURCE_KEYS: Record<string, MessageKey> = {
@@ -107,11 +108,10 @@ export function NetworkProbeField({ t }: { t: (k: string, vars?: Vars) => string
   });
 
   return (
-    <div className="settings-row settings-row--stack">
-      <div className="settings-row__text">
-        <div className="settings-row__label">{t("settings.netProbe")}</div>
-        <div className="settings-row__desc">{t("settings.netProbeDesc")}</div>
-      </div>
+    <SettingsStackRow
+      label={t("settings.netProbe")}
+      desc={t("settings.netProbeDesc")}
+    >
       <div className="settings-row__hint">{t("settings.netProbeHonesty")}</div>
       {effectiveLine ? (
         <div
@@ -236,6 +236,6 @@ export function NetworkProbeField({ t }: { t: (k: string, vars?: Vars) => string
           </ul>
         ) : null}
       </div>
-    </div>
+    </SettingsStackRow>
   );
 }

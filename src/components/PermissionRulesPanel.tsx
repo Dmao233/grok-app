@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Select } from "@/components/Select";
 import { GlassModal } from "@/components/GlassModal";
 import { IconPlus, IconShield, IconTrash } from "@/components/icons";
+import { SettingsStackRow } from "@/components/settings/shared";
 import * as api from "@/lib/api";
 import {
   addRule,
@@ -188,22 +189,23 @@ export function PermissionRulesPanel({
   /* Flat section inside parent settings-card — no nested card chrome. */
   return (
     <div className="perm-rules">
-      <div className="settings-row settings-row--stack perm-rules__head">
-        <div className="settings-row__text">
-          <div className="settings-row__label">
+      <SettingsStackRow
+        className="perm-rules__head"
+        label={
+          <>
             <IconShield size={16} />
             {t("settings.permissionRules")}
-          </div>
-          <div className="settings-row__desc">
-            {t("settings.permissionRulesDesc")}
-          </div>
-          {configPath ? (
+          </>
+        }
+        desc={t("settings.permissionRulesDesc")}
+        hint={
+          configPath ? (
             <div className="settings-row__hint perm-rules__path" title={configPath}>
               {t("settings.permissionRulesPath", { path: configPath })}
             </div>
-          ) : null}
-        </div>
-      </div>
+          ) : null
+        }
+      />
 
       {loading ? (
         <p className="perm-rules__empty">{t("settings.permissionRulesLoading")}</p>
