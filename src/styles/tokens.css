@@ -106,7 +106,6 @@
    */
   --sidebar-blur: 64px;
   --sidebar-saturate: 1.85;
-  --sidebar-edge-line: rgba(255, 255, 255, 0.08);
   /* No opaque --bg-main strip — that read as a black bar cutting the glass. */
   --sidebar-edge-shadow: none;
   --sidebar-seam: none;
@@ -151,12 +150,7 @@
    * Glass still used by selects / user sheet / slash where appropriate.
    * Context menus (右键) use solid --menu-context-* below.
    */
-  --menu-surface: var(--glass-surface);
-  --menu-surface-solid: var(--glass-surface-solid);
   --menu-border: var(--glass-border);
-  --menu-blur: var(--glass-blur);
-  --menu-saturate: var(--glass-saturate);
-  --menu-shadow: var(--glass-shadow);
   --menu-radius: 12px;
   --menu-pad: 6px;
   --menu-gap: 2px;
@@ -185,8 +179,6 @@
   --menu-context-item-pad-x: 8px;
   --menu-context-item-radius: 6px;
   --menu-context-item-gap: 6px;
-  /* Soft floor only — panels size to content; avoid large fixed widths */
-  --menu-min-width: 0px;
   --menu-max-width: min(360px, calc(100vw - 16px));
 
   /*
@@ -238,7 +230,6 @@
   --bg-user-bubble: #e8e8ed;
 
   /* Soft inward shade on glass; no 1px fill of --bg-main (that cut the frost). */
-  --sidebar-edge-line: rgba(0, 0, 0, 0.04);
   --sidebar-edge-shadow: inset -8px 0 12px -8px rgba(0, 0, 0, 0.035);
   --sidebar-seam: -4px 0 12px rgba(0, 0, 0, 0.02);
 
@@ -263,12 +254,7 @@
   --text-secondary: rgba(0, 0, 0, 0.55);
   --text-tertiary: rgba(0, 0, 0, 0.36);
 
-  --menu-surface: var(--glass-surface);
-  --menu-surface-solid: var(--glass-surface-solid);
   --menu-border: var(--glass-border);
-  --menu-blur: var(--glass-blur);
-  --menu-saturate: var(--glass-saturate);
-  --menu-shadow: var(--glass-shadow);
   --menu-hover: rgba(0, 0, 0, 0.05);
   --menu-active: rgba(0, 0, 0, 0.07);
 
