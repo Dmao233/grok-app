@@ -29,7 +29,7 @@ import {
   proxySoftFailMessageKey,
 } from "@/lib/networkProxy";
 import { resolveProxyApplyHonesty } from "@/lib/networkProxyPro";
-import { SettingsTabStrip, UiCheck } from "./shared";
+import { SettingsStackRow, SettingsTabStrip, UiCheck } from "./shared";
 import { IconArchive, IconDoctor } from "@/components/icons";
 import { NetworkProbeField } from "./NetworkProbeField";
 import { AcpServerField } from "./AcpServerField";
@@ -115,18 +115,17 @@ export function RuntimeSection() {
                 className={"settings-card" + rowHighlight("settings-anchor-cliPath")}
                 id="settings-anchor-cliPath"
               >
-                <div className="settings-row settings-row--stack">
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
+                <SettingsStackRow
+                  label={
+                    <>
                       {t("settings.cliPath")}{" "}
                       {cliInfo.found
                         ? `(${cliInfo.source || "ok"})`
                         : t("settings.cliNotFound")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.cliPathDesc")}
-                    </div>
-                  </div>
+                    </>
+                  }
+                  desc={t("settings.cliPathDesc")}
+                >
                   <input
                     className="settings-input"
                     value={manualCliPath}
@@ -168,7 +167,7 @@ export function RuntimeSection() {
                     );
                   })()}
                   {cliInfo.agentBinarySkew ? (
-                    <div className="settings-row settings-row--stack settings-row--compact">
+                    <SettingsStackRow className="settings-row--compact">
                       <div className="settings-row__hint settings-row__hint--warn">
                         {t("settings.cliAgentSkew", {
                           version: cliInfo.version || "—",
@@ -219,7 +218,7 @@ export function RuntimeSection() {
                             : t("settings.cliAgentSkewRepair")}
                         </button>
                       ) : null}
-                    </div>
+                    </SettingsStackRow>
                   ) : null}
                   {cliInfo.acpAgentVersionSkew ? (
                     <div
@@ -232,7 +231,7 @@ export function RuntimeSection() {
                       })}
                     </div>
                   ) : null}
-                </div>
+                </SettingsStackRow>
                 {detectAppPlatform() === "win" ? (
                   <div
                     className={
@@ -284,19 +283,16 @@ export function RuntimeSection() {
                     />
                   </div>
                 ) : null}
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-cliUpdate")
-                  }
-                  id="settings-anchor-cliUpdate"
+                <SettingsStackRow
+                  anchorId="settings-anchor-cliUpdate"
+                  highlight={rowHighlight}
                 >
                   <CliUpdateRow
                     t={t}
                     cliFound={cliInfo.found}
                     autoCheck
                   />
-                </div>
+                </SettingsStackRow>
               </div>
             )}
             {activeTab === "cli" && (
@@ -366,15 +362,10 @@ export function RuntimeSection() {
                 }
                 id="settings-anchor-proxy"
               >
-                <div className="settings-row settings-row--stack">
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.proxyMode")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.proxyModeDesc")}
-                    </div>
-                  </div>
+                <SettingsStackRow
+                  label={t("settings.proxyMode")}
+                  desc={t("settings.proxyModeDesc")}
+                >
                   <Select
                     className="settings-select"
                     aria-label={t("settings.proxyMode")}
@@ -416,18 +407,13 @@ export function RuntimeSection() {
                       </ul>
                     );
                   })()}
-                </div>
+                </SettingsStackRow>
                 {normalizeProxyMode(proxyMode) === "manual" && (
                   <>
-                    <div className="settings-row settings-row--stack">
-                      <div className="settings-row__text">
-                        <div className="settings-row__label">
-                          {t("settings.proxyUrl")}
-                        </div>
-                        <div className="settings-row__desc">
-                          {t("settings.proxyUrlDesc")}
-                        </div>
-                      </div>
+                    <SettingsStackRow
+                      label={t("settings.proxyUrl")}
+                      desc={t("settings.proxyUrlDesc")}
+                    >
                       {(() => {
                         const urlSoft = manualProxyUrlSoftFail(
                           proxyMode,
@@ -478,16 +464,11 @@ export function RuntimeSection() {
                           </>
                         );
                       })()}
-                    </div>
-                    <div className="settings-row settings-row--stack">
-                      <div className="settings-row__text">
-                        <div className="settings-row__label">
-                          {t("settings.proxyNoProxy")}
-                        </div>
-                        <div className="settings-row__desc">
-                          {t("settings.proxyNoProxyDesc")}
-                        </div>
-                      </div>
+                    </SettingsStackRow>
+                    <SettingsStackRow
+                      label={t("settings.proxyNoProxy")}
+                      desc={t("settings.proxyNoProxyDesc")}
+                    >
                       <input
                         className="settings-input"
                         value={proxyNoProxy}
@@ -496,7 +477,7 @@ export function RuntimeSection() {
                         spellCheck={false}
                         onChange={(e) => onProxyNoProxy?.(e.target.value)}
                       />
-                    </div>
+                    </SettingsStackRow>
                   </>
                 )}
                 <NetworkProbeField t={t} />
@@ -504,21 +485,12 @@ export function RuntimeSection() {
             )}
             {activeTab === "pool" && (
               <div className="settings-card">
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-maxConcurrentAgents")
-                  }
-                  id="settings-anchor-maxConcurrentAgents"
+                <SettingsStackRow
+                  anchorId="settings-anchor-maxConcurrentAgents"
+                  highlight={rowHighlight}
+                  label={t("settings.maxConcurrentAgents")}
+                  desc={t("settings.maxConcurrentAgentsDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.maxConcurrentAgents")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.maxConcurrentAgentsDesc")}
-                    </div>
-                  </div>
                   <input
                     className="settings-input"
                     type="number"
@@ -534,13 +506,10 @@ export function RuntimeSection() {
                       );
                     }}
                   />
-                </div>
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-processBudget")
-                  }
-                  id="settings-anchor-processBudget"
+                </SettingsStackRow>
+                <SettingsStackRow
+                  anchorId="settings-anchor-processBudget"
+                  highlight={rowHighlight}
                 >
                   <ProcessBudgetPanel
                     locale={resolveLocale(locale)}
@@ -549,22 +518,13 @@ export function RuntimeSection() {
                     lastProcessLimit={lastProcessLimit}
                     id="settings-process-budget"
                   />
-                </div>
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-agentIdleMinutes")
-                  }
-                  id="settings-anchor-agentIdleMinutes"
+                </SettingsStackRow>
+                <SettingsStackRow
+                  anchorId="settings-anchor-agentIdleMinutes"
+                  highlight={rowHighlight}
+                  label={t("settings.agentIdleMinutes")}
+                  desc={t("settings.agentIdleMinutesDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.agentIdleMinutes")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.agentIdleMinutesDesc")}
-                    </div>
-                  </div>
                   <input
                     className="settings-input"
                     type="number"
@@ -580,22 +540,13 @@ export function RuntimeSection() {
                       );
                     }}
                   />
-                </div>
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-streamStallSeconds")
-                  }
-                  id="settings-anchor-streamStallSeconds"
+                </SettingsStackRow>
+                <SettingsStackRow
+                  anchorId="settings-anchor-streamStallSeconds"
+                  highlight={rowHighlight}
+                  label={t("settings.streamStallSeconds")}
+                  desc={t("settings.streamStallSecondsDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.streamStallSeconds")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.streamStallSecondsDesc")}
-                    </div>
-                  </div>
                   <input
                     className="settings-input"
                     type="number"
@@ -611,7 +562,7 @@ export function RuntimeSection() {
                       );
                     }}
                   />
-                </div>
+                </SettingsStackRow>
                 {onIncludePartialMessages ? (
                   <div
                     className={
@@ -687,19 +638,14 @@ export function RuntimeSection() {
                         ariaLabel={t("settings.workflows")}
                       />
                     </div>
-                    <div className="settings-row settings-row--stack">
-                      <div className="settings-row__text">
-                        <div className="settings-row__desc">
-                          {t("settings.workflowsHonesty")}
-                        </div>
-                      </div>
+                    <SettingsStackRow desc={t("settings.workflowsHonesty")}>
                       <WorkflowsDiscoveryBlock
                         locale={resolveLocale(locale)}
                         projectPath={projectPath}
                         sessionDataMode={sessionDataMode}
                         showToast={showSettingsToast}
                       />
-                    </div>
+                    </SettingsStackRow>
                   </div>
                 ) : null}
                 <div
@@ -731,17 +677,15 @@ export function RuntimeSection() {
                   }
                   id="settings-anchor-traces"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
-                      <div className="settings-row__label">
+                  <SettingsStackRow
+                    label={
+                      <>
                         <IconArchive size={16} />
                         {t("session.tracesTitle")}
-                      </div>
-                      <div className="settings-row__desc">
-                        {t("session.tracesDesc")}
-                      </div>
-                    </div>
-                  </div>
+                      </>
+                    }
+                    desc={t("session.tracesDesc")}
+                  />
                   <div className="trace-history-settings">
                     <TraceHistoryList
                       locale={resolveLocale(locale)}
@@ -805,15 +749,10 @@ export function RuntimeSection() {
                     }
                     id="settings-anchor-auditRetention"
                   >
-                    <div className="settings-row settings-row--stack">
-                      <div className="settings-row__text">
-                        <div className="settings-row__label">
-                          {t("reliability.audit.retention")}
-                        </div>
-                        <div className="settings-row__desc">
-                          {t("reliability.audit.retentionDesc")}
-                        </div>
-                      </div>
+                    <SettingsStackRow
+                      label={t("reliability.audit.retention")}
+                      desc={t("reliability.audit.retentionDesc")}
+                    >
                       <SegmentedControl
                         value={
                           auditLedgerRetentionDays === 7 ||
@@ -841,7 +780,7 @@ export function RuntimeSection() {
                         }))}
                         onChange={onAuditLedgerRetentionDays}
                       />
-                    </div>
+                    </SettingsStackRow>
                   </div>
                 ) : null}
                 <div
@@ -877,16 +816,10 @@ export function RuntimeSection() {
                   }
                   id="settings-anchor-cost-rollup"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
-                      <div className="settings-row__label">
-                        {t("costRollup.title")}
-                      </div>
-                      <div className="settings-row__desc">
-                        {t("costRollup.settingsDesc")}
-                      </div>
-                    </div>
-                  </div>
+                  <SettingsStackRow
+                    label={t("costRollup.title")}
+                    desc={t("costRollup.settingsDesc")}
+                  />
                   <CostRollupPanel
                     locale={resolveLocale(locale)}
                     sessions={costRollupSessions}
@@ -902,16 +835,10 @@ export function RuntimeSection() {
                   }
                   id="settings-anchor-smj"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
-                      <div className="settings-row__label">
-                        {t("smj.title")}
-                      </div>
-                      <div className="settings-row__desc">
-                        {t("smj.settingsDesc")}
-                      </div>
-                    </div>
-                  </div>
+                  <SettingsStackRow
+                    label={t("smj.title")}
+                    desc={t("smj.settingsDesc")}
+                  />
                   <StreamingMessagesJsonPanel
                     locale={resolveLocale(locale)}
                     cliVersion={cliInfo.version}
@@ -925,16 +852,10 @@ export function RuntimeSection() {
                   }
                   id="settings-anchor-stream-acp-ndjson"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
-                      <div className="settings-row__label">
-                        {t("streamAcpNdjson.title")}
-                      </div>
-                      <div className="settings-row__desc">
-                        {t("streamAcpNdjson.settingsDesc")}
-                      </div>
-                    </div>
-                  </div>
+                  <SettingsStackRow
+                    label={t("streamAcpNdjson.title")}
+                    desc={t("streamAcpNdjson.settingsDesc")}
+                  />
                   <StreamingAcpNdjsonPanel
                     locale={resolveLocale(locale)}
                     manualCliPath={manualCliPath}
@@ -949,15 +870,10 @@ export function RuntimeSection() {
                   }
                   id="settings-anchor-inspect"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
-                      <div className="settings-row__label">
-                        {t("inspect.title")}
-                      </div>
-                      <div className="settings-row__desc">
-                        {t("inspect.desc")}
-                      </div>
-                    </div>
+                  <SettingsStackRow
+                    label={t("inspect.title")}
+                    desc={t("inspect.desc")}
+                  >
                     <button
                       type="button"
                       className="btn btn--ghost settings-row__action"
@@ -965,7 +881,7 @@ export function RuntimeSection() {
                     >
                       {t("settings.inspect.manageInExtensions")}
                     </button>
-                  </div>
+                  </SettingsStackRow>
                   {/* Flat body — no nested settings-card */}
                   <div className="pi-settings-body">
                     <ProjectInspectPanel
@@ -983,16 +899,10 @@ export function RuntimeSection() {
                   }
                   id="settings-anchor-prHub"
                 >
-                  <div className="settings-row settings-row--stack">
-                    <div className="settings-row__text">
-                      <div className="settings-row__label">
-                        {t("prHub.title")}
-                      </div>
-                      <div className="settings-row__desc">
-                        {t("prHub.desc")}
-                      </div>
-                    </div>
-                  </div>
+                  <SettingsStackRow
+                    label={t("prHub.title")}
+                    desc={t("prHub.desc")}
+                  />
                   <div className="pi-settings-body">
                     <GitPrHubPanel
                       locale={resolveLocale(locale)}

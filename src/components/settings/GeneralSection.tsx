@@ -86,7 +86,7 @@ import { CodebaseIndexingPanel } from "@/components/CodebaseIndexingPanel";
 import { CodebaseSearchPanel } from "@/components/CodebaseSearchPanel";
 import { AgentConfigTomlPanel } from "@/components/AgentConfigTomlPanel";
 import { CliSessionsPanel } from "./CliSessionsPanel";
-import { SettingsTabStrip, UiCheck } from "./shared";
+import { SettingsStackRow, SettingsTabStrip, UiCheck } from "./shared";
 import { resolveLocale } from "@/i18n";
 import type { MessageKey } from "@/i18n";
 import * as api from "@/lib/api";
@@ -285,18 +285,12 @@ export function GeneralSection() {
             <h2 className="settings-page__h2">{t("settings.section.composer")}</h2>
             <div className="settings-card" id="settings-anchor-composer">
               {onPrefsScope && (
-                <div
-                  className={"settings-row settings-row--stack" + rowHighlight("settings-anchor-prefsScope")}
-                  id="settings-anchor-prefsScope"
+                <SettingsStackRow
+                  anchorId="settings-anchor-prefsScope"
+                  highlight={rowHighlight}
+                  label={t("settings.prefsScope")}
+                  desc={t("settings.prefsScopeDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.prefsScope")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.prefsScopeDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={prefsScope}
                     onChange={(v) => onPrefsScope(v as ComposerPrefsScope)}
@@ -313,20 +307,14 @@ export function GeneralSection() {
                       ),
                     }))}
                   />
-                </div>
+                </SettingsStackRow>
               )}
-              <div
-                className={"settings-row settings-row--stack" + rowHighlight("settings-anchor-availableModels")}
-                id="settings-anchor-availableModels"
+              <SettingsStackRow
+                anchorId="settings-anchor-availableModels"
+                highlight={rowHighlight}
+                label={t("settings.availableModels")}
+                desc={t("settings.availableModelsDesc")}
               >
-                <div className="settings-row__text">
-                  <div className="settings-row__label">
-                    {t("settings.availableModels")}
-                  </div>
-                  <div className="settings-row__desc">
-                    {t("settings.availableModelsDesc")}
-                  </div>
-                </div>
                 <div className="settings-models-list" role="list">
                   {availableModels.length === 0 ? (
                     <span className="settings-row__desc">
@@ -347,7 +335,7 @@ export function GeneralSection() {
                     ))
                   )}
                 </div>
-              </div>
+              </SettingsStackRow>
               <div
                 className={
                   "settings-row" +
@@ -373,21 +361,12 @@ export function GeneralSection() {
                   onChange={onComposerMinRows}
                 />
               </div>
-              <div
-                className={
-                  "settings-row settings-row--stack" +
-                  rowHighlight("settings-anchor-composerSendKey")
-                }
-                id="settings-anchor-composerSendKey"
+              <SettingsStackRow
+                anchorId="settings-anchor-composerSendKey"
+                highlight={rowHighlight}
+                label={t("settings.composerSendKey")}
+                desc={t("settings.composerSendKeyDesc")}
               >
-                <div className="settings-row__text">
-                  <div className="settings-row__label">
-                    {t("settings.composerSendKey")}
-                  </div>
-                  <div className="settings-row__desc">
-                    {t("settings.composerSendKeyDesc")}
-                  </div>
-                </div>
                 <Select
                   value={composerSendKeyPref}
                   onChange={(v) => {
@@ -406,7 +385,7 @@ export function GeneralSection() {
                     },
                   ]}
                 />
-              </div>
+              </SettingsStackRow>
               <div
                 className={
                   "settings-row" +
@@ -465,19 +444,17 @@ export function GeneralSection() {
             <>
             <h2 className="settings-page__h2">{t("settings.section.permissions")}</h2>
             <div className="settings-card" id="settings-anchor-permissionRules">
-              <div
-                className={"settings-row settings-row--stack" + rowHighlight("settings-anchor-permissionPolicy")}
-                id="settings-anchor-permissionPolicy"
-              >
-                <div className="settings-row__text">
-                  <div className="settings-row__label">
+              <SettingsStackRow
+                anchorId="settings-anchor-permissionPolicy"
+                highlight={rowHighlight}
+                label={
+                  <>
                     <IconShield size={16} />
                     {t("settings.permissionDeep")}
-                  </div>
-                  <div className="settings-row__desc">
-                    {t("settings.permissionDeepDesc")}
-                  </div>
-                </div>
+                  </>
+                }
+                desc={t("settings.permissionDeepDesc")}
+              >
                 <Select
                   value={policy}
                   onChange={(v) => onPolicy(v as PermissionPolicyId)}
@@ -511,22 +488,13 @@ export function GeneralSection() {
                     </>
                   ) : null}
                 </div>
-              </div>
-              <div
-                className={
-                  "settings-row settings-row--stack" +
-                  rowHighlight("settings-anchor-cliPermissionModeAdvanced")
-                }
-                id="settings-anchor-cliPermissionModeAdvanced"
+              </SettingsStackRow>
+              <SettingsStackRow
+                anchorId="settings-anchor-cliPermissionModeAdvanced"
+                highlight={rowHighlight}
+                label={t("settings.permissionCliAdvanced")}
+                desc={t("settings.permissionCliAdvancedDesc")}
               >
-                <div className="settings-row__text">
-                  <div className="settings-row__label">
-                    {t("settings.permissionCliAdvanced")}
-                  </div>
-                  <div className="settings-row__desc">
-                    {t("settings.permissionCliAdvancedDesc")}
-                  </div>
-                </div>
                 <Select
                   value={policyToCliPermissionMode(policy)}
                   onChange={(v) => {
@@ -558,20 +526,14 @@ export function GeneralSection() {
                     mode: policyToCliPermissionMode(policy),
                   })}
                 </div>
-              </div>
+              </SettingsStackRow>
               {onSandboxProfile ? (
-                <div
-                  className={"settings-row settings-row--stack" + rowHighlight("settings-anchor-sandbox")}
-                  id="settings-anchor-sandbox"
+                <SettingsStackRow
+                  anchorId="settings-anchor-sandbox"
+                  highlight={rowHighlight}
+                  label={t("settings.sandboxProfile")}
+                  desc={t("settings.sandboxProfileDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.sandboxProfile")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.sandboxProfileDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={sandboxProfile || DEFAULT_SANDBOX_PROFILE}
                     onChange={(v) => onSandboxProfile(v)}
@@ -680,24 +642,15 @@ export function GeneralSection() {
                       </>
                     );
                   })()}
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onPermissionTimeoutSec ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-permissionTimeout")
-                  }
-                  id="settings-anchor-permissionTimeout"
+                <SettingsStackRow
+                  anchorId="settings-anchor-permissionTimeout"
+                  highlight={rowHighlight}
+                  label={t("settings.permissionTimeout")}
+                  desc={t("settings.permissionTimeoutDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.permissionTimeout")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.permissionTimeoutDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={String(permissionTimeoutSec ?? 0)}
                     onChange={(v) => onPermissionTimeoutSec(Number(v))}
@@ -737,24 +690,15 @@ export function GeneralSection() {
                       return presets;
                     })()}
                   />
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onAskUserTimeoutSec ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-askUserTimeout")
-                  }
-                  id="settings-anchor-askUserTimeout"
+                <SettingsStackRow
+                  anchorId="settings-anchor-askUserTimeout"
+                  highlight={rowHighlight}
+                  label={t("settings.askUserTimeout")}
+                  desc={t("settings.askUserTimeoutDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.askUserTimeout")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.askUserTimeoutDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={String(askUserTimeoutSec ?? 0)}
                     onChange={(v) => onAskUserTimeoutSec(Number(v))}
@@ -794,7 +738,7 @@ export function GeneralSection() {
                       return presets;
                     })()}
                   />
-                </div>
+                </SettingsStackRow>
               ) : null}
               <PermissionRulesPanel t={t} />
             </div>
@@ -806,18 +750,12 @@ export function GeneralSection() {
             <h2 className="settings-page__h2">{t("settings.section.agent")}</h2>
             <div className="settings-card" id="settings-agent-card">
               {onMaxAgentTurns ? (
-                <div
-                  className={"settings-row settings-row--stack" + rowHighlight("settings-anchor-maxAgentTurns")}
-                  id="settings-anchor-maxAgentTurns"
+                <SettingsStackRow
+                  anchorId="settings-anchor-maxAgentTurns"
+                  highlight={rowHighlight}
+                  label={t("settings.maxAgentTurns")}
+                  desc={t("settings.maxAgentTurnsDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.maxAgentTurns")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.maxAgentTurnsDesc")}
-                    </div>
-                  </div>
                   <input
                     className="settings-input"
                     type="number"
@@ -837,24 +775,15 @@ export function GeneralSection() {
                       onMaxAgentTurns(Math.min(200, Math.max(0, Math.round(n))));
                     }}
                   />
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onBackgroundWaitPolicy ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-backgroundWait")
-                  }
-                  id="settings-anchor-backgroundWait"
+                <SettingsStackRow
+                  anchorId="settings-anchor-backgroundWait"
+                  highlight={rowHighlight}
+                  label={t("settings.backgroundWaitPolicy")}
+                  desc={t("settings.backgroundWaitPolicyDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.backgroundWaitPolicy")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.backgroundWaitPolicyDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={
                       backgroundWaitPolicy === "no_wait" ||
@@ -913,21 +842,15 @@ export function GeneralSection() {
                       />
                     </>
                   ) : null}
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onPreferredAgent ? (
-                <div
-                  className={"settings-row settings-row--stack" + rowHighlight("settings-anchor-preferredAgent")}
-                  id="settings-anchor-preferredAgent"
+                <SettingsStackRow
+                  anchorId="settings-anchor-preferredAgent"
+                  highlight={rowHighlight}
+                  label={t("settings.preferredAgent")}
+                  desc={t("settings.preferredAgentDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.preferredAgent")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.preferredAgentDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={preferredAgent || ""}
                     onChange={(v) => onPreferredAgent(v)}
@@ -956,24 +879,15 @@ export function GeneralSection() {
                   <div className="settings-row__desc">
                     {t("settings.preferredAgent.apply.note")}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onAgentProfilePath ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-agentProfilePath")
-                  }
-                  id="settings-anchor-agentProfilePath"
+                <SettingsStackRow
+                  anchorId="settings-anchor-agentProfilePath"
+                  highlight={rowHighlight}
+                  label={t("settings.agentProfilePath")}
+                  desc={t("settings.agentProfilePathDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.agentProfilePath")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.agentProfilePathDesc")}
-                    </div>
-                  </div>
                   <input
                     className="settings-input"
                     value={agentProfilePath || ""}
@@ -1015,7 +929,7 @@ export function GeneralSection() {
                       </button>
                     ) : null}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               <div
                 className={rowHighlight("settings-anchor-configTomlView")}
@@ -1023,21 +937,12 @@ export function GeneralSection() {
                 <AgentConfigTomlPanel locale={resolveLocale(locale)} />
               </div>
               {onAgentsJson ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-agentsJson")
-                  }
-                  id="settings-anchor-agentsJson"
+                <SettingsStackRow
+                  anchorId="settings-anchor-agentsJson"
+                  highlight={rowHighlight}
+                  label={t("settings.agentsJson")}
+                  desc={t("settings.agentsJsonDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.agentsJson")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.agentsJsonDesc")}
-                    </div>
-                  </div>
                   <textarea
                     className="settings-input settings-agents-json__textarea"
                     value={agentsJson || ""}
@@ -1112,7 +1017,7 @@ export function GeneralSection() {
                       </button>
                     ) : null}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onExperimentalMemory ? (
                 <div
@@ -1135,21 +1040,12 @@ export function GeneralSection() {
                 </div>
               ) : null}
               {onCompactionMode ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-compactionMode")
-                  }
-                  id="settings-anchor-compactionMode"
+                <SettingsStackRow
+                  anchorId="settings-anchor-compactionMode"
+                  highlight={rowHighlight}
+                  label={t("settings.compactionMode")}
+                  desc={t("settings.compactionModeDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.compactionMode")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.compactionModeDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={compactionMode || "summary"}
                     onChange={(v) => onCompactionMode(v)}
@@ -1181,24 +1077,15 @@ export function GeneralSection() {
                       );
                     })()}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onCompactionDetail ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-compactionDetail")
-                  }
-                  id="settings-anchor-compactionDetail"
+                <SettingsStackRow
+                  anchorId="settings-anchor-compactionDetail"
+                  highlight={rowHighlight}
+                  label={t("settings.compactionDetail")}
+                  desc={t("settings.compactionDetailDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.compactionDetail")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.compactionDetailDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={compactionDetail || "verbose"}
                     onChange={(v) => onCompactionDetail(v)}
@@ -1225,7 +1112,7 @@ export function GeneralSection() {
                   <div className="settings-row__desc">
                     {t("settings.compactionDetail.help")}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onTwoPassCompactionEnabled ? (
                 <div
@@ -1417,21 +1304,12 @@ export function GeneralSection() {
                   });
                   return (
                     <>
-                      <div
-                        className={
-                          "settings-row settings-row--stack" +
-                          rowHighlight("settings-anchor-todoGate")
-                        }
-                        id="settings-anchor-todoGate"
+                      <SettingsStackRow
+                        anchorId="settings-anchor-todoGate"
+                        highlight={rowHighlight}
+                        label={t("settings.todoGate")}
+                        desc={t("settings.todoGateDesc")}
                       >
-                        <div className="settings-row__text">
-                          <div className="settings-row__label">
-                            {t("settings.todoGate")}
-                          </div>
-                          <div className="settings-row__desc">
-                            {t("settings.todoGateDesc")}
-                          </div>
-                        </div>
                         <UiCheck
                           checked={!!todoGateEnabled}
                           onChange={() => onTodoGateEnabled(!todoGateEnabled)}
@@ -1465,23 +1343,15 @@ export function GeneralSection() {
                             todoGateView.activity.vars,
                           )}
                         </div>
-                      </div>
+                      </SettingsStackRow>
                       {onTodoGateMaxFiresPerPrompt ? (
-                        <div
-                          className={
-                            "settings-row settings-row--stack" +
-                            rowHighlight("settings-anchor-todoGate")
-                          }
-                          id="settings-anchor-todoGateMaxFires"
+                        <SettingsStackRow
+                          anchorId="settings-anchor-todoGateMaxFires"
+                          highlightId="settings-anchor-todoGate"
+                          highlight={rowHighlight}
+                          label={t("settings.todoGateMaxFires")}
+                          desc={t("settings.todoGateMaxFiresDesc")}
                         >
-                          <div className="settings-row__text">
-                            <div className="settings-row__label">
-                              {t("settings.todoGateMaxFires")}
-                            </div>
-                            <div className="settings-row__desc">
-                              {t("settings.todoGateMaxFiresDesc")}
-                            </div>
-                          </div>
                           <input
                             className="settings-input"
                             type="number"
@@ -1534,7 +1404,7 @@ export function GeneralSection() {
                               })}
                             </div>
                           ) : null}
-                        </div>
+                        </SettingsStackRow>
                       ) : null}
                     </>
                   );
@@ -1581,26 +1451,19 @@ export function GeneralSection() {
                 </div>
               ) : null}
               {onAllowedTools ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-allowedTools")
-                  }
-                  id="settings-anchor-allowedTools"
-                >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.allowedTools")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.allowedToolsDesc")}
-                    </div>
-                    {bothToolListsSet(allowedTools, disallowedTools) ? (
+                <SettingsStackRow
+                  anchorId="settings-anchor-allowedTools"
+                  highlight={rowHighlight}
+                  label={t("settings.allowedTools")}
+                  desc={t("settings.allowedToolsDesc")}
+                  hint={
+                    bothToolListsSet(allowedTools, disallowedTools) ? (
                       <div className="settings-row__hint">
                         {t("settings.allowedTools.bothSet")}
                       </div>
-                    ) : null}
-                  </div>
+                    ) : null
+                  }
+                >
                   <div
                     className="settings-tool-deny__chips"
                     role="group"
@@ -1684,34 +1547,29 @@ export function GeneralSection() {
                       </button>
                     ) : null}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onDisallowedTools ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-disallowedTools")
+                <SettingsStackRow
+                  anchorId="settings-anchor-disallowedTools"
+                  highlight={rowHighlight}
+                  label={t("settings.disallowedTools")}
+                  desc={t("settings.disallowedToolsDesc")}
+                  hint={
+                    <>
+                      {disableWebSearch ? (
+                        <div className="settings-row__hint">
+                          {t("settings.disallowedTools.webCovered")}
+                        </div>
+                      ) : null}
+                      {bothToolListsSet(allowedTools, disallowedTools) ? (
+                        <div className="settings-row__hint">
+                          {t("settings.allowedTools.bothSet")}
+                        </div>
+                      ) : null}
+                    </>
                   }
-                  id="settings-anchor-disallowedTools"
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.disallowedTools")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.disallowedToolsDesc")}
-                    </div>
-                    {disableWebSearch ? (
-                      <div className="settings-row__hint">
-                        {t("settings.disallowedTools.webCovered")}
-                      </div>
-                    ) : null}
-                    {bothToolListsSet(allowedTools, disallowedTools) ? (
-                      <div className="settings-row__hint">
-                        {t("settings.allowedTools.bothSet")}
-                      </div>
-                    ) : null}
-                  </div>
                   <div
                     className="settings-tool-deny__chips"
                     role="group"
@@ -1803,15 +1661,12 @@ export function GeneralSection() {
                       </button>
                     ) : null}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onUseLeader ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-useLeader")
-                  }
-                  id="settings-anchor-useLeader"
+                <SettingsStackRow
+                  anchorId="settings-anchor-useLeader"
+                  highlight={rowHighlight}
                 >
                   <div className="settings-row" style={{ padding: 0 }}>
                     <div className="settings-row__text">
@@ -1839,7 +1694,7 @@ export function GeneralSection() {
                       {t(sandboxLeaderMutexMessageKey())}
                     </div>
                   ) : null}
-                </div>
+                </SettingsStackRow>
               ) : null}
               <div className={rowHighlight("settings-anchor-configTomlEdit")}>
                 <AgentConfigEditPanel locale={resolveLocale(locale)} />
@@ -1878,21 +1733,12 @@ export function GeneralSection() {
                 />
               </div>
               {onVoiceId ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-voiceId")
-                  }
-                  id="settings-anchor-voiceId"
+                <SettingsStackRow
+                  anchorId="settings-anchor-voiceId"
+                  highlight={rowHighlight}
+                  label={t("settings.voiceId")}
+                  desc={t("settings.voiceIdDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.voiceId")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.voiceIdDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={voiceId || "eve"}
                     onChange={(v) => onVoiceId(v)}
@@ -1908,7 +1754,7 @@ export function GeneralSection() {
                         : []),
                     ]}
                   />
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onVoiceDictationAutoSend ? (
                 <div
@@ -1961,21 +1807,12 @@ export function GeneralSection() {
                 </div>
               ) : null}
               {onSttEngine ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-sttEngine")
-                  }
-                  id="settings-anchor-sttEngine"
+                <SettingsStackRow
+                  anchorId="settings-anchor-sttEngine"
+                  highlight={rowHighlight}
+                  label={t("settings.sttEngine")}
+                  desc={t("settings.sttEngineDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.sttEngine")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.sttEngineDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={sttEngine || "official"}
                     onChange={(v) => onSttEngine(v)}
@@ -2234,7 +2071,7 @@ export function GeneralSection() {
                     </div>
                   </>
                 ) : null}
-                </div>
+                </SettingsStackRow>
               ) : null}
             </div>
 
@@ -2430,12 +2267,9 @@ export function GeneralSection() {
                 </div>
               ) : null}
               {onTrayBusyBadge ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-trayBusyBadge")
-                  }
-                  id="settings-anchor-trayBusyBadge"
+                <SettingsStackRow
+                  anchorId="settings-anchor-trayBusyBadge"
+                  highlight={rowHighlight}
                 >
                   <div className="settings-tray-notify__row-main">
                     <div className="settings-row__text">
@@ -2466,7 +2300,7 @@ export function GeneralSection() {
                       cap: trayBusySurface.displayCount,
                     })}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onWinTaskbarOverlay && detectAppPlatform() === "win" ? (
                 <div
@@ -2538,12 +2372,10 @@ export function GeneralSection() {
                 </div>
               ) : null}
               {onNotifyOnTurnDone || onNotifyOnPermission || onNotifySound ? (
-                <div
-                  className={
-                    "settings-row settings-row--stack settings-tray-notify__honesty" +
-                    rowHighlight("settings-anchor-notifyHonesty")
-                  }
-                  id="settings-anchor-notifyHonesty"
+                <SettingsStackRow
+                  anchorId="settings-anchor-notifyHonesty"
+                  highlight={rowHighlight}
+                  className="settings-tray-notify__honesty"
                 >
                   <div className="settings-tray-notify__honesty-head">
                     <div className="settings-row__text">
@@ -2610,7 +2442,7 @@ export function GeneralSection() {
                   >
                     {t(notifyHonesty.blockReasonKey)}
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               {onNotifyOnTurnDone ? (
                 <div
@@ -2708,7 +2540,7 @@ export function GeneralSection() {
                 />
               </div>
               {notifyQuietHours.enabled ? (
-                <div className="settings-row settings-row--stack settings-quiet-hours">
+                <SettingsStackRow className="settings-quiet-hours">
                   {notifyHonesty.quietHoursActive ? (
                     <div
                       className="settings-tray-notify__status is-info"
@@ -2759,7 +2591,7 @@ export function GeneralSection() {
                       />
                     </label>
                   </div>
-                </div>
+                </SettingsStackRow>
               ) : null}
               <div
                 className={
@@ -2812,21 +2644,12 @@ export function GeneralSection() {
                 />
               </div>
               {onDefaultOpenTarget && (
-                <div
-                  className={
-                    "settings-row settings-row--stack" +
-                    rowHighlight("settings-anchor-openTarget")
-                  }
-                  id="settings-anchor-openTarget"
+                <SettingsStackRow
+                  anchorId="settings-anchor-openTarget"
+                  highlight={rowHighlight}
+                  label={t("settings.openTarget")}
+                  desc={t("settings.openTargetDesc")}
                 >
-                  <div className="settings-row__text">
-                    <div className="settings-row__label">
-                      {t("settings.openTarget")}
-                    </div>
-                    <div className="settings-row__desc">
-                      {t("settings.openTargetDesc")}
-                    </div>
-                  </div>
                   <Select
                     value={defaultOpenTarget}
                     onChange={onDefaultOpenTarget}
@@ -2867,7 +2690,7 @@ export function GeneralSection() {
                       </div>
                     );
                   })()}
-                </div>
+                </SettingsStackRow>
               )}
             </div>
             </>

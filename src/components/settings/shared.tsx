@@ -213,6 +213,59 @@ export function SettingsTabStrip({
  * Module title + optional "?" help tip (description no longer inline under the label).
  */
 /**
+ * Stacked settings row shell (`settings-row--stack`): `label`/`desc`/`hint`
+ * fill `settings-row__text`; children render after it (controls, row-level
+ * hints). Rows without text content pass only children (bare shell).
+ */
+export function SettingsStackRow({
+  label,
+  desc,
+  hint,
+  anchorId,
+  highlight,
+  highlightId,
+  className,
+  children,
+}: {
+  label?: ReactNode;
+  desc?: ReactNode;
+  /** Extra node(s) inside `settings-row__text` after the desc (bring your own wrapper). */
+  hint?: ReactNode;
+  /** Search-anchor id; doubles as the highlight anchor unless `highlightId` is set. */
+  anchorId?: string;
+  /** `rowHighlight` from the settings model (returns "" or " <class>"). */
+  highlight?: (anchorId: string) => string;
+  /** Highlight anchor when it differs from `anchorId` (grouped rows). */
+  highlightId?: string;
+  className?: string;
+  children?: ReactNode;
+}) {
+  const highlightAnchor = highlightId ?? anchorId;
+  const hasText = label != null || desc != null || hint != null;
+  return (
+    <div
+      className={
+        "settings-row settings-row--stack" +
+        (className ? ` ${className}` : "") +
+        (highlight && highlightAnchor ? highlight(highlightAnchor) : "")
+      }
+      id={anchorId}
+    >
+      {hasText ? (
+        <div className="settings-row__text">
+          {label != null ? (
+            <div className="settings-row__label">{label}</div>
+          ) : null}
+          {desc != null ? <div className="settings-row__desc">{desc}</div> : null}
+          {hint}
+        </div>
+      ) : null}
+      {children}
+    </div>
+  );
+}
+
+/**
  * Round help icon button that reveals `tip` in a delayed tooltip.
  * The single implementation behind every `.settings-label-help` in the app
  * (settings rows, wallpaper scrim, account heatmap, compact modal).
