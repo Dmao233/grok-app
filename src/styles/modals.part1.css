@@ -434,6 +434,8 @@ div.composer__input:empty::before {
   white-space: nowrap;
 }
 .prompt-history__item-meta {
+  margin-left: 8px;
+  flex-shrink: 0;
   font-size: 11px;
   line-height: 1.2;
   color: var(--text-tertiary);

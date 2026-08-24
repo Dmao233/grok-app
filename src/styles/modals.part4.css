@@ -419,14 +419,6 @@
   margin-left: 0;
 }
 
-.ext-field-hint {
-  display: block;
-  margin-top: 4px;
-  font-size: 11.5px;
-  line-height: 1.4;
-  color: var(--text-tertiary);
-}
-
 .ext-env-textarea {
   resize: vertical;
   min-height: 72px;

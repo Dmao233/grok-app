@@ -144,10 +144,6 @@ button:disabled {
   }
 }
 
-.lobe-chat-action.is-copied {
-  color: var(--success, #3ecf8e);
-}
-
 /* Global: no focus outline rings — chrome uses hover / active instead */
 :focus,
 :focus-visible {

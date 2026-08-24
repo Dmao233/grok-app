@@ -462,13 +462,6 @@ button.composer__context-item {
   background: var(--bg-hover);
 }
 
-.prompt-history__item-meta {
-  margin-left: 8px;
-  flex-shrink: 0;
-  font-size: 10px;
-  color: var(--text-secondary);
-}
-
 .skill-chip--chat.is-stale {
   border-color: color-mix(in srgb, var(--text-primary) 28%, var(--border-subtle));
 }

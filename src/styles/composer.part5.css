@@ -373,16 +373,7 @@
   color: var(--text-tertiary);
 }
 
-/* Aside host: fill pane */
-.aside__inner {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
-  /* Ensure Suspense / lazy root still stretches */
-  align-items: stretch;
-}
-
+/* Aside host children: fill pane */
 .aside__inner .rp,
 .aside__inner > * {
   flex: 1 1 auto;
