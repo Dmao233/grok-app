@@ -72,6 +72,15 @@ describe("wallpaper theme contrast CSS", () => {
     );
   });
 
+  it("drops wallpaper pane blur while data-stream-perf is on", () => {
+    expect(css).toContain(
+      'html[data-stream-perf="1"][data-wallpaper="1"] .sidebar',
+    );
+    expect(css).toContain(
+      'html[data-stream-perf="1"][data-wallpaper="1"] .settings-page__nav',
+    );
+  });
+
   it("uses a dark edge on exposed light wallpaper chrome", () => {
     const lightRoot = css.match(
       /html\[data-theme="light"\]\[data-wallpaper="1"\]\s*\{[^}]*\}/s,

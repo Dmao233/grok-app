@@ -33,6 +33,9 @@ describe("Remote IM UI chrome guard", () => {
     expect(src).toContain("UiSwitch as RimSwitch");
     expect(src).toContain("UiCheck as RimCheck");
     expect(src).toContain('from "@/components/settings/shared"');
+    expect(src).not.toContain('role="switch"');
+    expect(src).not.toContain('role="checkbox"');
+    expect(src).not.toMatch(/Rim(?:Select|Seg)/);
   });
 
   it("ChannelPanel uses settings chrome and shared Select/SegmentedControl", () => {
@@ -45,6 +48,7 @@ describe("Remote IM UI chrome guard", () => {
     expect(src).toContain("<Select");
     expect(src).toContain("<SegmentedControl");
     expect(src).toContain("showsPublicUrlCallout");
+    expect(src).not.toMatch(/Rim(?:Select|Seg)/);
   });
 
   it("ChannelPanel secrets use RimSecretField (masked by default)", () => {
