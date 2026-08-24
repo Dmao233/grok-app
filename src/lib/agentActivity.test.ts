@@ -3,6 +3,7 @@ import {
   collectActivitySessions,
   countBusyLiveMapSessions,
   countQuitBlockingSessions,
+  countQuitBlockingSessionsWithHost,
   isActiveSessionSnapshot,
   isQuitBlockingSnapshot,
   otherBusySessions,
@@ -156,5 +157,62 @@ describe("isQuitBlockingSnapshot / countQuitBlockingSessions", () => {
     // Activity still sees connecting; quit does not.
     expect(countBusyLiveMapSessions(liveMap)).toBe(3);
     expect(countQuitBlockingSessions(liveMap)).toBe(2);
+  });
+});
+
+describe("countQuitBlockingSessionsWithHost", () => {
+  const streamingMap: SessionLiveMap = {
+    a: { ...emptyLiveSnapshot("a", 1), state: "streaming" },
+  };
+
+  it("adds a streaming host that liveMap has no row for", () => {
+    expect(
+      countQuitBlockingSessionsWithHost(streamingMap, {
+        sessionId: "h",
+        state: "streaming",
+      }),
+    ).toBe(2);
+    expect(
+      countQuitBlockingSessionsWithHost(streamingMap, {
+        sessionId: "h",
+        state: "awaiting_permission",
+      }),
+    ).toBe(2);
+  });
+
+  it("does not double-count a host already blocking in liveMap", () => {
+    expect(
+      countQuitBlockingSessionsWithHost(streamingMap, {
+        sessionId: "a",
+        state: "streaming",
+      }),
+    ).toBe(1);
+  });
+
+  it("covers a live host whose projected row already settled (sidebar busyIds rule)", () => {
+    const settled: SessionLiveMap = {
+      a: { ...emptyLiveSnapshot("a", 1), state: "ready" },
+    };
+    expect(
+      countQuitBlockingSessionsWithHost(settled, {
+        sessionId: "a",
+        state: "streaming",
+      }),
+    ).toBe(1);
+  });
+
+  it("ignores connecting / idle hosts and null session ids", () => {
+    expect(
+      countQuitBlockingSessionsWithHost(streamingMap, {
+        sessionId: "h",
+        state: "connecting",
+      }),
+    ).toBe(1);
+    expect(
+      countQuitBlockingSessionsWithHost(streamingMap, {
+        sessionId: null,
+        state: "streaming",
+      }),
+    ).toBe(1);
   });
 });

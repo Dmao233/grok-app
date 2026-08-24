@@ -159,3 +159,26 @@ export function countQuitBlockingSessions(liveMap: SessionLiveMap): number {
   }
   return n;
 }
+
+/**
+ * Quit-blocking count including the focused-host snapshot.
+ *
+ * Host events can lead the liveMap projection by one tick (streaming before
+ * the row lands, or after it settled), so a live host counts whenever the
+ * map does not already block on it — same coverage rule as the sidebar
+ * `busyIds` overlay in `useSessionRuntime`.
+ */
+export function countQuitBlockingSessionsWithHost(
+  liveMap: SessionLiveMap,
+  host: { sessionId: string | null; state: SessionState },
+): number {
+  let n = countQuitBlockingSessions(liveMap);
+  if (
+    host.sessionId &&
+    isSessionLiveStreaming(host.state) &&
+    !isQuitBlockingSnapshot(liveMap[host.sessionId])
+  ) {
+    n += 1;
+  }
+  return n;
+}

@@ -194,7 +194,7 @@ import {
 import { shouldExitComposerPlanModeAfterDecision } from "@/lib/planModePro";
 import {
   collectActivitySessions,
-  countQuitBlockingSessions,
+  countQuitBlockingSessionsWithHost,
   stoppableActivitySessions
 } from "@/lib/agentActivity";
 import {
@@ -15096,17 +15096,12 @@ export function AppWorkbench() {
       void api.appForceQuit();
       return;
     }
-    // Quit-busy excludes Connecting (dead reconnect must not trap exit).
-    let busyCount = countQuitBlockingSessions(liveMapRef.current);
-    // liveHost may be streaming before liveMap has the row (same as sidebar busyIds).
-    const host = liveHostRef.current;
-    if (
-      host.sessionId &&
-      isSessionLiveStreaming(host.state) &&
-      !liveMapRef.current[host.sessionId]
-    ) {
-      busyCount += 1;
-    }
+    // Quit-busy excludes Connecting (dead reconnect must not trap exit);
+    // liveHost may lead liveMap (same coverage as sidebar busyIds).
+    const busyCount = countQuitBlockingSessionsWithHost(
+      liveMapRef.current,
+      liveHostRef.current,
+    );
     if (
       !shouldConfirmQuit(busyCount, loadAlwaysQuitWithoutAskingPref())
     ) {
