@@ -476,7 +476,6 @@ export const esSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "El modo compartido es de solo lectura para las claves de privacidad de la App. OTEL externo se configura en el proceso de la CLI vía env / [telemetry] otel_* — no lo escribe esta App.",
   "settings.privacy.externalOtel.copyEnv": "Copiar plantilla de env",
   "settings.privacy.externalOtel.copied": "Copiado",
-  "settings.cliSessions.filterAll": "Todas",
   "settings.cliSessions.filterLinked": "Vinculadas",
   "settings.cliSessions.filterUnlinked": "Sin vincular",
   "settings.cliSessions.clearFilters": "Borrar filtros",

@@ -476,7 +476,6 @@ export const deSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "Shared-Modus ist für App-Datenschutz-Keys nur lesen. Externes OTEL wird am CLI-Prozess über env / [telemetry] otel_* konfiguriert — nicht von dieser App geschrieben.",
   "settings.privacy.externalOtel.copyEnv": "Env-Template kopieren",
   "settings.privacy.externalOtel.copied": "Kopiert",
-  "settings.cliSessions.filterAll": "Alle",
   "settings.cliSessions.filterLinked": "Verknüpft",
   "settings.cliSessions.filterUnlinked": "Nicht verknüpft",
   "settings.cliSessions.clearFilters": "Filter zurücksetzen",

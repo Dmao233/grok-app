@@ -476,7 +476,6 @@ export const jaSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "共有モードでは App のプライバシーキーは読み取り専用です。外部 OTEL は CLI プロセスの env / [telemetry] otel_* で設定します — このアプリは書きません。",
   "settings.privacy.externalOtel.copyEnv": "env テンプレートをコピー",
   "settings.privacy.externalOtel.copied": "コピーしました",
-  "settings.cliSessions.filterAll": "すべて",
   "settings.cliSessions.filterLinked": "関連済み",
   "settings.cliSessions.filterUnlinked": "未関連",
   "settings.cliSessions.clearFilters": "絞り込みを解除",

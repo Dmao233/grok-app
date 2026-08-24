@@ -476,7 +476,6 @@ export const filSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "Read-only ang shared mode para sa mga privacy key ng App. Naka-configure ang External OTEL sa proseso ng CLI sa pamamagitan ng env / [telemetry] otel_* — hindi isinusulat ng App na ito.",
   "settings.privacy.externalOtel.copyEnv": "Kopyahin ang env template",
   "settings.privacy.externalOtel.copied": "Nakopya",
-  "settings.cliSessions.filterAll": "Lahat",
   "settings.cliSessions.filterLinked": "Naka-link",
   "settings.cliSessions.filterUnlinked": "Hindi naka-link",
   "settings.cliSessions.clearFilters": "Alisin ang mga filter",

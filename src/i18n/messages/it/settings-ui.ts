@@ -476,7 +476,6 @@ export const itSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "La modalità condivisa è in sola lettura per le chiavi privacy dell’app. OTEL esterno è configurato sul processo CLI via env / [telemetry] otel_* — non scritto da questa app.",
   "settings.privacy.externalOtel.copyEnv": "Copia modello env",
   "settings.privacy.externalOtel.copied": "Copiato",
-  "settings.cliSessions.filterAll": "Tutte",
   "settings.cliSessions.filterLinked": "Collegate",
   "settings.cliSessions.filterUnlinked": "Non collegate",
   "settings.cliSessions.clearFilters": "Cancella filtri",

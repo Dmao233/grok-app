@@ -476,7 +476,6 @@ export const taSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "செயலி தனியுரிமை விசைகளுக்கு பகிரப்பட்ட பயன்முறை படிக்க மட்டுமே. வெளிப்புற OTEL env / [டெலிமெட்ரி] otel_* வழியாக CLI செயல்பாட்டில் உள்ளமைக்கப்பட்டுள்ளது — இந்த செயலிஸால் எழுதப்படவில்லை.",
   "settings.privacy.externalOtel.copyEnv": "env டெம்ப்ளேட்டை நகலெடு",
   "settings.privacy.externalOtel.copied": "நகலெடுக்கப்பட்டது",
-  "settings.cliSessions.filterAll": "அனைத்தும்",
   "settings.cliSessions.filterLinked": "இணைக்கப்பட்டது",
   "settings.cliSessions.filterUnlinked": "இணைக்கப்படவில்லை",
   "settings.cliSessions.clearFilters": "வடிகட்டிகளை அழி",

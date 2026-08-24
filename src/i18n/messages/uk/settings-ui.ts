@@ -476,7 +476,6 @@ export const ukSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "Спільний режим доступний лише для читання для ключів приватності застосунку. Зовнішній OTEL налаштовується на процес CLI через env / [телеметрія] otel_* — не написаний цією програмою.",
   "settings.privacy.externalOtel.copyEnv": "Копіювати шаблон env",
   "settings.privacy.externalOtel.copied": "Скопійовано",
-  "settings.cliSessions.filterAll": "Усі",
   "settings.cliSessions.filterLinked": "Пов’язано",
   "settings.cliSessions.filterUnlinked": "Не пов’язано",
   "settings.cliSessions.clearFilters": "Очистити фільтри",

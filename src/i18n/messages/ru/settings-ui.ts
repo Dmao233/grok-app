@@ -476,7 +476,6 @@ export const ruSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "Общий режим только для чтения ключей конфиденциальности приложения. Внешний OTEL настраивается в процессе CLI через env / [telemetry] otel_* — это приложение не пишет.",
   "settings.privacy.externalOtel.copyEnv": "Копировать шаблон env",
   "settings.privacy.externalOtel.copied": "Скопировано",
-  "settings.cliSessions.filterAll": "Все",
   "settings.cliSessions.filterLinked": "Связанные",
   "settings.cliSessions.filterUnlinked": "Несвязанные",
   "settings.cliSessions.clearFilters": "Очистить фильтры",

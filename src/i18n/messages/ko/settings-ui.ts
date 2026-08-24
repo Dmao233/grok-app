@@ -476,7 +476,6 @@ export const koSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "공유 모드는 앱 개인정보 키에 대해 읽기 전용입니다. 외부 OTEL은 env / [telemetry] otel_*를 통해 CLI 프로세스에서 구성되며 이 앱이 쓰지 않습니다.",
   "settings.privacy.externalOtel.copyEnv": "환경 템플릿 복사",
   "settings.privacy.externalOtel.copied": "복사됨",
-  "settings.cliSessions.filterAll": "모두",
   "settings.cliSessions.filterLinked": "연결됨",
   "settings.cliSessions.filterUnlinked": "연결되지 않음",
   "settings.cliSessions.clearFilters": "필터 지우기",

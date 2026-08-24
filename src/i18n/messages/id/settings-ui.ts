@@ -476,7 +476,6 @@ export const idSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "Mode bersama hanya-baca untuk kunci privasi App. OTEL eksternal dikonfigurasi pada proses CLI lewat env / [telemetry] otel_* — tidak ditulis oleh App ini.",
   "settings.privacy.externalOtel.copyEnv": "Salin templat env",
   "settings.privacy.externalOtel.copied": "Disalin",
-  "settings.cliSessions.filterAll": "Semua",
   "settings.cliSessions.filterLinked": "Tertaut",
   "settings.cliSessions.filterUnlinked": "Tidak tertaut",
   "settings.cliSessions.clearFilters": "Hapus filter",

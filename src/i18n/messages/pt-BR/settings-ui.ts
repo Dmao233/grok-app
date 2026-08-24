@@ -476,7 +476,6 @@ export const ptBRSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "O modo compartilhado é somente leitura para as chaves de privacidade do App. O OTEL externo é configurado no processo da CLI via env / [telemetry] otel_* — não gravado por este App.",
   "settings.privacy.externalOtel.copyEnv": "Copiar modelo de env",
   "settings.privacy.externalOtel.copied": "Copiado",
-  "settings.cliSessions.filterAll": "Todas",
   "settings.cliSessions.filterLinked": "Vinculadas",
   "settings.cliSessions.filterUnlinked": "Não vinculadas",
   "settings.cliSessions.clearFilters": "Limpar filtros",

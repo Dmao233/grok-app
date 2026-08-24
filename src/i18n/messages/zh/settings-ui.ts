@@ -476,7 +476,6 @@ export const zhSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "共享模式下 App 隐私键为只读。外部 OTEL 由 CLI 进程通过环境变量 / [telemetry] otel_* 配置——本应用不会写入。",
   "settings.privacy.externalOtel.copyEnv": "复制环境变量模板",
   "settings.privacy.externalOtel.copied": "已复制",
-  "settings.cliSessions.filterAll": "全部",
   "settings.cliSessions.filterLinked": "已关联",
   "settings.cliSessions.filterUnlinked": "未关联",
   "settings.cliSessions.clearFilters": "清除筛选",

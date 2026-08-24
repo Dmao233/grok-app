@@ -476,7 +476,6 @@ export const zhTWSettingsUi = {
   "settings.privacy.externalOtel.sharedNote": "共用模式下 App 隱私鍵為唯讀。外部 OTEL 由 CLI 行程透過環境變數 / [telemetry] otel_* 設定——本應用不會寫入。",
   "settings.privacy.externalOtel.copyEnv": "複製環境變數範本",
   "settings.privacy.externalOtel.copied": "已複製",
-  "settings.cliSessions.filterAll": "全部",
   "settings.cliSessions.filterLinked": "已關聯",
   "settings.cliSessions.filterUnlinked": "未關聯",
   "settings.cliSessions.clearFilters": "清除篩選",
