@@ -87,6 +87,7 @@ import {
   ExtensionsHooksPanel,
   type ExtHooksTabActions,
 } from "@/components/ExtensionsHooksPanel";
+import { UiSwitch } from "@/components/settings/shared";
 import {
   installedPluginDetailModel,
   type AvailablePluginDetailModel,
@@ -2311,7 +2312,7 @@ export function ExtensionsPanel({
               ) : null}
             </div>
             <div className="ext-ref-row__end">
-              <ExtensionToggle
+              <UiSwitch
                 checked={skillsDiscover?.appPref !== false}
                 disabled={!!busyKey || !api.isTauri()}
                 label={tr("ext.skills.discoverExternal")}
@@ -2390,7 +2391,7 @@ export function ExtensionsPanel({
                           <IconEdit size={14} />
                         </button>
                       ) : null}
-                      <ExtensionToggle
+                      <UiSwitch
                         checked={on}
                         disabled={!!busyKey}
                         label={on ? tr("ext.enabled") : tr("ext.disabled")}
@@ -2533,7 +2534,7 @@ export function ExtensionsPanel({
                       >
                         <IconSettings size={16} />
                       </button>
-                      <ExtensionToggle
+                      <UiSwitch
                         checked={on}
                         disabled={!!busyKey || !!actionBusy}
                         label={on ? tr("ext.enabled") : tr("ext.disabled")}
@@ -4113,33 +4114,6 @@ function parseEnvLines(raw: string): Record<string, string> {
     out[key] = val;
   }
   return out;
-}
-
-function ExtensionToggle({
-  checked,
-  disabled,
-  label,
-  onChange,
-}: {
-  checked: boolean;
-  disabled?: boolean;
-  label: string;
-  onChange: (next: boolean) => void;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      title={label}
-      disabled={disabled}
-      className={"ext-switch" + (checked ? " is-on" : "")}
-      onClick={() => onChange(!checked)}
-    >
-      <span className="ext-switch__thumb" aria-hidden />
-    </button>
-  );
 }
 
 function normalizeSourceLabel(source: string): string {
