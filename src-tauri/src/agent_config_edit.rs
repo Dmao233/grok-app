@@ -23,6 +23,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
+use crate::agent_config_view::normalize_mode;
 use crate::paths::{agent_config_toml, agent_home_dir, ensure_app_dirs};
 use crate::store;
 
@@ -119,15 +120,6 @@ pub struct AllowlistedFlags {
     pub lsp_tools_enabled: Option<bool>,
     pub codebase_indexing: Option<bool>,
     pub remote_fetch: Option<bool>,
-}
-
-/// Normalize session_data_mode to `independent` | `shared`.
-pub fn normalize_mode(session_data_mode: &str) -> &'static str {
-    if session_data_mode.trim().eq_ignore_ascii_case("shared") {
-        "shared"
-    } else {
-        "independent"
-    }
 }
 
 /// Normalize / validate a UI permission_mode string.
@@ -673,9 +665,6 @@ mod tests {
 
     #[test]
     fn normalize_modes() {
-        assert_eq!(normalize_mode("shared"), "shared");
-        assert_eq!(normalize_mode("SHARED"), "shared");
-        assert_eq!(normalize_mode(""), "independent");
         assert_eq!(normalize_permission_mode("default").unwrap(), "default");
         assert_eq!(
             normalize_permission_mode("accept_edits").unwrap(),

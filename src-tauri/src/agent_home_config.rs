@@ -20,6 +20,7 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::agent_config_view::normalize_mode;
 use crate::paths::{agent_config_toml, ensure_app_dirs};
 
 /// Serialize independent agent-home config writers (cascade sync + heal + prefs).
@@ -29,15 +30,6 @@ static CONFIG_WRITE_LOCK: Mutex<()> = Mutex::new(());
 pub fn with_config_write_lock<T>(f: impl FnOnce() -> T) -> T {
     let _guard = CONFIG_WRITE_LOCK.lock().unwrap_or_else(|e| e.into_inner());
     f()
-}
-
-/// Normalize session_data_mode to `independent` | `shared`.
-pub fn normalize_mode(session_data_mode: &str) -> &'static str {
-    if session_data_mode.trim().eq_ignore_ascii_case("shared") {
-        "shared"
-    } else {
-        "independent"
-    }
 }
 
 /// Error message when shared mode refuses a write-path resolve.

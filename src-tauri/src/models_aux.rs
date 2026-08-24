@@ -9,9 +9,9 @@
 #![allow(dead_code)] // residual-clippy: prompt-rewrite / spawn-env helpers retained for routing experiments
 use serde::{Deserialize, Serialize};
 
+use crate::agent_config_view::normalize_mode;
 use crate::agent_home_config::{
-    get_table_string, normalize_mode, resolve_writable_config_path, set_table_string,
-    SHARED_MODE_REFUSED,
+    get_table_string, resolve_writable_config_path, set_table_string, SHARED_MODE_REFUSED,
 };
 use crate::paths::agent_config_toml;
 use crate::providers::{

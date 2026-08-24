@@ -46,7 +46,10 @@ pub fn config_toml_path(session_data_mode: &str) -> PathBuf {
 }
 
 /// Normalize mode string to `independent` | `shared`.
-pub fn normalize_mode(session_data_mode: &str) -> &'static str {
+///
+/// Crate-wide single source (audit 7.2): `agent_home_config` / `agent_config_edit`
+/// and all other callers import from here.
+pub(crate) fn normalize_mode(session_data_mode: &str) -> &'static str {
     if session_data_mode.trim().eq_ignore_ascii_case("shared") {
         "shared"
     } else {
