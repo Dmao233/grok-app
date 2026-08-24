@@ -175,7 +175,16 @@ describe("wallpaper theme contrast CSS", () => {
       /html:not\(\[data-wallpaper="1"\]\)\s+\.workbench--side-expanded\s+\.aside:not\(\.aside--hidden\)\s*\{[^}]*background:\s*var\(--bg-aside\)/s,
     );
     expect(sideWorkbenchCss).toMatch(
-      /html\[data-wallpaper="1"\]\s+\.workbench--side-expanded\s+\.aside\s+:is\([^)]*\.rp-chrome[^)]*\.sw__empty[^)]*\)\s*\{[^}]*background:\s*transparent/s,
+      /html\[data-wallpaper="1"\]\s+\.workbench--side-expanded\s+\.aside\s+:is\([^)]*\.aside__inner[^)]*\.sw__empty[^)]*\)\s*\{[^}]*background:\s*transparent/s,
+    );
+  });
+
+  it("uses one right-pane chrome material in rail and full-cover modes", () => {
+    expect(sideWorkbenchCss).toMatch(
+      /html:not\(\[data-wallpaper="1"\]\) \.aside \.rp-chrome\s*\{[^}]*background:\s*var\(--bg-card\) !important[^}]*backdrop-filter:\s*none !important/s,
+    );
+    expect(sideWorkbenchCss).toMatch(
+      /html\[data-wallpaper="1"\] \.aside \.rp-chrome\s*\{[^}]*background:\s*transparent !important/s,
     );
   });
 
