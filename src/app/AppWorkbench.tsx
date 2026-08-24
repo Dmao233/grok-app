@@ -2800,6 +2800,7 @@ export function AppWorkbench() {
   const { paneMotionClass } = usePaneSplitMotion({
     sidebarCollapsed: layout.sidebarCollapsed,
     asideCollapsed: layout.asideCollapsed,
+    sideExpanded: sideWorkbench.expanded,
     phoneLayout,
     sidebarOverlay,
     asideOverlay,
@@ -22320,8 +22321,20 @@ export function AppWorkbench() {
           aria-label={tr("a11y.resourcesPane")}
           aria-hidden={layout.asideCollapsed}
           style={
-            phoneLayout || hideChatForSideExpand
+            phoneLayout
               ? undefined
+              : hideChatForSideExpand
+                ? ({
+                    width:
+                      "calc(100% - var(--sw-sidebar-occupied, 0px))",
+                    minWidth:
+                      "calc(100% - var(--sw-sidebar-occupied, 0px))",
+                    maxWidth:
+                      "calc(100% - var(--sw-sidebar-occupied, 0px))",
+                    flexBasis:
+                      "calc(100% - var(--sw-sidebar-occupied, 0px))",
+                    ["--aside-rail-min"]: `${layout.asideWidth || DEFAULT_LAYOUT.asideWidth}px`,
+                  } as CSSProperties)
               : asideOverlay
                 ? ({
                     width: asideOpenW,

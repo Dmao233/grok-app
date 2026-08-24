@@ -18,6 +18,7 @@ import { usePaneSplitMotion } from "./usePaneSplitMotion";
 const initialProps = {
   sidebarCollapsed: false,
   asideCollapsed: false,
+  sideExpanded: false,
   phoneLayout: false,
   sidebarOverlay: false,
   asideOverlay: true,
@@ -99,6 +100,48 @@ describe("usePaneSplitMotion", () => {
     );
     expect(nativeWebviewCoverDepth()).toBe(1);
     expect(isPaneSplitMotionActive()).toBe(true);
+
+    act(() => dispatchWidthTransitionEnd("aside"));
+    expect(nativeWebviewCoverDepth()).toBe(0);
+    expect(isPaneSplitMotionActive()).toBe(false);
+  });
+
+  it("interpolates and covers the aside while the side workbench expands", () => {
+    const { result, rerender } = renderHook(
+      (props) => usePaneSplitMotion(props),
+      { initialProps },
+    );
+
+    rerender({ ...initialProps, sideExpanded: true, asideOverlay: false });
+    expect(result.current.paneMotionClass).toContain(
+      "workbench--side-expand-motion",
+    );
+    expect(result.current.paneMotionClass).toContain(
+      "workbench--aside-motion",
+    );
+    expect(nativeWebviewCoverDepth()).toBe(1);
+
+    act(() => dispatchWidthTransitionEnd("aside"));
+    expect(result.current.paneMotionClass).not.toContain(
+      "workbench--side-expand-motion",
+    );
+    expect(nativeWebviewCoverDepth()).toBe(0);
+  });
+
+  it("keeps the cover and width motion across a rapid expand reversal", () => {
+    const { result, rerender } = renderHook(
+      (props) => usePaneSplitMotion(props),
+      { initialProps: { ...initialProps, asideOverlay: false } },
+    );
+
+    rerender({ ...initialProps, sideExpanded: true, asideOverlay: false });
+    expect(nativeWebviewCoverDepth()).toBe(1);
+
+    rerender({ ...initialProps, sideExpanded: false, asideOverlay: false });
+    expect(result.current.paneMotionClass).toContain(
+      "workbench--side-expand-motion",
+    );
+    expect(nativeWebviewCoverDepth()).toBe(1);
 
     act(() => dispatchWidthTransitionEnd("aside"));
     expect(nativeWebviewCoverDepth()).toBe(0);

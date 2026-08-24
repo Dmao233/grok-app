@@ -25,6 +25,8 @@ import {
 export function usePaneSplitMotion(opts: {
   sidebarCollapsed: boolean;
   asideCollapsed: boolean;
+  /** Side workbench occupies the full free area instead of its saved rail width. */
+  sideExpanded?: boolean;
   phoneLayout?: boolean;
   /** Left pane is an overlay drawer — its transform already owns the motion. */
   sidebarOverlay?: boolean;
@@ -34,16 +36,24 @@ export function usePaneSplitMotion(opts: {
   const [, setEpoch] = useState(0);
   const keyRef = useRef<string | null>(null);
   const asideOverlayRef = useRef(Boolean(opts.asideOverlay));
+  const sideExpandedRef = useRef(Boolean(opts.sideExpanded));
+  const sideExpandMotionRef = useRef(false);
   const tokenRef = useRef(0);
   const releaseRef = useRef<(() => void) | null>(null);
   const timerRef = useRef<number | null>(null);
 
   const key = `${opts.sidebarCollapsed}:${opts.asideCollapsed}`;
   const asideOverlay = Boolean(opts.asideOverlay);
+  const sideExpanded = Boolean(opts.sideExpanded);
   const asideOverlayModeChanged = asideOverlayRef.current !== asideOverlay;
+  const sideExpandedChanged = sideExpandedRef.current !== sideExpanded;
   if (keyRef.current === null) {
     keyRef.current = key;
-  } else if (keyRef.current !== key || asideOverlayModeChanged) {
+  } else if (
+    keyRef.current !== key ||
+    asideOverlayModeChanged ||
+    sideExpandedChanged
+  ) {
     const colon = keyRef.current.indexOf(":");
     const sidebarChanged =
       keyRef.current.slice(0, colon) !== String(opts.sidebarCollapsed);
@@ -51,7 +61,8 @@ export function usePaneSplitMotion(opts: {
       keyRef.current.slice(colon + 1) !== String(opts.asideCollapsed);
     const sidebarWidthChanged = sidebarChanged && !opts.sidebarOverlay;
     const asideWidthChanged =
-      asideChanged && !opts.asideOverlay && !asideOverlayRef.current;
+      sideExpandedChanged ||
+      (asideChanged && !opts.asideOverlay && !asideOverlayRef.current);
     const asideOverlayChanged =
       asideChanged && (asideOverlayRef.current || asideOverlay);
     const coverChanged =
@@ -67,6 +78,7 @@ export function usePaneSplitMotion(opts: {
       })
     ) {
       if (tokenRef.current) endPaneSplitMotion(tokenRef.current);
+      if (sideExpandedChanged) sideExpandMotionRef.current = true;
       tokenRef.current = beginPaneSplitMotion({
         cover: coverChanged,
         width: sidebarWidthChanged || asideWidthChanged,
@@ -76,6 +88,7 @@ export function usePaneSplitMotion(opts: {
     }
   }
   asideOverlayRef.current = asideOverlay;
+  sideExpandedRef.current = sideExpanded;
 
   useLayoutEffect(() => {
     const token = tokenRef.current;
@@ -99,6 +112,7 @@ export function usePaneSplitMotion(opts: {
       releaseRef.current = null;
       endPaneSplitMotion(token);
       tokenRef.current = 0;
+      sideExpandMotionRef.current = false;
       setEpoch((n) => n + 1);
     };
 
@@ -134,6 +148,7 @@ export function usePaneSplitMotion(opts: {
   }, [
     opts.sidebarCollapsed,
     opts.asideCollapsed,
+    opts.sideExpanded,
     opts.phoneLayout,
     opts.sidebarOverlay,
     opts.asideOverlay,
@@ -144,6 +159,7 @@ export function usePaneSplitMotion(opts: {
       if (timerRef.current != null) window.clearTimeout(timerRef.current);
       releaseRef.current?.();
       releaseRef.current = null;
+      sideExpandMotionRef.current = false;
       if (tokenRef.current) endPaneSplitMotion(tokenRef.current);
     };
   }, []);
@@ -154,5 +170,8 @@ export function usePaneSplitMotion(opts: {
     classes.push(PANE_SPLIT_SIDEBAR_MOTION_CLASS);
   }
   if (isPaneSplitAsideMotionActive()) classes.push(PANE_SPLIT_ASIDE_MOTION_CLASS);
+  if (sideExpandMotionRef.current && isPaneSplitAsideMotionActive()) {
+    classes.push("workbench--side-expand-motion");
+  }
   return { paneMotionClass: classes.length ? ` ${classes.join(" ")}` : "" };
 }
