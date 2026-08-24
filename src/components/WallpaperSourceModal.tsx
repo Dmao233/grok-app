@@ -76,16 +76,9 @@ function errorMessage(
 
 /** Thumb / list preview (remote thumb OK). */
 function itemThumbSrc(item: WallpaperGalleryItem): string {
-  if (item.localPath) {
-    return (
-      resolveImageSrcSync(item.localPath) ||
-      item.thumbUrl ||
-      item.fullUrl
-    );
-  }
-  if (item.fullUrl.startsWith("file://")) {
-    const p = decodeURIComponent(item.fullUrl.replace(/^file:\/\//, ""));
-    return resolveImageSrcSync(p) || item.thumbUrl || item.fullUrl;
+  const src = resolveApplySource(item);
+  if (src.kind === "path") {
+    return resolveImageSrcSync(src.path) || item.thumbUrl || item.fullUrl;
   }
   return item.thumbUrl || item.fullUrl;
 }
@@ -504,13 +497,13 @@ export function WallpaperSourceModal({
           (it) => it.id === item.id || it.localPath || it.fullUrl.startsWith("http"),
         );
         const slides = viable.map((it) => {
+          const sib = resolveApplySource(it);
           const path =
             it.id === item.id
               ? local.path
-              : it.localPath ||
-                (it.fullUrl.startsWith("file://")
-                  ? decodeURIComponent(it.fullUrl.replace(/^file:\/\//, ""))
-                  : it.fullUrl);
+              : sib.kind === "path"
+                ? sib.path
+                : sib.url;
           return {
             src: path,
             title:
