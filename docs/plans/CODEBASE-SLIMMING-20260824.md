@@ -316,4 +316,51 @@
 
 - ~~修改代码前需要:另一进程的**最终集成分支 SHA + 工作树 clean + 全量测试结果**~~ **已完成(2026-08-24)**:集成分支定格 `e1068f4c`、工作树 clean、全量基线七项全绿(test 503 文件/6561 用例、lint、typecheck、build:ui、quality-gates PASS、cargo fmt、cargo check)
 - ~~然后:备份分支 → `$MAIN_WT` ff-only → main 全量验证绿 → 建 `codex/codebase-slimming-20260824` worktree → 本文档落库~~ **已完成(2026-08-24)**:备份分支 `backup/main-before-codebase-slimming-20260824`@`665987ca`;main ff 到 `e1068f4c`;两个 worktree 已建 → 剩余:**按序实施**
+
+---
+
+## 实施记录(2026-08-24 ~ 2026-08-25,分支 `codex/codebase-slimming-20260824`)
+
+> 全部审计「执行」条目已落地;每个 commit 均经 pi 审核(`pi -p -t read,bash`)。
+> 起点 `e1068f4c`(审计基线),文档落库 `15b2424f`/`30ae9770` 后按序实施。
+
+### 批次与 commit 区间
+
+| 批次(审计条目) | commits | 净变化(区间 diff) |
+|---|---|---|
+| M1 前端死码 1.1–1.8 | `61d2eb75` `c44fb058` `c22e44d9` | 54 文件,+7 −9,946 |
+| M4 RV 壳/pane 死件 4.1–4.4(moveGhost) | `eb808673` `cd63fa2d` `6a3658de` | 25 文件,+64 −5,494 |
+| CSS 死簇/重复合并 5.1、8.2 | `608eb211` `89a9f54e` | 17 文件,+13 −608 |
+| 4.4 收尾 + M2 设置收敛 2.1–2.4 | `1d48391e` `13b7d362` `27d8baa1` `8edea069` `341eb1da` `c088fa98` `e3e49f28` `bad62d6a` `de0f05b3` | 49 文件,+2,661 −1,586 |
+| M3 主题/壁纸 3.1–3.3 | `c9125b40` `31a479bf` `a701d549` | 3 文件,+9 −36 |
+| M5 收敛 5.2–5.3 | `3ee688ba` `fc99193b` | 9 文件,+1,041 −613 |
+| M6 hooks 6.1–6.2 | `51183190` `f37951d5` | 5 文件,+153 −74 |
+| M7 Rust 7.1–7.4 | `f4dcfa54` `7117f351` `66c52f24` `e960f14a` | 13 文件,+15 −216 |
+| M8 资产/守卫/i18n 终清 8.1、8.3 + i18n 收口 | `adcfa0d2` `9246a532` `e9a2f592` | 139 文件,+18 −3,219 |
+
+**全系列总账**(`e1068f4c..e9a2f592`,含文档落库):307 文件,+4,297 −21,789(净 **−17,492 行**)。
+i18n 收口批删 169 个死 key × 15 locale(en 权威,lockstep 保持);npm 依赖 −5;
+无引用资产 −9 文件(provider SVG ×5、tray PNG ×4)。
+
+### 暂缓项(审计判定,未动)
+
+- 2.5 ProvidersPanel 手写 labeled switch ×2(先定视觉再收敛,禁止第三份)
+- 2.6 settings.part5/6.css ≈1,500 行错域寄存(单独 CSS 域迁移立项;删除即炸聊天 UI)
+- 3.4 MediaLayer ↔ FocusEditor 媒体测量/clip 重复(视频回归重)
+- 4.5 AppWorkbench 左右 resize 双状态机、BottomTerminal/SideTabBar 标签条(RpNamedTabChip)
+- 5.4 att-card 双轨(chat.part3 ↔ lobe-chat.part3,视觉分叉风险高)
+- 6.3 pref CHANGE_EVENT 订阅抽层(收益有限)
+- 7.6 AgentError vs `Result<_,String>` 双轨(301 处 IPC 形状)、sessions_list 行构造、remoteIm invokeSafe
+- 8.4 预埋未接线四件套:sendIntent(682)、worktreeParallel(417)、askUserDemoPath(≈450+,i18n 已埋)、chatcutCodexAdapter(505)——需产品拍板接线或砍半成品
+
+### 后续候选(实施期间新增发现)
+
+- `agent_workflows.rs` 的 ThreadWait/wait_thread/run_workflow:M8(`e960f14a`)已收敛为逐项 `#[allow(dead_code)]` 标注(`:550,:557,:588`,residual-clippy 注),是否删除待拍板(batch_agents.rs 存在近重复副本)
+- remote_im 一个既有 flaky 测试(依赖环境变量态)建议 env 隔离后消除偶发红
+- `.g-icon svg` 规则双份(settings.part5.css:795 vs sidebar.part3.css:320),属 2.6 CSS 域迁移同一工作单元
+- `ProviderBrandIcon.tsx` 一处历史注释指向不存在的 `docs/svg/opencode go.svg`(pi 审 `adcfa0d2` 时发现,先于本轮存在)
+
+### CHANGELOG 判定
+
+本系列为零行为变化的内部重构/死码清理,仓库 CHANGELOG 惯例(Keep a Changelog,Unreleased 只记用户可感知的 Added/Changed/Fixed)无内部重构条目先例,且各轮 pi 审核均判无需跟进 → **不进 CHANGELOG**。
 - 不 push、不建 PR、不动 `/tmp/grok-pr-*`、不新增依赖(持续有效)
