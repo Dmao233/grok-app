@@ -1448,8 +1448,6 @@ pub fn run() {
 
             desktop_notify::desktop_notify_show,
 
-            desktop_notify::desktop_notify_available,
-
             commands::app_force_quit,
             commands::app_cancel_pending_quit,
 
@@ -1587,8 +1585,6 @@ pub fn run() {
             voice_host::voice_push_pcm,
 
             voice_host::voice_invoke_tool,
-
-            voice_host::voice_dictation_transcribe,
 
             remote_im::remote_im_bridge_status,
 

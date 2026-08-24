@@ -138,12 +138,6 @@ pub fn desktop_notify_show(
     }
 }
 
-/// Whether the host can attempt native notifications.
-#[tauri::command]
-pub fn desktop_notify_available() -> bool {
-    true
-}
-
 /// Startup hook: request UN auth only inside a real `.app`.
 pub fn request_permission_on_startup() {
     #[cfg(target_os = "macos")]

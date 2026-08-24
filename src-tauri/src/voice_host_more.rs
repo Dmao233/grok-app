@@ -182,20 +182,6 @@ pub async fn voice_invoke_tool(
     .await
 }
 
-#[tauri::command]
-pub async fn voice_dictation_transcribe(
-    audio_base64: String,
-    mime: Option<String>,
-    language: Option<String>,
-) -> Result<crate::voice_stt::SttResult, String> {
-    crate::voice_stt::transcribe_base64(
-        &audio_base64,
-        mime.as_deref(),
-        language.as_deref(),
-    )
-    .await
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
