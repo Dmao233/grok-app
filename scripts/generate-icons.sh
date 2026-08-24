@@ -130,13 +130,11 @@ def pack(src: Image.Image, size: int, pad_ratio: float) -> Image.Image:
     canvas.alpha_composite(resized, (ox, oy))
     return canvas
 
+# Only the two consumed outputs: tray-icon.png (mac menu bar, include_bytes!)
+# and tray-32.png (Windows badge input for tray_win_badge.py).
 outs = {
     "tray-icon.png": (36, 0.14),
-    "tray-icon@2x.png": (36, 0.14),
-    "tray-icon-18.png": (18, 0.14),
-    "tray-16.png": (16, 0.12),
     "tray-32.png": (32, 0.12),
-    "tray-source.png": (128, 0.10),
 }
 for name, (sz, pad) in outs.items():
     im = pack(crop, sz, pad)

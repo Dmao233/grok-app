@@ -53,7 +53,7 @@ function AmuxMark({
   );
 }
 
-/** OpenRouter mark (src/assets/providers/openrouter.svg). Wide word-icon. */
+/** OpenRouter mark (inlined brand SVG). Wide word-icon. */
 function OpenRouterMark({
   className = "",
   title,

@@ -5,7 +5,7 @@ Two **separate** pipelines — never mix them.
 | Surface | Source | Outputs |
 |--------|--------|---------|
 | Dock / taskbar / `.app` / Windows `.exe` | `src-tauri/icons/icon (1).png` (copied as `icon-source.png`) | `icon.png`, `32x32.png`, `64x64.png`, `128x128.png`, `128x128@2x.png`, `icon.icns`, `icon.ico` |
-| macOS menu bar | `docs/svg/logo.svg` | `tray-icon.png` (**36×36**, @2x for 18pt bar), `tray-16` / `tray-32`, `tray-source.png` |
+| macOS menu bar | `docs/svg/logo.svg` | `tray-icon.png` (**36×36**, @2x for 18pt bar) |
 | Windows system tray | `docs/svg/logo.svg` → `tray-32.png` | `tray-win-light.png` (black tile, white glyph), `tray-win-dark.png` (white glyph on transparency, no fill tile). Host picks by **taskbar** theme (`SystemUsesLightTheme`) and swaps live. |
 
 ## Rules
