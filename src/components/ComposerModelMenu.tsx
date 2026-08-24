@@ -5,15 +5,7 @@
  * Narrow composer widths compress triggers to icon (+ short label).
  */
 
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   GROK_BUILD_MODELS,
   PERMISSION_POLICIES,
@@ -48,56 +40,16 @@ import {
   IconShield,
   IconShieldCheck,
 } from "@/components/icons";
-import { useFloatingMenu, type FloatingPos } from "@/lib/floatingMenu";
+import {
+  ComposerPortalPop,
+  useComposerPortalMenu,
+  type ComposerPortalMenu,
+} from "@/components/ComposerPortalPop";
 
 type Nested = "model" | "effort" | "window" | null;
 
-function usePortalMenu(
-  estHeight = 220,
-  minWidth = 200,
-  nestedKey?: string,
-) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const popRef = useRef<HTMLDivElement>(null);
-  const popId = useId();
-
-  const { pos, style: popStyle } = useFloatingMenu({
-    open,
-    triggerRef,
-    panelRef: popRef,
-    roots: [rootRef],
-    onClose: () => setOpen(false),
-    placement: "auto",
-    fitContent: true,
-    minWidth,
-    estHeight,
-    gap: 8,
-    deps: [nestedKey],
-  });
-
-  return {
-    open,
-    setOpen,
-    pos,
-    popStyle: popStyle as CSSProperties | undefined,
-    rootRef,
-    triggerRef,
-    popRef,
-    popId,
-  };
-}
-
 function MenuShell({
-  open,
-  setOpen,
-  rootRef,
-  triggerRef,
-  popRef,
-  popId,
-  pos,
-  popStyle,
+  menu,
   triggerIcon,
   triggerText,
   triggerShort,
@@ -110,14 +62,7 @@ function MenuShell({
   /** Applied on the portaled panel (body), not the trigger root. */
   panelClassName = "",
 }: {
-  open: boolean;
-  setOpen: (v: boolean | ((p: boolean) => boolean)) => void;
-  rootRef: React.RefObject<HTMLDivElement | null>;
-  triggerRef: React.RefObject<HTMLButtonElement | null>;
-  popRef: React.RefObject<HTMLDivElement | null>;
-  popId: string;
-  pos: FloatingPos | null;
-  popStyle: CSSProperties | undefined;
+  menu: ComposerPortalMenu;
   triggerIcon?: ReactNode;
   /** Full label (wide layout) */
   triggerText: string;
@@ -131,25 +76,7 @@ function MenuShell({
   className?: string;
   panelClassName?: string;
 }) {
-  const panel =
-    open && pos && typeof document !== "undefined"
-      ? createPortal(
-          <div
-            ref={popRef}
-            className={["cmm__pop", "cmm__pop--portal", panelClassName]
-              .filter(Boolean)
-              .join(" ")}
-            id={popId}
-            role="dialog"
-            aria-label={ariaLabel}
-            style={popStyle}
-          >
-            {children}
-          </div>,
-          document.body,
-        )
-      : null;
-
+  const { open, setOpen, rootRef, triggerRef, popId } = menu;
   const tipLabel = title ?? ariaLabel;
   const trigger = (
     <button
@@ -193,7 +120,15 @@ function MenuShell({
       className={`cmm ${open ? "is-open" : ""} ${danger ? "cmm--danger" : ""} ${className}`.trim()}
     >
       {tipLabel ? <Tip label={tipLabel}>{trigger}</Tip> : trigger}
-      {panel}
+      <ComposerPortalPop
+        menu={menu}
+        className={panelClassName}
+        id={popId}
+        role="dialog"
+        ariaLabel={ariaLabel}
+      >
+        {children}
+      </ComposerPortalPop>
     </div>
   );
 }
@@ -304,7 +239,11 @@ export function ComposerModelMenu({
   const [windowDraft, setWindowDraft] = useState("");
   const modelSearchRef = useRef<HTMLInputElement>(null);
   /* Wider min so long custom model ids render fully in the root rows. */
-  const menu = usePortalMenu(240, 200, nested ?? "root");
+  const menu = useComposerPortalMenu({
+    estHeight: 240,
+    minWidth: 200,
+    deps: [nested ?? "root"],
+  });
   const modelList = models.length > 0 ? models : GROK_BUILD_MODELS;
   const groups = buildComposerModelGroups({
     officialModels: modelList,
@@ -417,7 +356,7 @@ export function ComposerModelMenu({
 
   return (
     <MenuShell
-      {...menu}
+      menu={menu}
       className="cmm--model"
       panelClassName="cmm__pop--model"
       triggerIcon={<IconBolt size={14} />}
@@ -817,7 +756,7 @@ export function ComposerAccessMenu({
   onPolicy,
 }: ComposerAccessMenuProps) {
   /* Wider dual-column sheet: mode | permission side by side. */
-  const menu = usePortalMenu(320, 520);
+  const menu = useComposerPortalMenu({ estHeight: 320, minWidth: 520 });
   const isDanger = policy === "always_approve";
   const full = policyLabel(policy, labels);
   const short = policyShort(policy, labels);
@@ -825,7 +764,7 @@ export function ComposerAccessMenu({
 
   return (
     <MenuShell
-      {...menu}
+      menu={menu}
       className="cmm--access"
       panelClassName="cmm__pop--access"
       triggerIcon={policyIcon(policy)}

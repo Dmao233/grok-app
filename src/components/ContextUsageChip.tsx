@@ -6,11 +6,13 @@
  * soft-fail "—" when tokens unknown after compact (still opens the menu).
  */
 
-import { useMemo, useRef, useState, type CSSProperties } from "react";
-import { createPortal } from "react-dom";
+import { useMemo } from "react";
 import { IconArrowsMinimize } from "@/components/icons";
 import { Tip } from "@/components/ui/tooltip";
-import { useFloatingMenu } from "@/lib/floatingMenu";
+import {
+  ComposerPortalPop,
+  useComposerPortalMenu,
+} from "@/components/ComposerPortalPop";
 import {
   formatCompactBeforeAfterRange,
   formatTokenCount,
@@ -212,28 +214,17 @@ export function ContextUsageChip({
   usageAction,
   locale = "zh",
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const popRef = useRef<HTMLDivElement>(null);
-
-  const { pos, style: popStyle } = useFloatingMenu({
-    open,
-    triggerRef,
-    panelRef: popRef,
-    roots: [rootRef],
-    onClose: () => setOpen(false),
+  const menu = useComposerPortalMenu({
     placement: "up",
-    fitContent: true,
     minWidth: 220,
     estHeight: 420,
-    gap: 8,
     deps: [
       display.label,
       display.lastCompact?.messageId,
       display.breakdown?.totalTokens,
     ],
   });
+  const { open, setOpen, rootRef, triggerRef } = menu;
 
   const tip = useMemo(() => tipFor(display, labels), [display, labels]);
   const lastDetail = display.lastCompact
@@ -264,104 +255,96 @@ export function ContextUsageChip({
           <ContextRing percent={display.percent} softUnknown={softUnknown} />
         </button>
       </Tip>
-      {open &&
-        pos &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div
-            ref={popRef}
-            className="cmm__pop cmm__pop--portal ctx-chip__pop"
-            role="menu"
-            aria-label={labels.menuTitle}
-            style={popStyle as CSSProperties}
+      <ComposerPortalPop
+        menu={menu}
+        className="ctx-chip__pop"
+        ariaLabel={labels.menuTitle}
+      >
+        <div className="ctx-chip__head">{labels.menuTitle}</div>
+        <div className="ctx-chip__row">
+          <span className="ctx-chip__k">{labels.current}</span>
+          <span className="ctx-chip__v">
+            <span className="ctx-chip__tokens">{display.label}</span>
+            <span className="ctx-chip__src">
+              {sourceLabel(display.source, labels)}
+            </span>
+          </span>
+        </div>
+        {display.windowSize != null && display.windowSize > 0 ? (
+          <div className="ctx-chip__row">
+            <span className="ctx-chip__k">{labels.window}</span>
+            <span className="ctx-chip__v">
+              <span className="ctx-chip__tokens">
+                {formatTokenCount(display.windowSize, locale)}
+              </span>
+            </span>
+          </div>
+        ) : null}
+        {display.percent != null ? (
+          <div className="ctx-chip__row">
+            <span className="ctx-chip__k">{labels.percentUsed}</span>
+            <span className="ctx-chip__v">
+              <span className="ctx-chip__tokens">
+                {formatPercent(display.percent)}%
+              </span>
+            </span>
+          </div>
+        ) : null}
+        {display.cacheHitRate != null ? (
+          <div className="ctx-chip__row">
+            <span className="ctx-chip__k">{labels.cacheHit}</span>
+            <span className="ctx-chip__v">
+              <span className="ctx-chip__tokens">
+                {display.cacheHitRate}%
+              </span>
+            </span>
+          </div>
+        ) : null}
+        {display.breakdown ? (
+          <BreakdownRows
+            breakdown={display.breakdown}
+            labels={labels}
+            locale={locale}
+          />
+        ) : null}
+        <div className="ctx-chip__row ctx-chip__row--wrap">
+          <span className="ctx-chip__k">{labels.lastCompact}</span>
+          <span className="ctx-chip__v ctx-chip__v--wrap">
+            {lastDetail ?? labels.lastCompactNone}
+          </span>
+        </div>
+        {display.lastCompact?.summaryPreview?.trim() ? (
+          <p className="ctx-chip__summary">
+            {display.lastCompact.summaryPreview.trim()}
+          </p>
+        ) : null}
+        <p className="ctx-chip__note">{labels.heuristicNote}</p>
+        {onUsage && usageAction ? (
+          <button
+            type="button"
+            role="menuitem"
+            className="ctx-chip__action"
+            onClick={() => {
+              setOpen(false);
+              onUsage();
+            }}
           >
-            <div className="ctx-chip__head">{labels.menuTitle}</div>
-            <div className="ctx-chip__row">
-              <span className="ctx-chip__k">{labels.current}</span>
-              <span className="ctx-chip__v">
-                <span className="ctx-chip__tokens">{display.label}</span>
-                <span className="ctx-chip__src">
-                  {sourceLabel(display.source, labels)}
-                </span>
-              </span>
-            </div>
-            {display.windowSize != null && display.windowSize > 0 ? (
-              <div className="ctx-chip__row">
-                <span className="ctx-chip__k">{labels.window}</span>
-                <span className="ctx-chip__v">
-                  <span className="ctx-chip__tokens">
-                    {formatTokenCount(display.windowSize, locale)}
-                  </span>
-                </span>
-              </div>
-            ) : null}
-            {display.percent != null ? (
-              <div className="ctx-chip__row">
-                <span className="ctx-chip__k">{labels.percentUsed}</span>
-                <span className="ctx-chip__v">
-                  <span className="ctx-chip__tokens">
-                    {formatPercent(display.percent)}%
-                  </span>
-                </span>
-              </div>
-            ) : null}
-            {display.cacheHitRate != null ? (
-              <div className="ctx-chip__row">
-                <span className="ctx-chip__k">{labels.cacheHit}</span>
-                <span className="ctx-chip__v">
-                  <span className="ctx-chip__tokens">
-                    {display.cacheHitRate}%
-                  </span>
-                </span>
-              </div>
-            ) : null}
-            {display.breakdown ? (
-              <BreakdownRows
-                breakdown={display.breakdown}
-                labels={labels}
-                locale={locale}
-              />
-            ) : null}
-            <div className="ctx-chip__row ctx-chip__row--wrap">
-              <span className="ctx-chip__k">{labels.lastCompact}</span>
-              <span className="ctx-chip__v ctx-chip__v--wrap">
-                {lastDetail ?? labels.lastCompactNone}
-              </span>
-            </div>
-            {display.lastCompact?.summaryPreview?.trim() ? (
-              <p className="ctx-chip__summary">
-                {display.lastCompact.summaryPreview.trim()}
-              </p>
-            ) : null}
-            <p className="ctx-chip__note">{labels.heuristicNote}</p>
-            {onUsage && usageAction ? (
-              <button
-                type="button"
-                role="menuitem"
-                className="ctx-chip__action"
-                onClick={() => {
-                  setOpen(false);
-                  onUsage();
-                }}
-              >
-                <span>{usageAction}</span>
-              </button>
-            ) : null}
-            <button
-              type="button"
-              role="menuitem"
-              className="ctx-chip__action"
-              onClick={() => {
-                setOpen(false);
-                onCompact();
-              }}
-            >
-              <IconArrowsMinimize size={14} aria-hidden />
-              <span>{labels.compactAction}</span>
-            </button>
-          </div>,
-          document.body,
-        )}
+            <span>{usageAction}</span>
+          </button>
+        ) : null}
+        <button
+          type="button"
+          role="menuitem"
+          className="ctx-chip__action"
+          onClick={() => {
+            setOpen(false);
+            onCompact();
+          }}
+        >
+          <IconArrowsMinimize size={14} aria-hidden />
+          <span>{labels.compactAction}</span>
+        </button>
+      </ComposerPortalPop>
     </div>
   );
 }

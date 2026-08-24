@@ -4,8 +4,7 @@
  * Lives next to the project picker on the new-session context bar.
  */
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useRef } from "react";
 import {
   IconCheck,
   IconFileDiff,
@@ -17,7 +16,10 @@ import {
   IconUpload,
 } from "@/components/icons";
 import { Tip } from "@/components/ui/tooltip";
-import { useFloatingMenu } from "@/lib/floatingMenu";
+import {
+  ComposerPortalPop,
+  useComposerPortalMenu,
+} from "@/components/ComposerPortalPop";
 import {
   canOpenCliWorktreeAsCwd,
   cliWorktreeMetaLabel,
@@ -138,10 +140,6 @@ export function ComposerWorktreeMenu({
   onCliReveal,
   onCliOpen,
 }: Props) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const popRef = useRef<HTMLDivElement>(null);
   const onOpenRef = useRef(onOpen);
   onOpenRef.current = onOpen;
 
@@ -197,23 +195,18 @@ export function ComposerWorktreeMenu({
   const cliOpenBlocked =
     labels.cliWorktreeOpenUnavailable || "Path missing — cannot open";
 
-  const { pos, style: popStyle } = useFloatingMenu({
-    open,
-    triggerRef,
-    panelRef: popRef,
-    roots: [rootRef],
-    onClose: () => setOpen(false),
-    // Welcome composer is vertically centered — auto picks up/down so the menu fits.
-    placement: "auto",
+  // Welcome composer is vertically centered — default auto placement picks
+  // up/down so the menu fits.
+  const menu = useComposerPortalMenu({
     // Fixed width: fitContent + label measure caused first-open width "squeeze" flash.
     fitContent: false,
     width: 288,
     minWidth: 288,
     estHeight,
-    gap: 8,
     // Only re-anchor when row count changes, not on soft-refresh loading toggles.
     deps: [worktrees.length, cliWorktrees.length, showCliSection],
   });
+  const { open, setOpen, rootRef, triggerRef } = menu;
 
   useEffect(() => {
     if (!open) return;
@@ -259,58 +252,266 @@ export function ComposerWorktreeMenu({
           </span>
         </button>
       </Tip>
-      {open &&
-        pos &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div
-            ref={popRef}
-            className="cmm__pop cmm__pop--portal cwm__pop"
-            role="menu"
-            aria-label={labels.worktrees}
-            style={popStyle as CSSProperties}
+      <ComposerPortalPop
+        menu={menu}
+        className="cwm__pop"
+        ariaLabel={labels.worktrees}
+      >
+        <div className="cwm__head">{labels.worktrees}</div>
+        {worktrees.length > 0 ? (
+          <ul
+            className={"cwm__list" + (showLoading ? " is-loading" : "")}
+            aria-busy={showLoading || undefined}
+            style={{ maxHeight: LIST_MAX_H }}
           >
-            <div className="cwm__head">{labels.worktrees}</div>
-            {worktrees.length > 0 ? (
+            {worktrees.map((wt) => {
+              const isCurrent = pathsEqual(wt.path, activePath);
+              const name = worktreeLabel(wt);
+              const meta = [
+                wt.isMain ? labels.worktreeMain : null,
+                wt.detached ? labels.worktreeDetached : null,
+                isCurrent ? labels.worktreeCurrent : null,
+              ]
+                .filter(Boolean)
+                .join(" · ");
+              const showRemove =
+                !!onRemove && canRemoveWorktree(wt);
+              return (
+                <li key={wt.path} className="cwm__row">
+                  <div className="cwm__row-inner">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className={
+                        "cmm__opt cwm__item" +
+                        (isCurrent ? " is-active" : "")
+                      }
+                      title={wt.path}
+                      disabled={isCurrent}
+                      onClick={() => {
+                        if (isCurrent) return;
+                        setOpen(false);
+                        onSwitch(wt);
+                      }}
+                    >
+                      <span className="cwm__item-main">
+                        <span className="cwm__item-name">{name}</span>
+                        {meta ? (
+                          <span className="cwm__item-meta">{meta}</span>
+                        ) : null}
+                      </span>
+                      {isCurrent ? (
+                        <span className="cmm__opt-check" aria-hidden>
+                          <IconCheck size={16} />
+                        </span>
+                      ) : null}
+                    </button>
+                    {showRemove ? (
+                      <Tip label={removeLabel}>
+                        <button
+                          type="button"
+                          className="cwm__row-remove"
+                          aria-label={
+                            labels.worktreeRemove || removeLabel
+                          }
+                          title={removeLabel}
+                          disabled={
+                            disabled || worktreesLoading || showLoading
+                          }
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setOpen(false);
+                            onRemove?.(wt);
+                          }}
+                        >
+                          <IconTrash size={14} aria-hidden />
+                        </button>
+                      </Tip>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="cwm__empty">
+            {worktreesReason?.trim()
+              ? labels.worktreesUnavailable
+              : labels.worktreesEmpty}
+          </p>
+        )}
+
+        <div className="cwm__actions">
+          <button
+            type="button"
+            role="menuitem"
+            className="cwm__action"
+            onClick={() => {
+              setOpen(false);
+              onCreate();
+            }}
+          >
+            <IconPlus size={14} aria-hidden />
+            <span>{labels.worktreeNew}</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="cwm__action"
+            onClick={() => {
+              setOpen(false);
+              onCreateAndChat();
+            }}
+          >
+            <IconPlus size={14} aria-hidden />
+            <span>{labels.worktreeNewChat}</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="cwm__action cwm__action--muted"
+            onClick={() => {
+              setOpen(false);
+              onGc();
+            }}
+          >
+            <IconTrash size={14} aria-hidden />
+            <span>{labels.worktreeGc}</span>
+          </button>
+          {showCompare ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="cwm__action"
+              title={
+                labels.worktreeCompareTip || labels.worktreeCompare
+              }
+              onClick={() => {
+                setOpen(false);
+                onCompare?.();
+              }}
+            >
+              <IconFileDiff size={14} aria-hidden />
+              <span>{labels.worktreeCompare || "Compare with main…"}</span>
+            </button>
+          ) : null}
+          {showShip ? (
+            <button
+              type="button"
+              role="menuitem"
+              className="cwm__action"
+              title={labels.worktreeShipTip || labels.worktreeShip}
+              onClick={() => {
+                setOpen(false);
+                onShip?.();
+              }}
+            >
+              <IconUpload size={14} aria-hidden />
+              <span>{labels.worktreeShip || "Ship…"}</span>
+            </button>
+          ) : null}
+        </div>
+
+        {showCliSection ? (
+          <div className="cwm__cli">
+            <div className="cwm__cli-head">
+              <span className="cwm__head cwm__head--inline">{cliHead}</span>
+              {onCliRefresh ? (
+                <Tip label={cliRefreshLabel}>
+                  <button
+                    type="button"
+                    className="cwm__cli-refresh"
+                    aria-label={cliRefreshLabel}
+                    disabled={disabled || cliWorktreesLoading}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onCliRefresh();
+                    }}
+                  >
+                    <IconRefresh
+                      size={14}
+                      aria-hidden
+                      className={
+                        cliWorktreesLoading ? "is-spin" : undefined
+                      }
+                    />
+                  </button>
+                </Tip>
+              ) : null}
+            </div>
+            {cliWorktreesAvailable === false &&
+            cliWorktrees.length === 0 ? (
+              <p className="cwm__empty">
+                {cliWorktreesReason?.trim()
+                  ? labels.cliWorktreesUnavailable ||
+                    labels.worktreesUnavailable
+                  : labels.cliWorktreesEmpty || labels.worktreesEmpty}
+              </p>
+            ) : cliWorktrees.length > 0 ? (
               <ul
-                className={"cwm__list" + (showLoading ? " is-loading" : "")}
-                aria-busy={showLoading || undefined}
-                style={{ maxHeight: LIST_MAX_H }}
+                className={
+                  "cwm__list cwm__list--cli" +
+                  (showCliLoading ? " is-loading" : "")
+                }
+                aria-busy={showCliLoading || undefined}
+                style={{ maxHeight: CLI_LIST_MAX_H }}
               >
-                {worktrees.map((wt) => {
+                {cliWorktrees.map((wt) => {
                   const isCurrent = pathsEqual(wt.path, activePath);
-                  const name = worktreeLabel(wt);
-                  const meta = [
-                    wt.isMain ? labels.worktreeMain : null,
-                    wt.detached ? labels.worktreeDetached : null,
-                    isCurrent ? labels.worktreeCurrent : null,
+                  const canOpen =
+                    !!onCliOpen &&
+                    canOpenCliWorktreeAsCwd(wt) &&
+                    !isCurrent;
+                  const meta = cliWorktreeMetaLabel(wt, {
+                    current: isCurrent
+                      ? labels.worktreeCurrent
+                      : undefined,
+                  });
+                  const tipLine = [
+                    canOpen ? cliOpenLabel : !isCurrent ? cliOpenBlocked : null,
+                    wt.path,
+                    wt.status ? `status: ${wt.status}` : null,
+                    !wt.pathOk
+                      ? labels.cliWorktreeMissingPath || null
+                      : null,
                   ]
                     .filter(Boolean)
-                    .join(" · ");
-                  const showRemove =
-                    !!onRemove && canRemoveWorktree(wt);
+                    .join("\n");
                   return (
-                    <li key={wt.path} className="cwm__row">
+                    <li key={wt.id || wt.path} className="cwm__row">
                       <div className="cwm__row-inner">
                         <button
                           type="button"
                           role="menuitem"
                           className={
                             "cmm__opt cwm__item" +
-                            (isCurrent ? " is-active" : "")
+                            (isCurrent ? " is-active" : "") +
+                            (!canOpen && !isCurrent
+                              ? " is-muted"
+                              : "")
                           }
-                          title={wt.path}
-                          disabled={isCurrent}
+                          title={tipLine}
+                          disabled={
+                            disabled ||
+                            isCurrent ||
+                            !canOpen
+                          }
                           onClick={() => {
-                            if (isCurrent) return;
+                            if (!canOpen) return;
                             setOpen(false);
-                            onSwitch(wt);
+                            onCliOpen?.(wt);
                           }}
                         >
                           <span className="cwm__item-main">
-                            <span className="cwm__item-name">{name}</span>
+                            <span className="cwm__item-name">
+                              {wt.name}
+                            </span>
                             {meta ? (
-                              <span className="cwm__item-meta">{meta}</span>
+                              <span className="cwm__item-meta">
+                                {meta}
+                              </span>
                             ) : null}
                           </span>
                           {isCurrent ? (
@@ -319,26 +520,24 @@ export function ComposerWorktreeMenu({
                             </span>
                           ) : null}
                         </button>
-                        {showRemove ? (
-                          <Tip label={removeLabel}>
+                        {onCliReveal && wt.path ? (
+                          <Tip label={cliRevealLabel}>
                             <button
                               type="button"
-                              className="cwm__row-remove"
-                              aria-label={
-                                labels.worktreeRemove || removeLabel
-                              }
-                              title={removeLabel}
+                              className="cwm__row-remove cwm__row-reveal"
+                              aria-label={cliRevealLabel}
+                              title={cliRevealLabel}
                               disabled={
-                                disabled || worktreesLoading || showLoading
+                                disabled ||
+                                !wt.pathOk
                               }
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                setOpen(false);
-                                onRemove?.(wt);
+                                onCliReveal(wt);
                               }}
                             >
-                              <IconTrash size={14} aria-hidden />
+                              <IconFolder size={14} aria-hidden />
                             </button>
                           </Tip>
                         ) : null}
@@ -349,230 +548,16 @@ export function ComposerWorktreeMenu({
               </ul>
             ) : (
               <p className="cwm__empty">
-                {worktreesReason?.trim()
-                  ? labels.worktreesUnavailable
-                  : labels.worktreesEmpty}
+                {showCliLoading
+                  ? labels.cliWorktreesLoading ||
+                    labels.worktreesLoading ||
+                    "…"
+                  : labels.cliWorktreesEmpty || labels.worktreesEmpty}
               </p>
             )}
-
-            <div className="cwm__actions">
-              <button
-                type="button"
-                role="menuitem"
-                className="cwm__action"
-                onClick={() => {
-                  setOpen(false);
-                  onCreate();
-                }}
-              >
-                <IconPlus size={14} aria-hidden />
-                <span>{labels.worktreeNew}</span>
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                className="cwm__action"
-                onClick={() => {
-                  setOpen(false);
-                  onCreateAndChat();
-                }}
-              >
-                <IconPlus size={14} aria-hidden />
-                <span>{labels.worktreeNewChat}</span>
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                className="cwm__action cwm__action--muted"
-                onClick={() => {
-                  setOpen(false);
-                  onGc();
-                }}
-              >
-                <IconTrash size={14} aria-hidden />
-                <span>{labels.worktreeGc}</span>
-              </button>
-              {showCompare ? (
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="cwm__action"
-                  title={
-                    labels.worktreeCompareTip || labels.worktreeCompare
-                  }
-                  onClick={() => {
-                    setOpen(false);
-                    onCompare?.();
-                  }}
-                >
-                  <IconFileDiff size={14} aria-hidden />
-                  <span>{labels.worktreeCompare || "Compare with main…"}</span>
-                </button>
-              ) : null}
-              {showShip ? (
-                <button
-                  type="button"
-                  role="menuitem"
-                  className="cwm__action"
-                  title={labels.worktreeShipTip || labels.worktreeShip}
-                  onClick={() => {
-                    setOpen(false);
-                    onShip?.();
-                  }}
-                >
-                  <IconUpload size={14} aria-hidden />
-                  <span>{labels.worktreeShip || "Ship…"}</span>
-                </button>
-              ) : null}
-            </div>
-
-            {showCliSection ? (
-              <div className="cwm__cli">
-                <div className="cwm__cli-head">
-                  <span className="cwm__head cwm__head--inline">{cliHead}</span>
-                  {onCliRefresh ? (
-                    <Tip label={cliRefreshLabel}>
-                      <button
-                        type="button"
-                        className="cwm__cli-refresh"
-                        aria-label={cliRefreshLabel}
-                        disabled={disabled || cliWorktreesLoading}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          onCliRefresh();
-                        }}
-                      >
-                        <IconRefresh
-                          size={14}
-                          aria-hidden
-                          className={
-                            cliWorktreesLoading ? "is-spin" : undefined
-                          }
-                        />
-                      </button>
-                    </Tip>
-                  ) : null}
-                </div>
-                {cliWorktreesAvailable === false &&
-                cliWorktrees.length === 0 ? (
-                  <p className="cwm__empty">
-                    {cliWorktreesReason?.trim()
-                      ? labels.cliWorktreesUnavailable ||
-                        labels.worktreesUnavailable
-                      : labels.cliWorktreesEmpty || labels.worktreesEmpty}
-                  </p>
-                ) : cliWorktrees.length > 0 ? (
-                  <ul
-                    className={
-                      "cwm__list cwm__list--cli" +
-                      (showCliLoading ? " is-loading" : "")
-                    }
-                    aria-busy={showCliLoading || undefined}
-                    style={{ maxHeight: CLI_LIST_MAX_H }}
-                  >
-                    {cliWorktrees.map((wt) => {
-                      const isCurrent = pathsEqual(wt.path, activePath);
-                      const canOpen =
-                        !!onCliOpen &&
-                        canOpenCliWorktreeAsCwd(wt) &&
-                        !isCurrent;
-                      const meta = cliWorktreeMetaLabel(wt, {
-                        current: isCurrent
-                          ? labels.worktreeCurrent
-                          : undefined,
-                      });
-                      const tipLine = [
-                        canOpen ? cliOpenLabel : !isCurrent ? cliOpenBlocked : null,
-                        wt.path,
-                        wt.status ? `status: ${wt.status}` : null,
-                        !wt.pathOk
-                          ? labels.cliWorktreeMissingPath || null
-                          : null,
-                      ]
-                        .filter(Boolean)
-                        .join("\n");
-                      return (
-                        <li key={wt.id || wt.path} className="cwm__row">
-                          <div className="cwm__row-inner">
-                            <button
-                              type="button"
-                              role="menuitem"
-                              className={
-                                "cmm__opt cwm__item" +
-                                (isCurrent ? " is-active" : "") +
-                                (!canOpen && !isCurrent
-                                  ? " is-muted"
-                                  : "")
-                              }
-                              title={tipLine}
-                              disabled={
-                                disabled ||
-                                isCurrent ||
-                                !canOpen
-                              }
-                              onClick={() => {
-                                if (!canOpen) return;
-                                setOpen(false);
-                                onCliOpen?.(wt);
-                              }}
-                            >
-                              <span className="cwm__item-main">
-                                <span className="cwm__item-name">
-                                  {wt.name}
-                                </span>
-                                {meta ? (
-                                  <span className="cwm__item-meta">
-                                    {meta}
-                                  </span>
-                                ) : null}
-                              </span>
-                              {isCurrent ? (
-                                <span className="cmm__opt-check" aria-hidden>
-                                  <IconCheck size={16} />
-                                </span>
-                              ) : null}
-                            </button>
-                            {onCliReveal && wt.path ? (
-                              <Tip label={cliRevealLabel}>
-                                <button
-                                  type="button"
-                                  className="cwm__row-remove cwm__row-reveal"
-                                  aria-label={cliRevealLabel}
-                                  title={cliRevealLabel}
-                                  disabled={
-                                    disabled ||
-                                    !wt.pathOk
-                                  }
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onCliReveal(wt);
-                                  }}
-                                >
-                                  <IconFolder size={14} aria-hidden />
-                                </button>
-                              </Tip>
-                            ) : null}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : (
-                  <p className="cwm__empty">
-                    {showCliLoading
-                      ? labels.cliWorktreesLoading ||
-                        labels.worktreesLoading ||
-                        "…"
-                      : labels.cliWorktreesEmpty || labels.worktreesEmpty}
-                  </p>
-                )}
-              </div>
-            ) : null}
-          </div>,
-          document.body,
-        )}
+          </div>
+        ) : null}
+      </ComposerPortalPop>
     </div>
   );
 }
