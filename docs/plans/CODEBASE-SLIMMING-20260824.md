@@ -1,17 +1,16 @@
 # Grok App 项目瘦身审计 — 2026-08-24
 
-> 状态:**只读审计完成,未修改任何代码**。等待另一进程交接(最终集成分支 SHA + 工作树 clean + 全量测试结果)后,按本文档实施。
-> 本文件暂存于 /tmp,瘦身 worktree(`codex/codebase-slimming-20260824`)建立后作为首个提交落到 `docs/plans/CODEBASE-SLIMMING-20260824.md`。
+> 状态:**只读审计完成,未修改任何代码;前置门禁已于 2026-08-24 完成**——main 已 ff-only 到 `e1068f4c`,全量基线七项全绿,本文档已作为 `codex/codebase-slimming-20260824` 分支首个提交落库。后续按"实施顺序"逐模块执行。
 
 ## 基线
 
 | 项 | 值 |
 |---|---|
 | 审计基线 | `codex/ui-round2-integration-20260823` @ `e1068f4c`(工作树 clean) |
-| 本地 main | `665987ca`,`main...集成分支 = 0/68`,可 fast-forward |
+| 本地 main | 审计时点为 `665987ca`(`main...集成分支 = 0/68`);2026-08-24 已 ff-only 合并,**现 main = `e1068f4c`**,备份分支 `backup/main-before-codebase-slimming-20260824` 指向 `665987ca` |
 | origin/main | `60195551`(更旧,不使用) |
 | 代码规模 | src ≈ 54.1 万行;`src/app/AppWorkbench.tsx` 24,641 行;CSS 60 文件 ≈ 4.1 万行 |
-| 质量门禁 | `check-code-quality-gates.py --mode final`:App.tsx ≤6000、≥1k 行文件 ≤80(现 43+)、CSS 最大 ≤10000 等 |
+| 质量门禁 | `check-code-quality-gates.py --mode final`:App.tsx ≤6000、≥1k 行文件 ≤80(**现 80,已到预算上限,无余量**)、CSS 最大 ≤10000 等 |
 
 方法:8 个只读探查代理(UI 控件 / 设置 / 主题壁纸 / pane chrome / 聊天输入 / hooks / Rust / 测试资产)+ 主线独立交叉核验。**凡标 [已复核] 的项,调用点结论由主线用 rg 独立复现过**;[抽查] 表示主线抽样验证过代表样本。
 
@@ -298,7 +297,7 @@
 
 ---
 
-## 实施顺序(每模块一个中文 commit + pi 审核)
+## 实施顺序(每个独立工作单元一个中文 commit,**每个 commit 均 pi 审核**,见 AGENTS.md §8)
 
 1. **M1 死码大清扫(前端)**:1.1–1.8(可拆 2–3 个 commit:ui簇+依赖 / 死组件+级联 / lib孤儿批)
 2. **M4 ResourceViewer 壳删除**:4.1–4.3(独立大 commit)
@@ -315,6 +314,6 @@
 
 ## 门禁提醒
 
-- 修改代码前需要:另一进程的**最终集成分支 SHA + 工作树 clean + 全量测试结果**
-- 然后:备份分支 → `$MAIN_WT` ff-only → main 全量验证绿 → 建 `codex/codebase-slimming-20260824` worktree → 本文档落库 → 按序实施
-- 不 push、不建 PR、不动 `/tmp/grok-pr-*`、不新增依赖
+- ~~修改代码前需要:另一进程的**最终集成分支 SHA + 工作树 clean + 全量测试结果**~~ **已完成(2026-08-24)**:集成分支定格 `e1068f4c`、工作树 clean、全量基线七项全绿(test 503 文件/6561 用例、lint、typecheck、build:ui、quality-gates PASS、cargo fmt、cargo check)
+- ~~然后:备份分支 → `$MAIN_WT` ff-only → main 全量验证绿 → 建 `codex/codebase-slimming-20260824` worktree → 本文档落库~~ **已完成(2026-08-24)**:备份分支 `backup/main-before-codebase-slimming-20260824`@`665987ca`;main ff 到 `e1068f4c`;两个 worktree 已建 → 剩余:**按序实施**
+- 不 push、不建 PR、不动 `/tmp/grok-pr-*`、不新增依赖(持续有效)
