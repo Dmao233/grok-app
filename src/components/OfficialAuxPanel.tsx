@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import * as api from "@/lib/api";
 import { createT, type Locale } from "@/i18n";
+import { UiSwitch } from "@/components/settings/shared";
 
 export interface OfficialAuxPanelProps {
   locale: Locale;
@@ -122,7 +123,8 @@ export function OfficialAuxPanel({
 
       <div
         className={
-          "prov-official-aux" + (!injectAllowed ? " is-disabled" : "")
+          "settings-card prov-official-aux" +
+          (!injectAllowed ? " is-disabled" : "")
         }
         id="settings-anchor-official-aux-inject"
       >
@@ -138,25 +140,24 @@ export function OfficialAuxPanel({
                 : tr("prov.officialAuxInjectDesc")}
           </p>
         </div>
-        <label className="prov-official-aux__switch">
-          <input
-            type="checkbox"
+        <div className="prov-official-aux__switch">
+          <UiSwitch
             checked={injectAllowed && officialAuxInject}
             disabled={!injectAllowed || busy}
-            onChange={(e) => void setOfficialAuxInjectPref(e.target.checked)}
-            aria-label={tr("prov.officialAuxInject")}
+            onChange={(next) => void setOfficialAuxInjectPref(next)}
+            label={tr("prov.officialAuxInject")}
           />
           <span>
             {injectAllowed && officialAuxInject
               ? tr("prov.officialAuxInjectOn")
               : tr("prov.officialAuxInjectOff")}
           </span>
-        </label>
+        </div>
       </div>
 
       {injectAllowed && officialAuxInject ? (
         <div
-          className="prov-official-aux prov-official-aux--sub"
+          className="settings-card prov-official-aux prov-official-aux--sub"
           id="settings-anchor-official-aux-user-mcp"
         >
           <div className="prov-official-aux__text">
@@ -167,22 +168,19 @@ export function OfficialAuxPanel({
               {tr("prov.officialAuxWithUserMcpDesc")}
             </p>
           </div>
-          <label className="prov-official-aux__switch">
-            <input
-              type="checkbox"
+          <div className="prov-official-aux__switch">
+            <UiSwitch
               checked={officialAuxWithUserMcp}
               disabled={busy}
-              onChange={(e) =>
-                void setOfficialAuxWithUserMcpPref(e.target.checked)
-              }
-              aria-label={tr("prov.officialAuxWithUserMcp")}
+              onChange={(next) => void setOfficialAuxWithUserMcpPref(next)}
+              label={tr("prov.officialAuxWithUserMcp")}
             />
             <span>
               {officialAuxWithUserMcp
                 ? tr("prov.officialAuxInjectOn")
                 : tr("prov.officialAuxInjectOff")}
             </span>
-          </label>
+          </div>
         </div>
       ) : null}
     </div>
