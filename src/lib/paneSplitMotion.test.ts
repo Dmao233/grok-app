@@ -83,6 +83,19 @@ describe("desktop hidden CSS must not force width 0", () => {
     expect(chat).toMatch(/--aside-rail-min/);
   });
 
+  it("renders only one left-sidebar toggle after collapse state flips", () => {
+    const app = readFileSync(
+      resolve(__dirname, "../app/AppWorkbench.tsx"),
+      "utf8",
+    );
+    expect(app).toMatch(
+      /!layout\.sidebarCollapsed\s*&&\s*\(\s*<Tip label=\{tr\("main\.leftPaneHide"\)\}/s,
+    );
+    expect(app).toMatch(
+      /layout\.sidebarCollapsed\s*&&\s*\(\s*<Tip label=\{tr\("main\.leftPaneShow"\)\}/s,
+    );
+  });
+
   it("drop-idle fade must not replace sidebar width interpolation", () => {
     const css = readFileSync(
       resolve(__dirname, "../styles/settings.part5.css"),

@@ -19278,16 +19278,18 @@ export function AppWorkbench() {
             data-tauri-drag-region={dragRegion}
             {...titlebarMax}
           >
-            <Tip label={tr("main.leftPaneHide")}>
-              <button
-                type="button"
-                className="chrome-btn chrome-btn--traffic main__pane-toggle is-on"
-                aria-label={tr("main.leftPaneHide")}
-                onClick={() => closeSidebarPane()}
-              >
-                <IconPanel size={16} />
-              </button>
-            </Tip>
+            {!layout.sidebarCollapsed && (
+              <Tip label={tr("main.leftPaneHide")}>
+                <button
+                  type="button"
+                  className="chrome-btn chrome-btn--traffic main__pane-toggle is-on"
+                  aria-label={tr("main.leftPaneHide")}
+                  onClick={() => closeSidebarPane()}
+                >
+                  <IconPanel size={16} />
+                </button>
+              </Tip>
+            )}
             <div
               className="sidebar-chrome__drag"
               data-tauri-drag-region={dragRegion}
