@@ -17,7 +17,6 @@
 //!
 //! No visual workflow editor. Shared mode never rewrites `~/.grok/config.toml`.
 
-#![allow(dead_code)] // residual-clippy: normalize_enabled
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
@@ -32,11 +31,6 @@ use crate::proxy;
 use crate::store;
 
 pub const CONFIG_KEY: &str = "workflows_enabled";
-
-/// Normalize enable toggle (App default off).
-pub fn normalize_enabled(raw: bool) -> bool {
-    raw
-}
 
 /// Upsert `workflows_enabled` into a TOML-ish text blob.
 pub fn set_workflows_enabled_in_toml(text: &str, enabled: bool) -> String {
@@ -553,12 +547,14 @@ fn prepare_log(stdout: &str, stderr: &str) -> (Option<String>, bool) {
     }
 }
 
+#[allow(dead_code)] // residual-clippy: no callers; near-duplicate copy lives on in batch_agents.rs
 enum ThreadWait<T> {
     Done(T),
     TimedOut,
     JoinErr,
 }
 
+#[allow(dead_code)] // residual-clippy: no callers; near-duplicate copy lives on in batch_agents.rs
 fn wait_thread<T: Send + 'static>(
     handle: std::thread::JoinHandle<T>,
     timeout: Duration,
@@ -589,6 +585,7 @@ pub const WORKFLOW_RUN_PROGRESS_EVENT: &str = "workflows://run-progress";
 ///
 /// When `app` is provided, emits line-level progress on
 /// [`WORKFLOW_RUN_PROGRESS_EVENT`] so Settings can show a live log.
+#[allow(dead_code)] // residual-clippy: test-only wrapper; production path is run_workflow_with_app
 pub fn run_workflow(
     name: &str,
     project_path: Option<&str>,
@@ -926,9 +923,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn normalize_and_name() {
-        assert!(!normalize_enabled(false));
-        assert!(normalize_enabled(true));
+    fn name_from_file() {
         assert_eq!(
             workflow_name_from_file_name("review-changes.rhai").as_deref(),
             Some("review-changes")

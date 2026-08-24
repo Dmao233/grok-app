@@ -11,7 +11,6 @@
 //!
 //! Soft-respawn after a settings flip so the next agent process reloads.
 
-#![allow(dead_code)] // residual-clippy: normalize_enabled
 use serde_json::{json, Value};
 
 use crate::agent_home_config::{
@@ -20,11 +19,6 @@ use crate::agent_home_config::{
 
 pub const CONFIG_KEY: &str = "auto_wake_enabled";
 pub const GROK_CONFIG_ENV: &str = "GROK_CONFIG";
-
-/// Normalize enable toggle (App default off / opt-in).
-pub fn normalize_enabled(raw: bool) -> bool {
-    raw
-}
 
 /// Upsert top-level `auto_wake_enabled` and `[features].auto_wake`.
 pub fn set_auto_wake_in_toml(text: &str, enabled: bool) -> String {
@@ -116,12 +110,6 @@ pub fn apply_auto_wake_to_command(
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn normalize() {
-        assert!(!normalize_enabled(false));
-        assert!(normalize_enabled(true));
-    }
 
     #[test]
     fn upserts_top_level_and_features_key() {
