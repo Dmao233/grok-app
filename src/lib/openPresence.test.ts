@@ -117,11 +117,11 @@ describe("floating pop CSS", () => {
     expect(settings).not.toMatch(/settings-stage-(?:enter|leave)/);
   });
 
-  it("uses the same CSS frost on workbench sidebar and settings nav", () => {
+  it("uses the same CSS frost on overlay drawers and settings nav", () => {
     const blur =
       /backdrop-filter:\s*blur\(var\(--sidebar-blur\)\)\s*saturate\(var\(--sidebar-saturate\)\)/;
     expect(workbenchCss).toMatch(
-      /\.platform-mac \.sidebar:not\(\.sidebar--overlay\):not\(\.sidebar--phone-drawer\)::before\s*\{[^}]*backdrop-filter:\s*blur\(var\(--sidebar-blur\)\)/,
+      /\.platform-mac \.sidebar:not\(\.sidebar--overlay\):not\(\.sidebar--phone-drawer\)\s*\{[^}]*backdrop-filter:\s*none/s,
     );
     expect(workbenchCss).toMatch(
       /\.platform-mac \.sidebar\.sidebar--overlay,\s*\.platform-mac \.sidebar\.sidebar--phone-drawer\s*\{[^}]*backdrop-filter:\s*blur\(var\(--sidebar-blur\)\)/s,
