@@ -677,12 +677,59 @@
 }
 
 /* When left sidebar fully closed, reserve mac traffic-light inset on main */
+/* Sidebar hidden: clear traffic lights + the pinned left toggle (28px + gap)
+   so the title never slides under the fixed button. */
 .platform-mac .main--sidebar-hidden .main__top {
-  padding-left: var(--titlebar-safe-left, 96px);
+  padding-left: calc(var(--titlebar-safe-left, 96px) + 34px);
+}
+
+/* Frameless chrome: no traffic lights — clear only the pinned toggle. */
+.platform-win .main--sidebar-hidden .main__top,
+.platform-linux .main--sidebar-hidden .main__top,
+.platform-other .main--sidebar-hidden .main__top,
+.has-custom-chrome .main--sidebar-hidden .main__top {
+  padding-left: 44px;
 }
 
 .workbench--sidebar-motion .main__top {
   transition: padding-left var(--motion-pane) var(--motion-pane-ease);
+}
+
+/* Aside hidden: keep the trailing top-actions clear of the pinned right
+   toggle parked at the window corner. */
+.workbench:not(.workbench--phone):has(> .aside.aside--hidden) .main__top {
+  padding-right: 46px;
+}
+
+.platform-win .workbench:not(.workbench--phone):has(> .aside.aside--hidden) .main__top,
+.platform-linux .workbench:not(.workbench--phone):has(> .aside.aside--hidden) .main__top,
+.platform-other .workbench:not(.workbench--phone):has(> .aside.aside--hidden) .main__top,
+.has-custom-chrome .workbench:not(.workbench--phone):has(> .aside.aside--hidden) .main__top {
+  padding-right: calc(var(--window-controls-inset, 138px) + 34px);
+}
+
+.workbench--aside-motion .main__top {
+  transition: padding-right var(--motion-pane) var(--motion-pane-ease);
+}
+
+.workbench--sidebar-motion.workbench--aside-motion .main__top {
+  transition:
+    padding-left var(--motion-pane) var(--motion-pane-ease),
+    padding-right var(--motion-pane) var(--motion-pane-ease);
+}
+
+/* Aside open (rail mode): its own chrome actions stop before the pinned
+   toggle floating at the window corner. Expanded mode keeps the in-bar
+   close, so no reserve there. */
+.workbench:not(.workbench--phone):not(.workbench--side-expanded) .aside .rp-chrome {
+  padding-right: 44px;
+}
+
+.platform-win .workbench:not(.workbench--phone):not(.workbench--side-expanded) .aside .rp-chrome,
+.platform-linux .workbench:not(.workbench--phone):not(.workbench--side-expanded) .aside .rp-chrome,
+.platform-other .workbench:not(.workbench--phone):not(.workbench--side-expanded) .aside .rp-chrome,
+.has-custom-chrome .workbench:not(.workbench--phone):not(.workbench--side-expanded) .aside .rp-chrome {
+  padding-right: calc(var(--window-controls-inset, 138px) + 34px);
 }
 
 .main__pane-toggle.is-on {
@@ -731,9 +778,10 @@
   right: var(--window-controls-inset, 138px);
 }
 
-/* Side-expanded overlay (z 12000) covers the pinned toggles — drop them from
-   paint and tab order. The left one survives while the sidebar column stays
-   open (the expanded pane starts right of the rail). */
+/* Side-expanded pane carries its own chrome controls — drop the pinned
+   toggles from paint and tab order so nothing floats over (or hides behind)
+   the full-cover surface. The left one survives while the sidebar column
+   stays open (the expanded pane starts right of the rail). */
 .workbench--side-expanded .pane-toggle--right.pane-toggle--pinned,
 .workbench--side-expanded:has(> .sidebar:is(.sidebar--hidden, .sidebar--overlay))
   .pane-toggle--left.pane-toggle--pinned {

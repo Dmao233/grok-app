@@ -83,17 +83,22 @@ describe("desktop hidden CSS must not force width 0", () => {
     expect(chat).toMatch(/--aside-rail-min/);
   });
 
-  it("renders only one left-sidebar toggle after collapse state flips", () => {
+  it("renders one pinned toggle per side, never a per-state second copy", () => {
     const app = readFileSync(
       resolve(__dirname, "../app/AppWorkbench.tsx"),
       "utf8",
     );
+    // Desktop: a single workbench-level pinned pair; collapse state only flips
+    // props on the same mounted node (no unmount/remount, no travel).
     expect(app).toMatch(
-      /!layout\.sidebarCollapsed\s*&&\s*\(\s*<Tip label=\{tr\("main\.leftPaneHide"\)\}/s,
+      /\{!phoneLayout \? \(\s*<>\s*<PaneToggleButton\s+side="left"[\s\S]*?<PaneToggleButton\s+side="right"/,
     );
-    expect(app).toMatch(
-      /layout\.sidebarCollapsed\s*&&\s*\(\s*<Tip label=\{tr\("main\.leftPaneShow"\)\}/s,
+    // The old implementation: one copy inside .sidebar-chrome plus one in
+    // .main__top swapped by `layout.sidebarCollapsed &&` — both are gone.
+    expect(app).not.toMatch(
+      /layout\.sidebarCollapsed\s*&&\s*\(\s*<Tip label=\{tr\("main\.leftPane/s,
     );
+    expect(app).not.toMatch(/chrome-btn--traffic/);
   });
 
   it("replays a window resize clamp after pane motion settles", () => {

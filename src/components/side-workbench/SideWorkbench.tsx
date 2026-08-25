@@ -48,6 +48,12 @@ export type SideWorkbenchProps = {
   onStateChange?: (next: SideWorkbenchState) => void;
   onCloseSide: () => void;
   onExpandedChange?: (expanded: boolean) => void;
+  /**
+   * Render the close toggle inside the tab bar. Only for surfaces the pinned
+   * workbench toggle cannot reach (phone full-screen aside); expanded mode
+   * always carries its own close.
+   */
+  closeToggleInBar?: boolean;
   /** Bottom-docked compressed composer over expanded side content. */
   dockComposer?: boolean;
   onToggleDockComposer?: () => void;
@@ -83,6 +89,7 @@ export function SideWorkbench({
   onStateChange,
   onCloseSide,
   onExpandedChange,
+  closeToggleInBar = false,
   dockComposer = false,
   onToggleDockComposer,
   paneActive = true,
@@ -352,6 +359,7 @@ export function SideWorkbench({
         onToggleExpand={onToggleExpand}
         onToggleDockComposer={onToggleDockComposer}
         onToggleSide={onCloseSide}
+        closeToggleInBar={closeToggleInBar}
       />
 
       <div className="sw__content">

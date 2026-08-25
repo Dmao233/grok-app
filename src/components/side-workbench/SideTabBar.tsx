@@ -71,6 +71,12 @@ export type SideTabBarProps = {
   onToggleExpand: () => void;
   onToggleDockComposer?: () => void;
   onToggleSide: () => void;
+  /**
+   * Also render the close toggle inside the bar. Desktop rail mode relies on
+   * the pinned workbench toggle instead (single button, never two copies);
+   * phone full-screen aside and expanded mode need an in-surface close.
+   */
+  closeToggleInBar?: boolean;
 };
 
 function pathLooksDirty(
@@ -128,6 +134,7 @@ export function SideTabBar({
   onToggleExpand,
   onToggleDockComposer,
   onToggleSide,
+  closeToggleInBar = false,
 }: SideTabBarProps) {
   const tr = useMemo(() => createT(locale as Locale), [locale]);
   const titlebarMax = titlebarMaximizeHandlers();
@@ -484,18 +491,20 @@ export function SideTabBar({
             <IconSideExpand size={16} />
           </button>
         </Tip>
-        <Tip label={tr("side.toggle")}>
-          <button
-            type="button"
-            className="chrome-btn main__pane-toggle is-on"
-            aria-label={tr("side.toggle")}
-            aria-pressed
-            data-testid="side-toggle-in-bar"
-            onClick={onToggleSide}
-          >
-            <IconPanelRight size={16} />
-          </button>
-        </Tip>
+        {expanded || closeToggleInBar ? (
+          <Tip label={tr("side.toggle")}>
+            <button
+              type="button"
+              className="chrome-btn main__pane-toggle is-on"
+              aria-label={tr("side.toggle")}
+              aria-pressed
+              data-testid="side-toggle-in-bar"
+              onClick={onToggleSide}
+            >
+              <IconPanelRight size={16} />
+            </button>
+          </Tip>
+        ) : null}
       </div>
 
       {plusOpen && pos

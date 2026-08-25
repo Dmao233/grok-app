@@ -118,6 +118,8 @@ import {
   runAfterPaneSplitMotion,
 } from "@/lib/paneSplitMotion";
 import { usePaneSplitMotion } from "@/hooks/usePaneSplitMotion";
+import { usePaneUnreadDot } from "@/hooks/usePaneUnreadDot";
+import { PaneToggleButton } from "@/components/PaneToggleButton";
 import { acquireNativeWebviewCover } from "@/lib/nativeWebviewCover";
 import {
   PHONE_KEYBOARD_INSET_VAR,
@@ -846,8 +848,6 @@ import {
   IconImagine,
   IconScheduled,
   IconMenu,
-  IconPanel,
-  IconPanelRight,
   IconUser,
   IconArchive,
   IconListCheck,
@@ -971,6 +971,7 @@ import { CompactModal } from "@/components/workbench-modals/CompactModal";
 import { AppDialogHost } from "@/components/workbench-modals/AppDialogHost";
 import { SearchPalette } from "@/components/workbench-modals/SearchPalette";
 import {
+  changeSignalKeys,
   mergeSessionChange,
   sessionChangesFromMessages,
   summarizeSessionChanges,
@@ -12568,6 +12569,21 @@ export function AppWorkbench() {
     return summarizeSessionChanges(list);
   }, [session.sessionId, sessionChangesById]);
 
+  // Pane-toggle unread dots (shared accumulate/clear hook). Left: sessions
+  // that finished a turn unviewed (same source as sidebar row dots + tray
+  // badge). Right: file changes of the viewed session, re-based per session.
+  const sidebarToggleUnread = usePaneUnreadDot({
+    open: !layout.sidebarCollapsed,
+    keys: unreadSessionIds,
+  });
+  const asideToggleUnread = usePaneUnreadDot({
+    open: !layout.asideCollapsed,
+    keys: changeSignalKeys(
+      session.sessionId ? (sessionChangesById[session.sessionId] ?? []) : [],
+    ),
+    resetKey: session.sessionId || "",
+  });
+
   // Reset find when switching conversation (keep open across same session).
   useEffect(() => {
     setShowChatFind(false);
@@ -19143,6 +19159,41 @@ export function AppWorkbench() {
           } as CSSProperties
         }
       >
+        {/* Pinned pane toggles — workbench-level, so pane motion slides under
+            them: no travel, no per-state duplicate. Phone uses the hamburger. */}
+        {!phoneLayout ? (
+          <>
+            <PaneToggleButton
+              side="left"
+              open={!layout.sidebarCollapsed}
+              unread={sidebarToggleUnread}
+              label={tr(
+                layout.sidebarCollapsed
+                  ? "main.leftPaneShow"
+                  : "main.leftPaneHide",
+              )}
+              unreadLabel={tr("main.paneUnread")}
+              controlsId="workbench-sidebar"
+              onToggle={
+                layout.sidebarCollapsed ? openSidebarPane : closeSidebarPane
+              }
+            />
+            <PaneToggleButton
+              side="right"
+              open={!layout.asideCollapsed}
+              unread={asideToggleUnread}
+              label={tr(
+                layout.asideCollapsed
+                  ? "main.rightPaneShow"
+                  : "main.rightPaneHide",
+              )}
+              unreadLabel={tr("main.paneUnread")}
+              controlsId="workbench-aside"
+              testId="main-side-toggle"
+              onToggle={layout.asideCollapsed ? openAsidePane : closeAsidePane}
+            />
+          </>
+        ) : null}
         {/* Phone drawer scrim — tap closes without resizing the conversation */}
         {phoneLayout && !layout.sidebarCollapsed ? (
           <button
@@ -19162,8 +19213,9 @@ export function AppWorkbench() {
             }}
           />
         ) : null}
-        {/* LEFT — fully hideable (not icon-rail); open via top-bar icon when closed */}
+        {/* LEFT — fully hideable (not icon-rail); open via pinned toggle when closed */}
         <aside
+          id="workbench-sidebar"
           className={
             "sidebar" +
             (layout.sidebarCollapsed ? " sidebar--hidden" : "") +
@@ -19230,24 +19282,13 @@ export function AppWorkbench() {
             />
           ) : null}
           <div className="sidebar__clip">
-          {/* Row 1: traffic-light height — panel toggle sits just right of traffic lights */}
+          {/* Row 1: traffic-light strip — drag region only; the pinned
+              workbench toggle floats over it. */}
           <div
             className="sidebar-chrome"
             data-tauri-drag-region={dragRegion}
             {...titlebarMax}
           >
-            {!layout.sidebarCollapsed && (
-              <Tip label={tr("main.leftPaneHide")}>
-                <button
-                  type="button"
-                  className="chrome-btn chrome-btn--traffic main__pane-toggle is-on"
-                  aria-label={tr("main.leftPaneHide")}
-                  onClick={() => closeSidebarPane()}
-                >
-                  <IconPanel size={16} />
-                </button>
-              </Tip>
-            )}
             <div
               className="sidebar-chrome__drag"
               data-tauri-drag-region={dragRegion}
@@ -20203,34 +20244,24 @@ export function AppWorkbench() {
             {...titlebarMax}
           >
             <div className="main__title-row" data-tauri-drag-region={dragRegion}>
-              {/* Phone: always-visible hamburger (≥44px). Desktop: reopen when rail hidden. */}
+              {/* Phone: always-visible hamburger (≥44px) — same shared
+                  toggle, in-flow variant. */}
               {phoneLayout ? (
-                <button
-                  type="button"
-                  className="chrome-btn main__phone-menu"
-                  aria-label={tr("phone.menu")}
-                  aria-expanded={!layout.sidebarCollapsed}
-                  onClick={() => {
-                    if (layout.sidebarCollapsed) openPhoneDrawer();
-                    else closePhoneDrawer();
-                  }}
-                >
-                  <IconMenu size={20} />
-                </button>
-              ) : (
-                layout.sidebarCollapsed && (
-                  <Tip label={tr("main.leftPaneShow")}>
-                    <button
-                      type="button"
-                      className="chrome-btn chrome-btn--traffic main__pane-toggle"
-                      aria-label={tr("main.leftPaneShow")}
-                      onClick={() => openSidebarPane()}
-                    >
-                      <IconPanel size={16} />
-                    </button>
-                  </Tip>
-                )
-              )}
+                <PaneToggleButton
+                  side="left"
+                  pinned={false}
+                  open={!layout.sidebarCollapsed}
+                  unread={sidebarToggleUnread}
+                  label={tr("phone.menu")}
+                  unreadLabel={tr("main.paneUnread")}
+                  icon={<IconMenu size={20} />}
+                  className="main__phone-menu"
+                  controlsId="workbench-sidebar"
+                  onToggle={
+                    layout.sidebarCollapsed ? openPhoneDrawer : closePhoneDrawer
+                  }
+                />
+              ) : null}
               {mainPane === "automations" ? (
                 <>
                   {!phoneLayout ? (
@@ -20378,11 +20409,8 @@ export function AppWorkbench() {
                       reads as a failure. Final failures surface via
                       session://turn_error instead. setRetryStatus(null) calls
                       stay as no-op cleanup. */}
-                  {/* Codex Side Workbench chrome:
-                      collapsed → open-with · env · side
-                      open      → open-with · env · side (also on side bar)
-                      Main keeps a toggle when open so narrow/non-maximized
-                      windows can still close if side chrome is clipped. */}
+                  {/* Codex Side Workbench chrome: open-with · env · terminal.
+                      Aside open/close lives on the pinned pane toggle. */}
                   {mainPane === "chat" &&
                     activeProject &&
                     !isMirrorClient() && (
@@ -20468,36 +20496,6 @@ export function AppWorkbench() {
                     open={bottomTerminal.state.open}
                     onToggle={bottomTerminal.toggle}
                   />
-                  {/* Always keep a main-chrome toggle: when the window is not
-                      maximized, the side pane can clip its own close control
-                      past the right edge — main column stays reachable. */}
-                  {layout.asideCollapsed ? (
-                    <Tip label={tr("main.rightPaneShow")}>
-                      <button
-                        type="button"
-                        className="chrome-btn main__pane-toggle"
-                        aria-label={tr("main.rightPaneShow")}
-                        aria-pressed={false}
-                        data-testid="main-side-toggle"
-                        onClick={() => openAsidePane()}
-                      >
-                        <IconPanelRight size={16} />
-                      </button>
-                    </Tip>
-                  ) : (
-                    <Tip label={tr("main.rightPaneHide")}>
-                      <button
-                        type="button"
-                        className="chrome-btn main__pane-toggle is-on"
-                        aria-label={tr("main.rightPaneHide")}
-                        aria-pressed
-                        data-testid="main-side-toggle"
-                        onClick={() => closeAsidePane()}
-                      >
-                        <IconPanelRight size={16} />
-                      </button>
-                    </Tip>
-                  )}
                 </>
               )}
             </div>
@@ -22270,6 +22268,7 @@ export function AppWorkbench() {
 
         {/* RIGHT — session-linked project resource viewer (fully hideable + resizable) */}
         <aside
+          id="workbench-aside"
           className={
             (layout.asideCollapsed ? "aside aside--hidden" : "aside") +
             (resizingAside ? " is-resizing" : "") +
@@ -22365,6 +22364,7 @@ export function AppWorkbench() {
                   setCloseActiveSideRequest(null)
                 }
                 onCloseSide={closeAsidePane}
+                closeToggleInBar={phoneLayout}
                 onExpandedChange={(expanded) => {
                   if (phoneLayout) return;
                   if (!expanded) setSideDockComposer(false);
