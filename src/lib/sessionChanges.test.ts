@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildUnifiedDiff,
   changeListKey,
+  changeSignalKeys,
   countLineDelta,
   isEditToolKind,
   mergeSessionChange,
@@ -46,6 +47,41 @@ describe("pathBaseName / relative", () => {
     expect(pathRelativeToProject("/other/x", "/Users/me/proj")).toBe(
       "/other/x",
     );
+  });
+});
+
+describe("changeSignalKeys", () => {
+  const change = (over: Partial<SessionFileChange>): SessionFileChange => ({
+    path: "/p/a.ts",
+    name: "a.ts",
+    toolKind: "write",
+    status: "completed",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+    ...over,
+  });
+
+  it("is stable for an unchanged list", () => {
+    const list = [change({})];
+    expect(changeSignalKeys(list)).toEqual(changeSignalKeys(list));
+  });
+
+  it("changes when a file is re-edited or its status flips", () => {
+    const before = changeSignalKeys([change({})]);
+    const reEdited = changeSignalKeys([
+      change({ updatedAt: "2026-01-01T00:05:00.000Z" }),
+    ]);
+    const flipped = changeSignalKeys([change({ status: "failed" })]);
+    expect(reEdited).not.toEqual(before);
+    expect(flipped).not.toEqual(before);
+  });
+
+  it("adds a key per new file", () => {
+    const keys = changeSignalKeys([
+      change({}),
+      change({ path: "/p/b.ts", name: "b.ts" }),
+    ]);
+    expect(keys).toHaveLength(2);
+    expect(new Set(keys).size).toBe(2);
   });
 });
 
