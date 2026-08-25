@@ -70,7 +70,6 @@ import {
 } from "@/lib/contextUsage";
 import {
   emptySessionPlan,
-  invalidatePlanGate,
   mergePlanFromEvent,
   planStateToStored,
 } from "@/lib/planSession";
@@ -1415,38 +1414,12 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
             if (cancelled || !p) return;
             const sessions = Array.isArray(p.sessions) ? p.sessions : [];
             const viewing = c.viewingSessionIdRef.current;
-            const planMap = c.planBySessionRef?.current as
-              | Map<string, import("@/lib/planSession").SessionPlanState>
-              | undefined;
-
-            const dropPlanGate = (sid: string) => {
-              if (!planMap) return;
-              if (sid === viewing) {
-                c.setPlan(
-                  (prev: import("@/lib/planSession").SessionPlanState) => {
-                    const next = invalidatePlanGate(prev);
-                    planMap.set(sid, next);
-                    c.markPlanPendingBadge?.(sid, next);
-                    return next;
-                  },
-                );
-                return;
-              }
-              const base = planMap.get(sid);
-              if (!base) return;
-              const next = invalidatePlanGate(base);
-              planMap.set(sid, next);
-              c.markPlanPendingBadge?.(sid, next);
-            };
 
             for (const row of sessions) {
               const sid = row?.sessionId;
               if (!sid) continue;
-              c.pendingPermBySessionRef.current.delete(sid);
-              c.pendingAskUserBySessionRef.current.delete(sid);
               // Session listed ⇒ process/gates gone; drop plan Approve even if
               // planRpcId was already taken in Host before emit.
-              dropPlanGate(sid);
               c.clearPendingGatesRef.current?.(sid);
               if (sid === viewing) {
                 c.setPerm(null);
@@ -1456,11 +1429,16 @@ export function useSessionHostEvents(ctx: SessionHostEventsCtx) {
             // Also clear any focused permission that lost its process even if
             // the payload omitted session ids (older hosts).
             if (!sessions.length) {
-              c.pendingPermBySessionRef.current.clear();
-              c.pendingAskUserBySessionRef.current.clear();
+              const staleSessionIds = new Set([
+                ...c.pendingPermBySessionRef.current.keys(),
+                ...c.pendingAskUserBySessionRef.current.keys(),
+              ]);
+              if (viewing) staleSessionIds.add(viewing);
+              for (const sid of staleSessionIds) {
+                c.clearPendingGatesRef.current?.(sid);
+              }
               c.setPerm(null);
               c.setAskUser?.(null);
-              if (viewing) dropPlanGate(viewing);
             }
           }),
         );

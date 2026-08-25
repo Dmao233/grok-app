@@ -331,7 +331,80 @@
   color: var(--text-primary);
 }
 
-/* Agent ask_user_question questionnaire (GlassModal body) */
+/* Agent ask_user_question panel anchored above the composer */
+.ask-user-panel {
+  pointer-events: auto;
+  width: 100%;
+  max-width: 42rem;
+  max-height: min(50vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  background: color-mix(
+    in srgb,
+    var(--bg-elevated, var(--bg-card)) 92%,
+    transparent
+  );
+  color: var(--text-primary);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+}
+
+.ask-user-panel--collapsed {
+  max-height: none;
+}
+
+.ask-user-panel__head {
+  appearance: none;
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ask-user-panel__head:hover {
+  background: var(--bg-hover);
+}
+
+.ask-user-panel__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.ask-user-panel__body {
+  min-height: 0;
+  overflow: auto;
+  padding: 2px 14px 14px;
+  overscroll-behavior: contain;
+}
+
+.ask-user-panel__actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
 .ask-user {
   display: flex;
   flex-direction: column;

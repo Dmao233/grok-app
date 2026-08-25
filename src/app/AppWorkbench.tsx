@@ -360,7 +360,7 @@ import {
   formatPermissionSummary,
   mapPermissionButtons
 } from "@/lib/permissionOptions";
-import { AskUserModal, dropAskUserClocks } from "@/components/AskUserModal";
+import { AskUserPanel, dropAskUserState } from "@/components/AskUserPanel";
 import {
   clearSessionSearchFilters,
   filterSessionSearch,
@@ -2410,7 +2410,7 @@ export function AppWorkbench() {
     pendingAskUserBySessionRef.current.delete(sessionId);
     // The request is settled — its clock must not outlive it.
     dropGateClocks(permRaisedAtRef.current, sessionId);
-    dropAskUserClocks(sessionId);
+    dropAskUserState(sessionId);
     const cached = planBySessionRef.current.get(sessionId);
     if (cached && cached.rpcId != null) {
       const next = invalidatePlanGate(cached);
@@ -21264,6 +21264,102 @@ export function AppWorkbench() {
                 </div>
               </div>
             ) : null}
+            <AskUserPanel
+              payload={askUser}
+              timeoutSec={askUserTimeoutSec}
+              labels={{
+                title: tr("askUser.title"),
+                submit: tr("askUser.submit"),
+                cancel: tr("askUser.cancel"),
+                otherPlaceholder: tr("askUser.otherPlaceholder"),
+                freeTextHint: tr("askUser.freeTextHint"),
+                multiHint: tr("askUser.multiHint"),
+                waiting: tr("askUser.waiting"),
+                expand: tr("askUser.expand"),
+                collapse: tr("askUser.collapse"),
+                autoCancelCountdown: tr("askUser.autoCancelCountdown"),
+              }}
+              onSubmit={async (answers) => {
+                if (!askUser) return false;
+                if (
+                  !canClaimAskUserSettle(
+                    askUserSettlingRpcRef.current,
+                    askUser.rpcId,
+                  )
+                ) {
+                  return false;
+                }
+                const payload = askUser;
+                askUserSettlingRpcRef.current = payload.rpcId;
+                setAskUser(null);
+                const settled = await settleAskUserDecision({
+                  payload,
+                  decision: "accepted",
+                  answers,
+                  viewingSessionId: () => viewingSessionIdRef.current,
+                  currentRpcId: () => askUserRef.current?.rpcId ?? null,
+                  resolve: (args) => api.sessionResolveAskUser(args),
+                });
+                if (settled.kind === "restore") {
+                  if (askUserSettlingRpcRef.current === payload.rpcId) {
+                    askUserSettlingRpcRef.current = null;
+                  }
+                  showToast(String(settled.error), 4500);
+                  pendingAskUserBySessionRef.current.set(
+                    payload.sessionId,
+                    payload,
+                  );
+                  if (viewingSessionIdRef.current === payload.sessionId) {
+                    setAskUser(payload);
+                  }
+                  return false;
+                }
+                if (askUserSettlingRpcRef.current === payload.rpcId) {
+                  askUserSettlingRpcRef.current = null;
+                }
+                if (
+                  shouldClearAskUserGate({
+                    settledRpcId: payload.rpcId,
+                    currentRpcId: askUserRef.current?.rpcId ?? null,
+                  })
+                ) {
+                  clearPendingGates(payload.sessionId);
+                }
+                return true;
+              }}
+              onCancel={async () => {
+                if (!askUser) return;
+                if (
+                  !canClaimAskUserSettle(
+                    askUserSettlingRpcRef.current,
+                    askUser.rpcId,
+                  )
+                ) {
+                  return;
+                }
+                const payload = askUser;
+                askUserSettlingRpcRef.current = payload.rpcId;
+                setAskUser(null);
+                await settleAskUserDecision({
+                  payload,
+                  decision: "cancelled",
+                  viewingSessionId: () => viewingSessionIdRef.current,
+                  currentRpcId: () => askUserRef.current?.rpcId ?? null,
+                  resolve: (args) => api.sessionResolveAskUser(args),
+                });
+                if (askUserSettlingRpcRef.current === payload.rpcId) {
+                  askUserSettlingRpcRef.current = null;
+                }
+                if (
+                  shouldClearAskUserGate({
+                    settledRpcId: payload.rpcId,
+                    currentRpcId: askUserRef.current?.rpcId ?? null,
+                  })
+                ) {
+                  clearPendingGates(payload.sessionId);
+                }
+              }}
+            />
             {(() => {
               // Desktop composer always shows the workspace chip (including
               // unbound / default workspace). Phone uses PhoneComposerToolsSheet.
@@ -22788,88 +22884,6 @@ export function AppWorkbench() {
       />
       </Suspense>
       ) : null}
-      <AskUserModal
-        payload={askUser}
-        timeoutSec={askUserTimeoutSec}
-        labels={{
-          title: tr("askUser.title"),
-          submit: tr("askUser.submit"),
-          cancel: tr("askUser.cancel"),
-          otherPlaceholder: tr("askUser.otherPlaceholder"),
-          freeTextHint: tr("askUser.freeTextHint"),
-          multiHint: tr("askUser.multiHint"),
-          close: tr("common.close"),
-          autoCancelCountdown: tr("askUser.autoCancelCountdown"),
-        }}
-        onSubmit={async (answers) => {
-          if (!askUser) return;
-          if (!canClaimAskUserSettle(askUserSettlingRpcRef.current, askUser.rpcId)) {
-            return;
-          }
-          const payload = askUser;
-          askUserSettlingRpcRef.current = payload.rpcId;
-          // Hide before the ACP write. Waiting left every control disabled
-          // for the Host stdin timeout when the agent was wedged (#844).
-          setAskUser(null);
-          const settled = await settleAskUserDecision({
-            payload,
-            decision: "accepted",
-            answers,
-            viewingSessionId: () => viewingSessionIdRef.current,
-            currentRpcId: () => askUserRef.current?.rpcId ?? null,
-            resolve: (args) => api.sessionResolveAskUser(args),
-          });
-          if (settled.kind === "restore") {
-            if (askUserSettlingRpcRef.current === payload.rpcId) {
-              askUserSettlingRpcRef.current = null;
-            }
-            showToast(String(settled.error), 4500);
-            pendingAskUserBySessionRef.current.set(payload.sessionId, payload);
-            if (viewingSessionIdRef.current === payload.sessionId) {
-              setAskUser(payload);
-            }
-            return;
-          }
-          if (askUserSettlingRpcRef.current === payload.rpcId) {
-            askUserSettlingRpcRef.current = null;
-          }
-          if (
-            shouldClearAskUserGate({
-              settledRpcId: payload.rpcId,
-              currentRpcId: askUserRef.current?.rpcId ?? null,
-            })
-          ) {
-            clearPendingGates(payload.sessionId);
-          }
-        }}
-        onCancel={async () => {
-          if (!askUser) return;
-          if (!canClaimAskUserSettle(askUserSettlingRpcRef.current, askUser.rpcId)) {
-            return;
-          }
-          const payload = askUser;
-          askUserSettlingRpcRef.current = payload.rpcId;
-          setAskUser(null);
-          await settleAskUserDecision({
-            payload,
-            decision: "cancelled",
-            viewingSessionId: () => viewingSessionIdRef.current,
-            currentRpcId: () => askUserRef.current?.rpcId ?? null,
-            resolve: (args) => api.sessionResolveAskUser(args),
-          });
-          if (askUserSettlingRpcRef.current === payload.rpcId) {
-            askUserSettlingRpcRef.current = null;
-          }
-          if (
-            shouldClearAskUserGate({
-              settledRpcId: payload.rpcId,
-              currentRpcId: askUserRef.current?.rpcId ?? null,
-            })
-          ) {
-            clearPendingGates(payload.sessionId);
-          }
-        }}
-      />
       <StatusModal
         open={showStatusModal}
         locale={locale}
