@@ -1814,10 +1814,6 @@ export function AppWorkbench() {
   const [sessionDataMode, setSessionDataMode] = useState(DEFAULT_SESSION_DATA_MODE);
   const [defaultOpenTarget, setDefaultOpenTarget] = useState("finder");
   const [showUserMenu, setShowUserMenu] = useState(false);
-  useEffect(() => {
-    if (!layout.sidebarCollapsed) return;
-    setShowUserMenu(false);
-  }, [layout.sidebarCollapsed]);
   /** Desktop Connect panel (AC7) — close does not stop host. */
 
   /** Phone mirror chrome: WS link + host account summary. */
