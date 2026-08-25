@@ -84,6 +84,7 @@ import {
 import { savePermissionTimeoutSec } from "@/lib/permissionTimeout";
 import { saveAskUserTimeoutSec } from "@/lib/askUserTimeout";
 import {
+  type AskUserSettlePayload,
   canClaimAskUserSettle,
   settleAskUserDecision,
   shouldClearAskUserGate,
@@ -2361,7 +2362,7 @@ export function AppWorkbench() {
   const [askUser, setAskUser] = useState<AskUserPayload | null>(null);
   const askUserRef = useRef(askUser);
   askUserRef.current = askUser;
-  const askUserSettlingRpcRef = useRef<number | null>(null);
+  const askUserSettlingRef = useRef<AskUserSettlePayload | null>(null);
   /**
    * Unanswered gates per session (`sessionId` → payload).
    *
@@ -21283,14 +21284,14 @@ export function AppWorkbench() {
                 if (!askUser) return false;
                 if (
                   !canClaimAskUserSettle(
-                    askUserSettlingRpcRef.current,
-                    askUser.rpcId,
+                    askUserSettlingRef.current,
+                    askUser,
                   )
                 ) {
                   return false;
                 }
                 const payload = askUser;
-                askUserSettlingRpcRef.current = payload.rpcId;
+                askUserSettlingRef.current = payload;
                 setAskUser(null);
                 const settled = await settleAskUserDecision({
                   payload,
@@ -21301,8 +21302,8 @@ export function AppWorkbench() {
                   resolve: (args) => api.sessionResolveAskUser(args),
                 });
                 if (settled.kind === "restore") {
-                  if (askUserSettlingRpcRef.current === payload.rpcId) {
-                    askUserSettlingRpcRef.current = null;
+                  if (askUserSettlingRef.current === payload) {
+                    askUserSettlingRef.current = null;
                   }
                   showToast(String(settled.error), 4500);
                   pendingAskUserBySessionRef.current.set(
@@ -21314,8 +21315,8 @@ export function AppWorkbench() {
                   }
                   return false;
                 }
-                if (askUserSettlingRpcRef.current === payload.rpcId) {
-                  askUserSettlingRpcRef.current = null;
+                if (askUserSettlingRef.current === payload) {
+                  askUserSettlingRef.current = null;
                 }
                 if (
                   shouldClearAskUserGate({
@@ -21331,14 +21332,14 @@ export function AppWorkbench() {
                 if (!askUser) return;
                 if (
                   !canClaimAskUserSettle(
-                    askUserSettlingRpcRef.current,
-                    askUser.rpcId,
+                    askUserSettlingRef.current,
+                    askUser,
                   )
                 ) {
                   return;
                 }
                 const payload = askUser;
-                askUserSettlingRpcRef.current = payload.rpcId;
+                askUserSettlingRef.current = payload;
                 setAskUser(null);
                 await settleAskUserDecision({
                   payload,
@@ -21347,8 +21348,8 @@ export function AppWorkbench() {
                   currentRpcId: () => askUserRef.current?.rpcId ?? null,
                   resolve: (args) => api.sessionResolveAskUser(args),
                 });
-                if (askUserSettlingRpcRef.current === payload.rpcId) {
-                  askUserSettlingRpcRef.current = null;
+                if (askUserSettlingRef.current === payload) {
+                  askUserSettlingRef.current = null;
                 }
                 if (
                   shouldClearAskUserGate({

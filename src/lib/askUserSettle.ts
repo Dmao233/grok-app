@@ -1,7 +1,7 @@
 /**
  * Ask-user questionnaire settle policy (#844).
  *
- * Waiting on `session_resolve_ask_user` before hiding the modal left every
+ * Waiting on `session_resolve_ask_user` before hiding the questionnaire left every
  * control `disabled={busy}` for the whole Host stdin timeout when the agent
  * was wedged. Dismiss first; restore only a failed accept if this chat is
  * still showing the same request.
@@ -23,12 +23,16 @@ export function askUserDismissLocked(_busy: boolean): boolean {
   return false;
 }
 
-/** First settle for an rpcId wins; a second accept/cancel is a no-op. */
+/** First settle for a session request wins; a second accept/cancel is a no-op. */
 export function canClaimAskUserSettle(
-  claimedRpcId: number | null | undefined,
-  rpcId: number,
+  claimedRequest: AskUserSettlePayload | null | undefined,
+  request: AskUserSettlePayload,
 ): boolean {
-  return claimedRpcId !== rpcId;
+  return (
+    !claimedRequest ||
+    claimedRequest.sessionId !== request.sessionId ||
+    claimedRequest.rpcId !== request.rpcId
+  );
 }
 
 /**

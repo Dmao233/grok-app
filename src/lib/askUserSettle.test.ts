@@ -18,11 +18,17 @@ describe("askUserDismissLocked", () => {
 
 describe("canClaimAskUserSettle", () => {
   it("lets the first accept or cancel claim the request", () => {
-    expect(canClaimAskUserSettle(null, 7)).toBe(true);
+    expect(canClaimAskUserSettle(null, payload)).toBe(true);
   });
 
-  it("rejects a second settle for the same rpcId", () => {
-    expect(canClaimAskUserSettle(7, 7)).toBe(false);
+  it("rejects a second settle for the same session request", () => {
+    expect(canClaimAskUserSettle(payload, { ...payload })).toBe(false);
+  });
+
+  it("lets another session settle the same rpcId independently", () => {
+    expect(
+      canClaimAskUserSettle(payload, { rpcId: 7, sessionId: "s2" }),
+    ).toBe(true);
   });
 });
 
