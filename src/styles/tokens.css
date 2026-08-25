@@ -62,8 +62,9 @@
 
   --motion-fast: 120ms;
   --motion-normal: 200ms;
-  --motion-pane: 320ms;
-  --motion-pane-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* ChatGPT Codex panel-animated: 0.3s ease on flex-grow / max-width. */
+  --motion-pane: 300ms;
+  --motion-pane-ease: ease;
 
   /* Solid window base — never leave transparent or theme switches flash white */
   --bg-app: #0d0d0d;

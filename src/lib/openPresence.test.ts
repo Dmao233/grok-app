@@ -95,9 +95,12 @@ describe("floating pop CSS", () => {
     expect(sidebar).toMatch(/transform-origin:\s*bottom/);
     expect(sidebar).toMatch(/translateY\(16px\) scaleY\(0\.92\)/);
     expect(sidebar).toMatch(/\.user-menu__flyout\.is-open/);
-    expect(env).toMatch(/\.sw-env-menu\.menu-panel\.is-open/);
+    expect(env).toMatch(/\.sw-env-menu\.menu-panel\.is-open:not\(\.is-parked\)/);
     expect(sidebar).toMatch(/var\(--motion-normal\) var\(--motion-pane-ease\)/);
-    expect(env).toMatch(/var\(--motion-normal\) var\(--motion-pane-ease\)/);
+    expect(env).toMatch(/transform-origin:\s*top right/);
+    expect(env).toMatch(/translateX\(100%\) scale\(0\.8\) rotateY\(-22deg\)/);
+    expect(env).toMatch(/\.sw-env-dock\s*\{[^}]*perspective:\s*900px/s);
+    expect(env).toMatch(/--env-summary-width:\s*300px/);
   });
 
   it("switches settings atomically without a presence or paint gap", () => {

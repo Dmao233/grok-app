@@ -20435,6 +20435,7 @@ export function AppWorkbench() {
                   {mainPane === "chat" ? (
                     <EnvInfoButton
                       locale={locale}
+                      asideOpen={!layout.asideCollapsed}
                       projectPath={effectiveProjectPath}
                       projectName={
                         activeProject

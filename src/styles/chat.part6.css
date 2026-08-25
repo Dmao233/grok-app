@@ -566,6 +566,8 @@
 
 .workbench--aside-motion
   .aside:not(.is-resizing):not(.aside--overlay) {
+  /* ChatGPT .panel-animated [data-panel]: clip the box, keep inner width. */
+  will-change: width, max-width, flex-basis;
   transition:
     width var(--motion-pane) var(--motion-pane-ease),
     min-width var(--motion-pane) var(--motion-pane-ease),
