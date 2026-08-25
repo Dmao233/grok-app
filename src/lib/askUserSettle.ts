@@ -7,6 +7,8 @@
  * still showing the same request.
  */
 
+import { gateClockKey } from "./gateClock";
+
 export type AskUserSettleDecision = "accepted" | "cancelled";
 
 export type AskUserSettlePayload = {
@@ -23,16 +25,15 @@ export function askUserDismissLocked(_busy: boolean): boolean {
   return false;
 }
 
-/** First settle for a session request wins; a second accept/cancel is a no-op. */
-export function canClaimAskUserSettle(
-  claimedRequest: AskUserSettlePayload | null | undefined,
+/** Claim one session request; a duplicate accept/cancel is a no-op. */
+export function claimAskUserSettle(
+  claimedRequests: Set<string>,
   request: AskUserSettlePayload,
-): boolean {
-  return (
-    !claimedRequest ||
-    claimedRequest.sessionId !== request.sessionId ||
-    claimedRequest.rpcId !== request.rpcId
-  );
+): string | null {
+  const key = gateClockKey(request.sessionId, request.rpcId);
+  if (claimedRequests.has(key)) return null;
+  claimedRequests.add(key);
+  return key;
 }
 
 /**

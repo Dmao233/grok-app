@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   askUserDismissLocked,
-  canClaimAskUserSettle,
+  claimAskUserSettle,
   settleAskUserDecision,
   shouldClearAskUserGate,
   shouldRestoreAskUserOnError,
@@ -16,19 +16,42 @@ describe("askUserDismissLocked", () => {
   });
 });
 
-describe("canClaimAskUserSettle", () => {
+describe("claimAskUserSettle", () => {
   it("lets the first accept or cancel claim the request", () => {
-    expect(canClaimAskUserSettle(null, payload)).toBe(true);
+    expect(claimAskUserSettle(new Set(), payload)).toBe("s1:7");
   });
 
   it("rejects a second settle for the same session request", () => {
-    expect(canClaimAskUserSettle(payload, { ...payload })).toBe(false);
+    const claimed = new Set<string>();
+    expect(claimAskUserSettle(claimed, payload)).toBe("s1:7");
+    expect(claimAskUserSettle(claimed, { ...payload })).toBeNull();
   });
 
   it("lets another session settle the same rpcId independently", () => {
+    const claimed = new Set<string>();
+    expect(claimAskUserSettle(claimed, payload)).toBe("s1:7");
     expect(
-      canClaimAskUserSettle(payload, { rpcId: 7, sessionId: "s2" }),
-    ).toBe(true);
+      claimAskUserSettle(claimed, { rpcId: 7, sessionId: "s2" }),
+    ).toBe("s2:7");
+  });
+
+  it("keeps S1 claimed across an interleaved S1 → S2 → S1 switch", () => {
+    const claimed = new Set<string>();
+    const s1Key = claimAskUserSettle(claimed, payload);
+    const s2Key = claimAskUserSettle(claimed, {
+      rpcId: 7,
+      sessionId: "s2",
+    });
+
+    expect(s1Key).toBe("s1:7");
+    expect(s2Key).toBe("s2:7");
+    expect(claimAskUserSettle(claimed, payload)).toBeNull();
+
+    claimed.delete(s2Key!);
+    expect(claimAskUserSettle(claimed, payload)).toBeNull();
+
+    claimed.delete(s1Key!);
+    expect(claimAskUserSettle(claimed, payload)).toBe("s1:7");
   });
 });
 

@@ -84,8 +84,7 @@ import {
 import { savePermissionTimeoutSec } from "@/lib/permissionTimeout";
 import { saveAskUserTimeoutSec } from "@/lib/askUserTimeout";
 import {
-  type AskUserSettlePayload,
-  canClaimAskUserSettle,
+  claimAskUserSettle,
   settleAskUserDecision,
   shouldClearAskUserGate,
 } from "@/lib/askUserSettle";
@@ -2362,7 +2361,7 @@ export function AppWorkbench() {
   const [askUser, setAskUser] = useState<AskUserPayload | null>(null);
   const askUserRef = useRef(askUser);
   askUserRef.current = askUser;
-  const askUserSettlingRef = useRef<AskUserSettlePayload | null>(null);
+  const askUserSettlingRef = useRef(new Set<string>());
   /**
    * Unanswered gates per session (`sessionId` → payload).
    *
@@ -21282,16 +21281,12 @@ export function AppWorkbench() {
               }}
               onSubmit={async (answers) => {
                 if (!askUser) return false;
-                if (
-                  !canClaimAskUserSettle(
-                    askUserSettlingRef.current,
-                    askUser,
-                  )
-                ) {
-                  return false;
-                }
                 const payload = askUser;
-                askUserSettlingRef.current = payload;
+                const settleKey = claimAskUserSettle(
+                  askUserSettlingRef.current,
+                  payload,
+                );
+                if (!settleKey) return false;
                 setAskUser(null);
                 const settled = await settleAskUserDecision({
                   payload,
@@ -21301,10 +21296,8 @@ export function AppWorkbench() {
                   currentRpcId: () => askUserRef.current?.rpcId ?? null,
                   resolve: (args) => api.sessionResolveAskUser(args),
                 });
+                askUserSettlingRef.current.delete(settleKey);
                 if (settled.kind === "restore") {
-                  if (askUserSettlingRef.current === payload) {
-                    askUserSettlingRef.current = null;
-                  }
                   showToast(String(settled.error), 4500);
                   pendingAskUserBySessionRef.current.set(
                     payload.sessionId,
@@ -21314,9 +21307,6 @@ export function AppWorkbench() {
                     setAskUser(payload);
                   }
                   return false;
-                }
-                if (askUserSettlingRef.current === payload) {
-                  askUserSettlingRef.current = null;
                 }
                 if (
                   shouldClearAskUserGate({
@@ -21330,16 +21320,12 @@ export function AppWorkbench() {
               }}
               onCancel={async () => {
                 if (!askUser) return;
-                if (
-                  !canClaimAskUserSettle(
-                    askUserSettlingRef.current,
-                    askUser,
-                  )
-                ) {
-                  return;
-                }
                 const payload = askUser;
-                askUserSettlingRef.current = payload;
+                const settleKey = claimAskUserSettle(
+                  askUserSettlingRef.current,
+                  payload,
+                );
+                if (!settleKey) return;
                 setAskUser(null);
                 await settleAskUserDecision({
                   payload,
@@ -21348,9 +21334,7 @@ export function AppWorkbench() {
                   currentRpcId: () => askUserRef.current?.rpcId ?? null,
                   resolve: (args) => api.sessionResolveAskUser(args),
                 });
-                if (askUserSettlingRef.current === payload) {
-                  askUserSettlingRef.current = null;
-                }
+                askUserSettlingRef.current.delete(settleKey);
                 if (
                   shouldClearAskUserGate({
                     settledRpcId: payload.rpcId,
