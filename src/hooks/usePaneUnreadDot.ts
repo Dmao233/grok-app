@@ -8,7 +8,7 @@
  * never fork between the two sides.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 export type PaneUnreadState = {
   /** Keys already shown to the user (baseline taken while the pane is open). */
@@ -35,6 +35,9 @@ function setsEqual(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
  * - closed → prune vanished keys from `seen` (content consumed elsewhere must
  *   not keep the dot lit, and the same id re-appearing later must light it
  *   again), then unread = "any current key not in seen".
+ *
+ * Idempotent: re-running with the same input returns the same object, which
+ * lets the hook apply it during render without looping.
  */
 export function reducePaneUnread(
   prev: PaneUnreadState,
@@ -66,11 +69,6 @@ function toKeySet(
   return keys instanceof Set ? keys : new Set(keys);
 }
 
-/** Value signature so fresh array/set identities do not re-run the effect. */
-function keySignature(keys: ReadonlySet<string>): string {
-  return Array.from(keys).sort().join("\u0000");
-}
-
 export function usePaneUnreadDot(opts: {
   /** Pane visibility — `!collapsed`. Opening clears the dot. */
   open: boolean;
@@ -84,20 +82,18 @@ export function usePaneUnreadDot(opts: {
   const [state, setState] = useState<PaneUnreadState>(() =>
     seedPaneUnread(keys),
   );
-  const keysRef = useRef(keys);
-  keysRef.current = keys;
-  const resetRef = useRef(resetKey);
-  const signature = keySignature(keys);
+  const [prevResetKey, setPrevResetKey] = useState(resetKey);
 
-  useEffect(() => {
-    const current = keysRef.current;
-    if (resetRef.current !== resetKey) {
-      resetRef.current = resetKey;
-      setState(seedPaneUnread(current));
-      return;
-    }
-    setState((prev) => reducePaneUnread(prev, { open: opts.open, keys: current }));
-  }, [opts.open, resetKey, signature]);
-
-  return state.unread;
+  // Render-phase adjust (React "derived state from props" pattern): clears
+  // must be synchronous — the same render that opens the pane or switches
+  // the viewed session already reports the dot off, no stale-frame flash.
+  if (prevResetKey !== resetKey) {
+    setPrevResetKey(resetKey);
+    const seeded = seedPaneUnread(keys);
+    setState(seeded);
+    return seeded.unread;
+  }
+  const next = reducePaneUnread(state, { open: opts.open, keys });
+  if (next !== state) setState(next);
+  return next.unread;
 }

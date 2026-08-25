@@ -125,6 +125,34 @@ describe("usePaneUnreadDot", () => {
     expect(result.current).toBe(true);
   });
 
+  it("clears synchronously when resetKey and open flip in the same render", () => {
+    const { result, rerender } = render({
+      open: false,
+      keys: ["a"],
+      resetKey: "s1",
+    });
+    rerender({ open: false, keys: ["a", "b"], resetKey: "s1" });
+    expect(result.current).toBe(true);
+
+    // Session switch + pane opened in one commit: dot must already be off.
+    rerender({ open: true, keys: ["z"], resetKey: "s2" });
+    expect(result.current).toBe(false);
+
+    // Session switch while still closed: no inherited dot either.
+    rerender({ open: false, keys: ["q"], resetKey: "s3" });
+    expect(result.current).toBe(false);
+  });
+
+  it("open-with-new-keys then immediate close treats them as seen", () => {
+    const { result, rerender } = render({ open: true, keys: [] });
+    rerender({ open: true, keys: ["k1"] });
+    expect(result.current).toBe(false);
+    rerender({ open: false, keys: ["k1"] });
+    expect(result.current).toBe(false);
+    rerender({ open: false, keys: ["k1", "k2"] });
+    expect(result.current).toBe(true);
+  });
+
   it("accepts a ReadonlySet source (left toggle passes unreadSessionIds)", () => {
     const { result, rerender } = renderHook(
       (p: { open: boolean; keys: ReadonlySet<string> }) => usePaneUnreadDot(p),

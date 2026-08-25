@@ -27,6 +27,8 @@ export type PaneToggleButtonProps = {
   pinned?: boolean;
   /** Icon override (phone hamburger). Defaults to the side's panel icon. */
   icon?: ReactNode;
+  /** DOM id of the controlled pane region (`aria-controls`). */
+  controlsId?: string;
   className?: string;
   testId?: string;
 };
@@ -40,6 +42,7 @@ export function PaneToggleButton({
   onToggle,
   pinned = true,
   icon,
+  controlsId,
   className,
   testId,
 }: PaneToggleButtonProps) {
@@ -58,6 +61,7 @@ export function PaneToggleButton({
         }
         aria-label={fullLabel}
         aria-expanded={open}
+        aria-controls={controlsId}
         data-testid={testId}
         onClick={onToggle}
       >

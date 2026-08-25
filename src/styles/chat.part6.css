@@ -690,6 +690,71 @@
   background: var(--bg-active);
 }
 
+/* ── Pinned pane toggles (PaneToggleButton) ─────────────────────────────
+   One shared button per side, absolutely positioned at the workbench top
+   corners — never inside the sliding pane. Open/close motion moves the pane
+   under the button; the button itself never travels. */
+.pane-toggle--pinned {
+  position: absolute;
+  top: calc((var(--titlebar-height, 40px) - 28px) / 2);
+  /* Above pane overlays (sidebar 40 / aside 41) and scrim (34);
+     below tips (10050), window controls (10040) and modals (12000). */
+  z-index: 45;
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.pane-toggle--left.pane-toggle--pinned {
+  left: 10px;
+}
+
+/* mac inline titlebar: sit right of the traffic lights — same clear as
+   .sidebar-chrome (open) and collapsed .main__top used to apply. */
+.platform-mac .pane-toggle--left.pane-toggle--pinned {
+  left: var(--titlebar-safe-left, 96px);
+}
+
+/* Frameless custom chrome draws no traffic lights on the left. */
+.has-custom-chrome .pane-toggle--left.pane-toggle--pinned {
+  left: 10px;
+}
+
+.pane-toggle--right.pane-toggle--pinned {
+  right: 12px;
+}
+
+/* Frameless windows: clear the fixed min/max/close cluster on the right. */
+.platform-win .pane-toggle--right.pane-toggle--pinned,
+.platform-linux .pane-toggle--right.pane-toggle--pinned,
+.platform-other .pane-toggle--right.pane-toggle--pinned,
+.has-custom-chrome .pane-toggle--right.pane-toggle--pinned {
+  right: var(--window-controls-inset, 138px);
+}
+
+/* Side-expanded overlay (z 12000) covers the pinned toggles — drop them from
+   paint and tab order. The left one survives while the sidebar column stays
+   open (the expanded pane starts right of the rail). */
+.workbench--side-expanded .pane-toggle--right.pane-toggle--pinned,
+.workbench--side-expanded:has(> .sidebar:is(.sidebar--hidden, .sidebar--overlay))
+  .pane-toggle--left.pane-toggle--pinned {
+  display: none;
+}
+
+/* Unread dot — same accent language as sidebar session rows
+   (.tree-l3__unread); token colors stay visible in light + dark. */
+.pane-toggle__dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent, #6b9fff);
+  box-shadow: 0 0 0 1px
+    color-mix(in srgb, var(--accent, #6b9fff) 28%, transparent);
+  pointer-events: none;
+}
+
 /* ===== Composer model / access menus (Codex-style sheet) ===== */
 .cmm {
   position: relative;

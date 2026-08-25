@@ -311,11 +311,12 @@ export function summarizeSessionChanges(
  * Stable per-edit signatures for the aside unread dot (`usePaneUnreadDot`).
  * A new edit on a file bumps `updatedAt`/`status`, so its key changes and the
  * collapsed aside toggle lights up; unchanged files keep their keys.
+ * JSON tuple encoding — paths may contain any separator character.
  */
 export function changeSignalKeys(
   changes: readonly SessionFileChange[],
 ): string[] {
-  return changes.map((c) => `${c.path}@${c.updatedAt}|${c.status}`);
+  return changes.map((c) => JSON.stringify([c.path, c.updatedAt, c.status]));
 }
 
 /** Source segment of a Changes-list navigation key (`session:…` / `workspace:…`). */

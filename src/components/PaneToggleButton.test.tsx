@@ -2,6 +2,8 @@
  * @vitest-environment jsdom
  */
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PaneToggleButton } from "./PaneToggleButton";
@@ -20,14 +22,12 @@ const base = {
 };
 
 describe("PaneToggleButton", () => {
-  it("is pinned by default and never carries pane-motion containers", () => {
-    render(<PaneToggleButton {...base} testId="t" />);
+  it("is pinned by default with side + controls wiring", () => {
+    render(<PaneToggleButton {...base} controlsId="pane-x" testId="t" />);
     const btn = screen.getByTestId("t");
     expect(btn.className).toContain("pane-toggle--pinned");
     expect(btn.className).toContain("pane-toggle--left");
-    // Fixed-position guard: the button must not live inside the sliding pane.
-    expect(btn.closest(".sidebar")).toBeNull();
-    expect(btn.closest(".aside")).toBeNull();
+    expect(btn.getAttribute("aria-controls")).toBe("pane-x");
   });
 
   it("shows the dot only while closed with unread content", () => {
@@ -77,5 +77,42 @@ describe("PaneToggleButton", () => {
     expect(screen.getByTestId("custom-icon")).toBeTruthy();
     fireEvent.click(btn);
     expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("pane-toggle CSS contract (button immobility)", () => {
+  const css = readFileSync(
+    resolve(__dirname, "../styles/chat.part6.css"),
+    "utf8",
+  );
+
+  it("pins the toggle absolutely at the workbench level", () => {
+    expect(css).toMatch(
+      /\.pane-toggle--pinned\s*\{[^}]*position:\s*absolute/s,
+    );
+    expect(css).toMatch(/\.pane-toggle--pinned\s*\{[^}]*z-index:\s*45/s);
+  });
+
+  it("keeps both terminal positions on the same fixed spot per platform", () => {
+    // mac: right of traffic lights (same clear the two old copies used).
+    expect(css).toMatch(
+      /\.platform-mac \.pane-toggle--left\.pane-toggle--pinned\s*\{[^}]*left:\s*var\(--titlebar-safe-left, 96px\)/s,
+    );
+    // frameless: clear the window-controls cluster on the right.
+    expect(css).toMatch(
+      /\.pane-toggle--right\.pane-toggle--pinned\s*\{[^}]*right:\s*var\(--window-controls-inset, 138px\)/s,
+    );
+  });
+
+  it("hides pinned toggles under the side-expanded overlay (focus hygiene)", () => {
+    expect(css).toMatch(
+      /\.workbench--side-expanded \.pane-toggle--right\.pane-toggle--pinned,\s*\.workbench--side-expanded:has\(> \.sidebar:is\(\.sidebar--hidden, \.sidebar--overlay\)\)\s*\.pane-toggle--left\.pane-toggle--pinned\s*\{[^}]*display:\s*none/s,
+    );
+  });
+
+  it("draws the unread dot from theme tokens, visible in light + dark", () => {
+    const dot = css.slice(css.indexOf(".pane-toggle__dot"));
+    expect(dot).toMatch(/background:\s*var\(--accent/);
+    expect(dot).toMatch(/pointer-events:\s*none/);
   });
 });
