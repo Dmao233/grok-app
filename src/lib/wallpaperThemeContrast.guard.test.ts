@@ -88,10 +88,13 @@ describe("wallpaper theme contrast CSS", () => {
     expect(lightRoot).toContain("--wallpaper-chrome-foreground");
     expect(lightRoot).toContain("--wallpaper-chrome-shadow-color");
     expect(css).toMatch(
-      /html\[data-theme="dark"\]\[data-wallpaper="1"\] \.sidebar\s*\{[^}]*text-shadow:/s,
+      /html\[data-theme="dark"\]\[data-wallpaper="1"\]\s+:is\(\s*\.sidebar,\s*\.aside \.rp-chrome,\s*\.aside \.plan-resource-empty,\s*\.aside \.rp__empty-state,\s*\.aside \.sw__empty\s*\)\s*\{[^}]*text-shadow:/s,
     );
     expect(css).toMatch(
-      /html\[data-theme="light"\]\[data-wallpaper="1"\] \.sidebar\s*\{[^}]*--text-primary:\s*var\(--wallpaper-chrome-foreground\)[^}]*text-shadow:\s*0 1px 2px var\(--wallpaper-chrome-shadow-color\)/s,
+      /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+:is\(\s*\.sidebar,\s*\.aside \.rp-chrome,\s*\.aside \.plan-resource-empty,\s*\.aside \.rp__empty-state,\s*\.aside \.sw__empty\s*\)\s*\{[^}]*--text-primary:\s*var\(--wallpaper-chrome-foreground\)[^}]*text-shadow:\s*0 1px 2px var\(--wallpaper-chrome-shadow-color\)/s,
+    );
+    expect(css).not.toMatch(
+      /html\[data-theme="light"\]\[data-wallpaper="1"\][^{]*\.plan-review\s*\{[^}]*--text-primary:\s*var\(--wallpaper-chrome-foreground\)/s,
     );
     expect(css).toMatch(
       /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+\.sidebar\s+\.user-avatar--logo\s+\.grok-logo\s+svg\s*\{[^}]*color:\s*var\(--text-inverse\)[^}]*filter:\s*none/s,
@@ -152,6 +155,9 @@ describe("wallpaper theme contrast CSS", () => {
     )?.[0];
     expect(lightExposed).toBeTruthy();
     expect(darkExposed).toBeTruthy();
+    expect(css).toMatch(
+      /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+:is\(\s*\.sidebar,\s*\.aside \.rp-chrome,\s*\.aside \.plan-resource-empty/s,
+    );
     expect(workbenchCss).toMatch(
       /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+\.auto-page\s+:is\(\.auto-page__title, \.auto-page__subtitle\)\s*\{/s,
     );

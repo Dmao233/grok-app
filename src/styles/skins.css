@@ -139,11 +139,26 @@ html[data-wallpaper="1"] .sidebar.sidebar--phone-drawer {
     saturate(1.25);
 }
 
-html[data-theme="dark"][data-wallpaper="1"] .sidebar {
+html[data-theme="dark"][data-wallpaper="1"]
+  :is(
+    .sidebar,
+    .aside .rp-chrome,
+    .aside .plan-resource-empty,
+    .aside .rp__empty-state,
+    .aside .sw__empty
+  ) {
   text-shadow: 0 1px 2px var(--wallpaper-foreground-shadow-color);
 }
 
-html[data-theme="dark"][data-wallpaper="1"] .sidebar svg {
+html[data-theme="dark"][data-wallpaper="1"]
+  :is(
+    .sidebar,
+    .aside .rp-chrome,
+    .aside .plan-resource-empty,
+    .aside .rp__empty-state,
+    .aside .sw__empty
+  )
+  svg {
   filter: drop-shadow(0 1px 1px var(--wallpaper-foreground-shadow-color));
 }
 
@@ -359,9 +374,29 @@ html[data-wallpaper="1"][data-wallpaper-clear="1"] .app-wallpaper-media {
 
 /* Wallpaper luminance is unknowable. Keep light and dark wallpaper layouts
  * structurally identical, then protect only foreground ink with the same
- * white-on-dark-edge treatment used by the dark shell. */
-html[data-theme="light"][data-wallpaper="1"] .sidebar {
+ * white-on-dark-edge treatment used by the dark shell.
+ * One ink for every glass pane: sidebar is all-glass; aside chrome + empty
+ * copy sit on transparent `.sw.rp`. Solid inner boards (.plan-review, files,
+ * previews) keep theme tokens. */
+html[data-theme="light"][data-wallpaper="1"]
+  :is(
+    .sidebar,
+    .aside .rp-chrome,
+    .aside .plan-resource-empty,
+    .aside .rp__empty-state,
+    .aside .sw__empty
+  ) {
   --text-primary: var(--wallpaper-chrome-foreground);
+  --text-secondary: color-mix(
+    in srgb,
+    var(--wallpaper-chrome-foreground) 80%,
+    transparent
+  );
+  --text-tertiary: color-mix(
+    in srgb,
+    var(--wallpaper-chrome-foreground) 62%,
+    transparent
+  );
   --text-inverse: rgb(15 15 15 / 0.96);
   --bg-hover: rgb(0 0 0 / 0.14);
   --bg-active: rgb(0 0 0 / 0.2);
@@ -369,7 +404,15 @@ html[data-theme="light"][data-wallpaper="1"] .sidebar {
   text-shadow: 0 1px 2px var(--wallpaper-chrome-shadow-color);
 }
 
-html[data-theme="light"][data-wallpaper="1"] .sidebar svg {
+html[data-theme="light"][data-wallpaper="1"]
+  :is(
+    .sidebar,
+    .aside .rp-chrome,
+    .aside .plan-resource-empty,
+    .aside .rp__empty-state,
+    .aside .sw__empty
+  )
+  svg {
   filter: drop-shadow(0 1px 1px var(--wallpaper-chrome-shadow-color));
 }
 
