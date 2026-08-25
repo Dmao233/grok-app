@@ -1055,6 +1055,15 @@ html[data-theme="light"] .sw-terminal--pty {
  * origin-top-right + translateX(100%) scale(0.8) + opacity.
  * `.is-parked` is set when the right rail opens (not on outside click) so
  * closing the rail brings the summary back unless the user dismissed it.
+ *
+ * Codex layout (conversation-source):
+ *   mws panel width 300, wrapper `pe-4` (16) → register 316px inset
+ *   (`F = j(P ? 316 : 0)`). Overlay+half-translate is NOT how they leave
+ *   space: the 720/736 thread recenters in the remaining width
+ *   (shift-mode contentX = -316/2 is the same visual as shrinking the
+ *   centering box by 316). Shrink `.main__stage` so welcome/composer
+ *   (position:absolute left/right 0) recenter; padding would not inset
+ *   those abs children.
  */
 .sw-env-dock {
   position: absolute;
@@ -1068,6 +1077,16 @@ html[data-theme="light"] .sw-terminal--pty {
 
 .main {
   --env-summary-width: 300px;
+  --env-summary-gutter: 0px;
+}
+
+.main:has(.sw-env-menu.is-open:not(.is-parked)) {
+  --env-summary-gutter: 316px;
+}
+
+.main > .main__stage {
+  margin-right: var(--env-summary-gutter);
+  transition: margin-right var(--motion-pane) var(--motion-pane-ease);
 }
 
 .sw-env-menu.menu-panel,
@@ -1226,6 +1245,10 @@ body > .sw-env-dock {
   .sw-env-menu.menu-panel,
   .menu-panel.sw-env-menu {
     transform: none;
+    transition: none;
+  }
+
+  .main > .main__stage {
     transition: none;
   }
 }

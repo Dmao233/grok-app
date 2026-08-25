@@ -101,6 +101,15 @@ describe("floating pop CSS", () => {
     expect(env).toMatch(/translateX\(100%\) scale\(0\.8\) rotateY\(-22deg\)/);
     expect(env).toMatch(/\.sw-env-dock\s*\{[^}]*perspective:\s*900px/s);
     expect(env).toMatch(/--env-summary-width:\s*300px/);
+    expect(env).toMatch(
+      /\.main:has\(\.sw-env-menu\.is-open:not\(\.is-parked\)\)\s*\{[^}]*--env-summary-gutter:\s*316px/s,
+    );
+    expect(env).toMatch(
+      /\.main\s*>\s*\.main__stage\s*\{[^}]*margin-right:\s*var\(--env-summary-gutter\)/s,
+    );
+    expect(env).not.toMatch(
+      /translateX\(calc\(var\(--env-summary-gutter\) \* -0\.5\)\)/,
+    );
   });
 
   it("switches settings atomically without a presence or paint gap", () => {
