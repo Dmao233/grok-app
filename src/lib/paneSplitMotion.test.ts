@@ -93,10 +93,18 @@ describe("desktop hidden CSS must not force width 0", () => {
     expect(app).toMatch(
       /\{!phoneLayout \? \(\s*<>\s*<PaneToggleButton\s+side="left"[\s\S]*?<PaneToggleButton\s+side="right"/,
     );
+    // Exactly three mounts total: pinned left + pinned right + phone
+    // hamburger. A fourth means a per-state second copy came back.
+    expect(app.match(/<PaneToggleButton/g)).toHaveLength(3);
+    expect(app.match(/testId="main-side-toggle"/g)).toHaveLength(1);
     // The old implementation: one copy inside .sidebar-chrome plus one in
-    // .main__top swapped by `layout.sidebarCollapsed &&` — both are gone.
+    // .main__top swapped by `layout.sidebarCollapsed &&` — both are gone,
+    // as is the right-side collapsed/open ternary button pair.
     expect(app).not.toMatch(
       /layout\.sidebarCollapsed\s*&&\s*\(\s*<Tip label=\{tr\("main\.leftPane/s,
+    );
+    expect(app).not.toMatch(
+      /layout\.asideCollapsed\s*\?\s*\(\s*<Tip label=\{tr\("main\.rightPane/s,
     );
     expect(app).not.toMatch(/chrome-btn--traffic/);
   });
