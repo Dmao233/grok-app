@@ -88,6 +88,18 @@ describe("floating pop CSS", () => {
     resolve(__dirname, "../components/UserMenu.tsx"),
     "utf8",
   );
+  const msgRail = readFileSync(
+    resolve(__dirname, "../components/lobe-chat/lobe-chat.part2.css"),
+    "utf8",
+  );
+  const msgRailTheme = readFileSync(
+    resolve(__dirname, "../components/lobe-chat/lobe-chat.part3.css"),
+    "utf8",
+  );
+  const msgRailTsx = readFileSync(
+    resolve(__dirname, "../components/lobe-chat/MessageNodeRail.tsx"),
+    "utf8",
+  );
 
   it("keeps account / env pops on the shared motion tokens", () => {
     expect(OPEN_PRESENCE_MS).toBe(200);
@@ -109,6 +121,30 @@ describe("floating pop CSS", () => {
     );
     expect(env).not.toMatch(
       /translateX\(calc\(var\(--env-summary-gutter\) \* -0\.5\)\)/,
+    );
+  });
+
+  it("keeps the message rail on the left like Codex (opposite the env summary)", () => {
+    expect(msgRail).toMatch(
+      /\.lobe-msg-rail\s*\{[^}]*left:\s*16px/s,
+    );
+    expect(msgRail).not.toMatch(
+      /\.lobe-msg-rail\s*\{[^}]*right:\s*6px/s,
+    );
+    expect(msgRailTsx).toMatch(/MSG_RAIL_MIN_LEFT_GUTTER_PX\s*=\s*48/);
+    expect(msgRailTsx).toMatch(/left:\s*r\.right\s*\+\s*8/);
+    expect(msgRailTheme).toMatch(
+      /\.lobe-msg-rail__tip\s*\{[^}]*background:\s*var\(--bg-elevated/s,
+    );
+    expect(msgRailTheme).toMatch(
+      /\.lobe-msg-rail__tick::before\s*\{[^}]*background:\s*var\(--text-tertiary\)/s,
+    );
+    const tipBlock = msgRailTheme.match(/\.lobe-msg-rail__tip\s*\{[^}]*\}/s)?.[0];
+    expect(tipBlock).toContain("var(--bg-elevated");
+    expect(tipBlock).toContain("var(--text-primary)");
+    expect(tipBlock).not.toMatch(/--chat-card[^-]|--chat-text/);
+    expect(msgRailTheme).not.toMatch(
+      /\[data-theme="dark"\] \.lobe-msg-rail__tip/,
     );
   });
 

@@ -489,7 +489,7 @@ html[data-theme="light"][data-wallpaper="1"] .composer-welcome-mark svg {
 }
 
 html[data-theme="light"][data-wallpaper="1"]
-  :is(.lobe-chat-empty, .main__stage > .conn-bar) {
+  :is(.lobe-chat-empty, .main__stage > .conn-bar, .lobe-msg-rail) {
   color: var(--wallpaper-chrome-foreground);
   text-shadow: 0 1px 2px var(--wallpaper-chrome-shadow-color);
 }
@@ -503,6 +503,24 @@ html[data-theme="light"][data-wallpaper="1"] .lobe-chat-empty {
   );
 }
 
+html[data-theme="light"][data-wallpaper="1"] .lobe-msg-rail {
+  --text-primary: var(--wallpaper-chrome-foreground);
+  --text-secondary: color-mix(
+    in srgb,
+    var(--wallpaper-chrome-foreground) 84%,
+    transparent
+  );
+  --text-tertiary: color-mix(
+    in srgb,
+    var(--wallpaper-chrome-foreground) 72%,
+    transparent
+  );
+}
+
+html[data-theme="light"][data-wallpaper="1"] .lobe-msg-rail svg {
+  filter: drop-shadow(0 1px 1px var(--wallpaper-chrome-shadow-color));
+}
+
 html[data-theme="light"][data-wallpaper="1"] .main__stage > .conn-bar strong {
   color: color-mix(
     in srgb,
@@ -512,7 +530,7 @@ html[data-theme="light"][data-wallpaper="1"] .main__stage > .conn-bar strong {
 }
 
 html[data-theme="dark"][data-wallpaper="1"]
-  :is(.lobe-chat-empty, .main__stage > .conn-bar) {
+  :is(.lobe-chat-empty, .main__stage > .conn-bar, .lobe-msg-rail) {
   color: var(--text-primary);
   text-shadow: 0 1px 2px var(--wallpaper-foreground-shadow-color);
 }
@@ -520,6 +538,15 @@ html[data-theme="dark"][data-wallpaper="1"]
 html[data-theme="dark"][data-wallpaper="1"] .lobe-chat-empty {
   --chat-text: var(--text-primary);
   --chat-text-3: color-mix(in srgb, var(--text-primary) 72%, transparent);
+}
+
+html[data-theme="dark"][data-wallpaper="1"] .lobe-msg-rail {
+  --text-secondary: color-mix(in srgb, var(--text-primary) 84%, transparent);
+  --text-tertiary: color-mix(in srgb, var(--text-primary) 72%, transparent);
+}
+
+html[data-theme="dark"][data-wallpaper="1"] .lobe-msg-rail svg {
+  filter: drop-shadow(0 1px 1px var(--wallpaper-foreground-shadow-color));
 }
 
 html[data-theme="dark"][data-wallpaper="1"] .main__stage > .conn-bar strong {

@@ -1,5 +1,5 @@
 /**
- * Grok-web-style message node rail (right edge of the transcript).
+ * Message node rail (Codex: left of the transcript, opposite pinned summary).
  * One tick per user/assistant message; hover preview; prev/next steppers.
  *
  * Active highlight is owned here during free scroll (rAF-throttled
@@ -25,6 +25,7 @@ import {
 } from "@/lib/sessionMessageNodes";
 import type { ChatMessage } from "@/lib/session";
 import { cn } from "@/lib/utils";
+import { scrollPerfDebug } from "@/lib/scrollPerfDebug";
 
 export type MessageNodeRailLabels = {
   aria: string;
@@ -39,10 +40,11 @@ export type MessageNodeRailLabels = {
 type TipState = {
   node: SessionMessageNode;
   top: number;
-  right: number;
+  left: number;
 };
 
-import { scrollPerfDebug } from "@/lib/scrollPerfDebug";
+/** Codex `Re()`: show the rail only when the transcript has ≥48px left gutter. */
+const MSG_RAIL_MIN_LEFT_GUTTER_PX = 48;
 
 export function MessageNodeRail({
   nodes,
@@ -86,6 +88,7 @@ export function MessageNodeRail({
    * stale parent activeId cannot pin the rail after the user has scrolled.
    */
   const [scrollActiveId, setScrollActiveId] = useState<string | null>(null);
+  const [hasLeftGutter, setHasLeftGutter] = useState(true);
   const rafRef = useRef<number | null>(null);
   const onScrollActiveChangeRef = useRef(onScrollActiveChange);
   onScrollActiveChangeRef.current = onScrollActiveChange;
@@ -199,12 +202,39 @@ export function MessageNodeRail({
     }
   }, [activeId]);
 
+  // Codex hides the rail when the centered column leaves < 48px on the left
+  // (`(content.left - scroll.left) >= 48`). Env reservation shrinks the stage
+  // from the right, so this also drops the rail instead of parking it on the
+  // summary.
+  useEffect(() => {
+    const viewport = scrollParentRef?.current;
+    if (!viewport) return;
+    const chat = viewport.closest(".lobe-chat");
+    const inner =
+      viewport.querySelector(".lobe-chat__inner") ??
+      chat?.querySelector(".lobe-chat__inner");
+    if (!(chat instanceof HTMLElement) || !(inner instanceof HTMLElement)) {
+      return;
+    }
+
+    const measure = () => {
+      const cr = chat.getBoundingClientRect();
+      const ir = inner.getBoundingClientRect();
+      setHasLeftGutter(ir.left - cr.left >= MSG_RAIL_MIN_LEFT_GUTTER_PX);
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(chat);
+    ro.observe(inner);
+    measure();
+    return () => ro.disconnect();
+  }, [scrollParentRef, nodes.length]);
+
   const showTipFor = (node: SessionMessageNode, el: HTMLElement) => {
     const r = el.getBoundingClientRect();
     setTip({
       node,
       top: r.top + r.height / 2,
-      right: window.innerWidth - r.left + 8,
+      left: r.right + 8,
     });
   };
 
@@ -212,7 +242,7 @@ export function MessageNodeRail({
     setTip((cur) => (cur?.node.id === id ? null : cur));
   };
 
-  if (nodes.length < 2) return null;
+  if (nodes.length < 2 || !hasLeftGutter) return null;
 
   const tipRole =
     tip == null
@@ -289,7 +319,7 @@ export function MessageNodeRail({
               role="tooltip"
               style={{
                 top: tip.top,
-                right: tip.right,
+                left: tip.left,
               }}
             >
               <div className="lobe-msg-rail__tip-role">{tipRole}</div>
