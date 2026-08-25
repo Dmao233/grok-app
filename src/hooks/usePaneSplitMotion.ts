@@ -45,7 +45,8 @@ export function usePaneSplitMotion(opts: {
   const key = `${opts.sidebarCollapsed}:${opts.asideCollapsed}`;
   const asideOverlay = Boolean(opts.asideOverlay);
   const sideExpanded = Boolean(opts.sideExpanded);
-  const asideOverlayModeChanged = asideOverlayRef.current !== asideOverlay;
+  const asideOverlayModeChanged =
+    !opts.asideCollapsed && asideOverlayRef.current !== asideOverlay;
   const sideExpandedChanged = sideExpandedRef.current !== sideExpanded;
   if (keyRef.current === null) {
     keyRef.current = key;
