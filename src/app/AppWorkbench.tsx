@@ -77,6 +77,10 @@ import {
   loadChatWidth
 } from "@/lib/chatWidthPref";
 import {
+  applyMsgRailSide,
+  loadMsgRailSide
+} from "@/lib/msgRailSidePref";
+import {
   dropGateClocks,
   gateClockKey,
   resumeGateClock
@@ -3228,6 +3232,9 @@ export function AppWorkbench() {
   // Chat transcript reading width (Appearance) — html[data-chat-width].
   useEffect(() => {
     applyChatWidth(loadChatWidth());
+  }, []);
+  useEffect(() => {
+    applyMsgRailSide(loadMsgRailSide());
   }, []);
 
   /**
