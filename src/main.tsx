@@ -48,6 +48,10 @@ import {
   loadChatWidth,
 } from "./lib/chatWidthPref";
 import {
+  applyMsgRailSide,
+  loadMsgRailSide,
+} from "./lib/msgRailSidePref";
+import {
   applySidebarDensity,
   loadSidebarDensity,
 } from "./lib/sidebarDensity";
@@ -84,6 +88,7 @@ applyUiFontFamily(loadUiFontFamily(localStorage));
 applyChatDensity(loadChatDensity(localStorage));
 // Chat transcript reading width (Appearance) — html[data-chat-width].
 applyChatWidth(loadChatWidth(localStorage));
+applyMsgRailSide(loadMsgRailSide(localStorage));
 // Sidebar session list density (Appearance) — html[data-sidebar-density].
 // Boot: skip notify (no listeners yet); App will load metrics from localStorage.
 applySidebarDensity(loadSidebarDensity(localStorage), undefined, false);

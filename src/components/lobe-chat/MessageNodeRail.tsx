@@ -1,6 +1,7 @@
 /**
- * Grok-web-style message node rail (right edge of the transcript).
- * One tick per user/assistant message; hover preview; prev/next steppers.
+ * Message node rail — Codex-style growing ticks on the left or right
+ * (`data-msg-rail-side`). One tick per user/assistant message; hover preview;
+ * prev/next steppers.
  *
  * Active highlight is owned here during free scroll (rAF-throttled
  * querySelectorAll) so ConversationThread does not setState on every scroll
@@ -25,6 +26,12 @@ import {
 } from "@/lib/sessionMessageNodes";
 import type { ChatMessage } from "@/lib/session";
 import { cn } from "@/lib/utils";
+import { scrollPerfDebug } from "@/lib/scrollPerfDebug";
+import {
+  MSG_RAIL_SIDE_CHANGE_EVENT,
+  readMsgRailSideFromDocument,
+  type MsgRailSide,
+} from "@/lib/msgRailSidePref";
 
 export type MessageNodeRailLabels = {
   aria: string;
@@ -39,10 +46,12 @@ export type MessageNodeRailLabels = {
 type TipState = {
   node: SessionMessageNode;
   top: number;
-  right: number;
+  left?: number;
+  right?: number;
 };
 
-import { scrollPerfDebug } from "@/lib/scrollPerfDebug";
+/** Hide the rail when the centered column leaves < 48px on the chosen side. */
+const MSG_RAIL_MIN_GUTTER_PX = 48;
 
 export function MessageNodeRail({
   nodes,
@@ -86,6 +95,12 @@ export function MessageNodeRail({
    * stale parent activeId cannot pin the rail after the user has scrolled.
    */
   const [scrollActiveId, setScrollActiveId] = useState<string | null>(null);
+  const [hasGutter, setHasGutter] = useState(true);
+  const [hot, setHot] = useState(false);
+  const [side, setSide] = useState<MsgRailSide>(() =>
+    readMsgRailSideFromDocument(),
+  );
+  const clusterRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const onScrollActiveChangeRef = useRef(onScrollActiveChange);
   onScrollActiveChangeRef.current = onScrollActiveChange;
@@ -104,6 +119,7 @@ export function MessageNodeRail({
     (activeIndex < 0 && nodes.length > 0);
 
   const nodeIdSet = useMemo(() => new Set(nodes.map((n) => n.id)), [nodes]);
+  const sessionSig = nodes[0]?.id ?? "";
 
   // Keep the active tick roughly in view inside a long rail.
   useEffect(() => {
@@ -199,12 +215,58 @@ export function MessageNodeRail({
     }
   }, [activeId]);
 
+  useEffect(() => {
+    const onSide = () => setSide(readMsgRailSideFromDocument());
+    onSide();
+    window.addEventListener(MSG_RAIL_SIDE_CHANGE_EVENT, onSide);
+    return () => window.removeEventListener(MSG_RAIL_SIDE_CHANGE_EVENT, onSide);
+  }, []);
+
+  useEffect(() => {
+    setHot(false);
+    setTip(null);
+  }, [sessionSig]);
+
+  useEffect(() => {
+    const viewport = scrollParentRef?.current;
+    if (!viewport) return;
+    const chat = viewport.closest(".lobe-chat");
+    const inner =
+      viewport.querySelector(".lobe-chat__inner") ??
+      chat?.querySelector(".lobe-chat__inner");
+    if (!(chat instanceof HTMLElement) || !(inner instanceof HTMLElement)) {
+      return;
+    }
+
+    const measure = () => {
+      const cr = chat.getBoundingClientRect();
+      const ir = inner.getBoundingClientRect();
+      const gutter =
+        side === "right" ? cr.right - ir.right : ir.left - cr.left;
+      setHasGutter(gutter >= MSG_RAIL_MIN_GUTTER_PX);
+    };
+    const ro = new ResizeObserver(measure);
+    ro.observe(chat);
+    ro.observe(inner);
+    measure();
+    return () => ro.disconnect();
+  }, [scrollParentRef, nodes.length, side]);
+
   const showTipFor = (node: SessionMessageNode, el: HTMLElement) => {
     const r = el.getBoundingClientRect();
+    const top = r.top + r.height / 2;
+    if (side === "right") {
+      setTip({
+        node,
+        top,
+        right: window.innerWidth - r.left + 8,
+      });
+      return;
+    }
     setTip({
       node,
-      top: r.top + r.height / 2,
-      right: window.innerWidth - r.left + 8,
+      top,
+      left: r.right + 8,
     });
   };
 
@@ -212,7 +274,7 @@ export function MessageNodeRail({
     setTip((cur) => (cur?.node.id === id ? null : cur));
   };
 
-  if (nodes.length < 2) return null;
+  if (nodes.length < 2 || !hasGutter) return null;
 
   const tipRole =
     tip == null
@@ -221,17 +283,38 @@ export function MessageNodeRail({
         ? labels.userRole
         : labels.assistantRole;
 
+  const onClusterLeave = () => {
+    setHot(false);
+    setTip(null);
+    const active = document.activeElement;
+    if (
+      active instanceof HTMLElement &&
+      clusterRef.current?.contains(active)
+    ) {
+      active.blur();
+    }
+  };
+
   return (
     <nav
-      className="lobe-msg-rail"
+      className={
+        "lobe-msg-rail" + (hot ? " is-hot" : "")
+      }
       aria-label={labels.aria}
       data-slot="message-node-rail"
     >
+      <div
+        ref={clusterRef}
+        className="lobe-msg-rail__cluster"
+        onPointerEnter={() => setHot(true)}
+        onPointerLeave={onClusterLeave}
+      >
       <button
         type="button"
-        className="lobe-msg-rail__step"
+        className="lobe-msg-rail__chev"
         aria-label={labels.prev}
         disabled={!canPrev}
+        tabIndex={hot && canPrev ? 0 : -1}
         onClick={onPrev}
       >
         <IconChevronUp size={14} />
@@ -252,8 +335,6 @@ export function MessageNodeRail({
                 data-node-id={n.id}
                 className={cn(
                   "lobe-msg-rail__tick",
-                  n.role === "user" && "lobe-msg-rail__tick--user",
-                  n.role === "assistant" && "lobe-msg-rail__tick--assistant",
                   isActive && "is-active",
                   isHover && "is-hover",
                   n.status === "error" && "is-error",
@@ -274,13 +355,15 @@ export function MessageNodeRail({
 
       <button
         type="button"
-        className="lobe-msg-rail__step"
+        className="lobe-msg-rail__chev"
         aria-label={labels.next}
         disabled={!canNext}
+        tabIndex={hot && canNext ? 0 : -1}
         onClick={onNext}
       >
         <IconChevronDown size={14} />
       </button>
+      </div>
 
       {tip && typeof document !== "undefined"
         ? createPortal(
@@ -289,7 +372,8 @@ export function MessageNodeRail({
               role="tooltip"
               style={{
                 top: tip.top,
-                right: tip.right,
+                ...(tip.left != null ? { left: tip.left } : {}),
+                ...(tip.right != null ? { right: tip.right } : {}),
               }}
             >
               <div className="lobe-msg-rail__tip-role">{tipRole}</div>

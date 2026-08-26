@@ -148,13 +148,19 @@ describe("wallpaper theme contrast CSS", () => {
     expect(darkTimeline).toContain("var(--text-primary) 84%");
     expect(darkTimeline).toContain("var(--text-primary) 72%");
     const lightExposed = css.match(
-      /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+:is\(\.lobe-chat-empty, \.main__stage > \.conn-bar\)\s*\{[^}]*color:\s*var\(--wallpaper-chrome-foreground\)[^}]*text-shadow:\s*0 1px 2px var\(--wallpaper-chrome-shadow-color\)[^}]*\}/s,
+      /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+:is\(\.lobe-chat-empty, \.main__stage > \.conn-bar, \.lobe-msg-rail\)\s*\{[^}]*color:\s*var\(--wallpaper-chrome-foreground\)[^}]*text-shadow:\s*0 1px 2px var\(--wallpaper-chrome-shadow-color\)[^}]*\}/s,
     )?.[0];
     const darkExposed = css.match(
-      /html\[data-theme="dark"\]\[data-wallpaper="1"\]\s+:is\(\.lobe-chat-empty, \.main__stage > \.conn-bar\)\s*\{[^}]*color:\s*var\(--text-primary\)[^}]*text-shadow:\s*0 1px 2px var\(--wallpaper-foreground-shadow-color\)[^}]*\}/s,
+      /html\[data-theme="dark"\]\[data-wallpaper="1"\]\s+:is\(\.lobe-chat-empty, \.main__stage > \.conn-bar, \.lobe-msg-rail\)\s*\{[^}]*color:\s*var\(--text-primary\)[^}]*text-shadow:\s*0 1px 2px var\(--wallpaper-foreground-shadow-color\)[^}]*\}/s,
     )?.[0];
     expect(lightExposed).toBeTruthy();
     expect(darkExposed).toBeTruthy();
+    expect(css).toMatch(
+      /html\[data-theme="light"\]\[data-wallpaper="1"\] \.lobe-msg-rail\s*\{[^}]*--text-primary:\s*var\(--wallpaper-chrome-foreground\)/s,
+    );
+    expect(css).toMatch(
+      /html\[data-theme="dark"\]\[data-wallpaper="1"\] \.lobe-msg-rail\s*\{[^}]*--text-tertiary:\s*color-mix\(in srgb, var\(--text-primary\) 72%/s,
+    );
     expect(css).toMatch(
       /html\[data-theme="light"\]\[data-wallpaper="1"\]\s+:is\(\s*\.sidebar,\s*\.aside \.rp-chrome,\s*\.aside \.plan-resource-empty/s,
     );

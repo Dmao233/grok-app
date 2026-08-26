@@ -67,6 +67,13 @@ import {
   type ChatWidth,
 } from "@/lib/chatWidthPref";
 import {
+  applyMsgRailSide,
+  dispatchMsgRailSideChange,
+  loadMsgRailSide,
+  saveMsgRailSide,
+  type MsgRailSide,
+} from "@/lib/msgRailSidePref";
+import {
   loadExportLogoPref,
   readImageFileAsDataUrl,
   saveExportLogoPref,
@@ -604,6 +611,18 @@ export function SettingsPage({
     saveChatWidth(next);
     applyChatWidth(next);
     dispatchChatWidthChange(next);
+  }, []);
+  const [msgRailSide, setMsgRailSideState] = useState<MsgRailSide>(() =>
+    loadMsgRailSide(),
+  );
+  useEffect(() => {
+    applyMsgRailSide(loadMsgRailSide());
+  }, []);
+  const onMsgRailSide = useCallback((next: MsgRailSide) => {
+    setMsgRailSideState(next);
+    saveMsgRailSide(next);
+    applyMsgRailSide(next);
+    dispatchMsgRailSideChange(next);
   }, []);
   /** Share-card export logo — localStorage data URL (no AppSettings). */
   const [exportLogo, setExportLogo] = useState<string | null>(() =>
@@ -1417,6 +1436,8 @@ export function SettingsPage({
     onChatDensity,
     chatWidth,
     onChatWidth,
+    msgRailSide,
+    onMsgRailSide,
     exportLogo,
     exportLogoInputRef,
     onExportLogoFile,

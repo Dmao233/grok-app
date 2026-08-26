@@ -566,6 +566,7 @@
 
 .workbench--aside-motion
   .aside:not(.is-resizing):not(.aside--overlay) {
+  will-change: width, max-width, flex-basis;
   transition:
     width var(--motion-pane) var(--motion-pane-ease),
     min-width var(--motion-pane) var(--motion-pane-ease),

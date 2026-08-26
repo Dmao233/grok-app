@@ -61,7 +61,7 @@ describe("floating pop CSS", () => {
     "utf8",
   );
   const env = readFileSync(
-    resolve(__dirname, "../styles/side-workbench.css"),
+    resolve(__dirname, "../styles/sw-env-dock.css"),
     "utf8",
   );
   const settings = readFileSync(
@@ -95,9 +95,15 @@ describe("floating pop CSS", () => {
     expect(sidebar).toMatch(/transform-origin:\s*bottom/);
     expect(sidebar).toMatch(/translateY\(16px\) scaleY\(0\.92\)/);
     expect(sidebar).toMatch(/\.user-menu__flyout\.is-open/);
-    expect(env).toMatch(/\.sw-env-menu\.menu-panel\.is-open/);
+    expect(env).toMatch(/\.sw-env-menu\.is-open:not\(\.is-parked\)/);
+    expect(env).toMatch(/translateX\(100%\) scale\(0\.8\) rotateY\(-22deg\)/);
+    expect(env).not.toMatch(/\.menu-panel/);
+    expect(env).not.toMatch(/translateY\(-8px\) scale\(0\.97\)/);
+    expect(
+      readFileSync(resolve(__dirname, "../styles/side-workbench.css"), "utf8"),
+    ).not.toMatch(/sw-env-menu/);
     expect(sidebar).toMatch(/var\(--motion-normal\) var\(--motion-pane-ease\)/);
-    expect(env).toMatch(/var\(--motion-normal\) var\(--motion-pane-ease\)/);
+    expect(env).toMatch(/var\(--motion-pane\) var\(--motion-pane-ease\)/);
   });
 
   it("switches settings atomically without a presence or paint gap", () => {
