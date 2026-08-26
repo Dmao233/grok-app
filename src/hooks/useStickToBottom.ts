@@ -30,13 +30,12 @@ import {
   isMeaningfulScrollUp,
   isNearBottom,
   nextStickPinState,
-  pinnedFollowDelayMs,
+  pinnedFollowDelayForLayout,
   shouldClampPinnedOverscroll,
   shouldClampPinnedStreamDrift,
   shouldReleaseStickOnDistanceFromBottom,
   shouldReleaseStickOnScrollUp,
 } from "@/lib/stickToBottom";
-import { runAfterPaneSplitMotion } from "@/lib/paneSplitMotion";
 
 export type UseStickToBottomOptions = {
   /** Re-pin when the conversation identity changes (session / first message). */
@@ -220,6 +219,7 @@ export function useStickToBottom(
           shouldReleaseStickOnDistanceFromBottom({
             pinned: true,
             scrollTop,
+            previousScrollTop: lastScrollTop,
             scrollHeight: el.scrollHeight,
             clientHeight: el.clientHeight,
           })
@@ -461,16 +461,24 @@ export function useStickToBottom(
     if (!el) return;
 
     let previousHeight: number | undefined;
+    let previousViewportWidth: number | undefined = el.clientWidth;
+    let viewportWidthChanged = false;
     let raf = 0;
     let mediaFollowTimer: ReturnType<typeof setTimeout> | null = null;
 
     const onHeightChange = (height: number) => {
+      const widthMoved = viewportWidthChanged;
+      viewportWidthChanged = false;
       const difference = height - (previousHeight ?? height);
       // Thought-stream / font / 1–3px reflow: skip full follow machinery so
       // micro reflows do not bounce — BUT still clamp if many small stream
       // deltas stacked and left us off hard bottom while pinned (smooth
       // thinking/body reveal is usually 2–7px per frame).
-      if (previousHeight != null && isHeightDeltaNoise(difference)) {
+      if (
+        previousHeight != null &&
+        isHeightDeltaNoise(difference) &&
+        !widthMoved
+      ) {
         previousHeight = height;
         if (
           shouldClampPinnedStreamDrift(
@@ -526,8 +534,13 @@ export function useStickToBottom(
       // Do NOT compensate scrollTop while escaped — stream growth is almost
       // always at the bottom; adding the full height delta would yank the
       // user down. Large jumps (image/PDF decode) wait so a storm of
-      // screenshots is one snap, not one per file.
-      const delay = pinnedFollowDelayMs(difference);
+      // screenshots is one snap, not one per file. Width interpolation
+      // (aside / env gutter) must follow this frame or the column jumps
+      // up until the motion ends, then snaps back.
+      const delay = pinnedFollowDelayForLayout({
+        heightDelta: difference,
+        viewportWidthChanged: widthMoved,
+      });
       if (delay <= 0) {
         if (mediaFollowTimer != null) {
           clearTimeout(mediaFollowTimer);
@@ -559,7 +572,6 @@ export function useStickToBottom(
     };
 
     const scheduleMeasure = () => {
-      if (runAfterPaneSplitMotion(scheduleMeasure)) return;
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -567,10 +579,21 @@ export function useStickToBottom(
       });
     };
 
-    const ro = new ResizeObserver(() => {
+    const ro = new ResizeObserver((entries) => {
       // Coalesce multi-node notifications to one frame. Always read the
       // content column height from the DOM — viewport RO entries report
       // client box size, which is not what we want for grow/shrink.
+      for (const entry of entries) {
+        if (entry.target !== el) continue;
+        const w = entry.contentRect.width;
+        if (
+          previousViewportWidth != null &&
+          Math.abs(w - previousViewportWidth) >= 0.5
+        ) {
+          viewportWidthChanged = true;
+        }
+        previousViewportWidth = w;
+      }
       scheduleMeasure();
     });
 

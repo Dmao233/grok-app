@@ -393,14 +393,22 @@ export function useChatMessageVirtualizer(
     const ro =
       typeof ResizeObserver !== "undefined"
         ? new ResizeObserver(() => {
-            if (scrollingRef.current || isPaneSplitMotionActive()) {
+            if (scrollingRef.current) {
               pendingHeightRecomputeRef.current = true;
-              if (isPaneSplitMotionActive()) {
-                runAfterPaneSplitMotion(() => {
-                  pendingHeightRecomputeRef.current = false;
-                  recomputeNow();
-                });
-              }
+              return;
+            }
+            // Pinned + viewport width motion (aside / env gutter): follow
+            // this frame. Debouncing until settle is the jump-up-then-snap.
+            if (isPinnedRef.current) {
+              scheduleOnFrame(scrollFrameRef.current, recomputeNow);
+              return;
+            }
+            if (isPaneSplitMotionActive()) {
+              pendingHeightRecomputeRef.current = true;
+              runAfterPaneSplitMotion(() => {
+                pendingHeightRecomputeRef.current = false;
+                recomputeNow();
+              });
               return;
             }
             recompute();
@@ -477,7 +485,14 @@ export function useChatMessageVirtualizer(
   const commitRowHeight = useCallback(
     (index: number, el: HTMLElement, measuredHeight?: number) => {
       if (!virtualizedRef.current) return;
-      if (runAfterPaneSplitMotion(() => commitRowHeight(index, el, measuredHeight))) return;
+      if (
+        !isPinnedRef.current &&
+        runAfterPaneSplitMotion(() =>
+          commitRowHeight(index, el, measuredHeight),
+        )
+      ) {
+        return;
+      }
       const key = getKeyRef.current(index);
       const nextH =
         measuredHeight != null && Number.isFinite(measuredHeight) && measuredHeight >= 0

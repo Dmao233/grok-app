@@ -123,11 +123,19 @@ export function shouldReleaseStickOnDistanceFromBottom(input: {
   pinned: boolean;
   escaped?: boolean;
   scrollTop: number;
+  /** Prior event's scrollTop. Unchanged / down = reflow, not a trackpad tick. */
+  previousScrollTop?: number;
   scrollHeight: number;
   clientHeight: number;
   minDeltaPx?: number;
 }): boolean {
   if (!input.pinned || input.escaped) return false;
+  if (
+    input.previousScrollTop != null &&
+    input.scrollTop >= input.previousScrollTop - 0.5
+  ) {
+    return false;
+  }
   const min = input.minDeltaPx ?? STICK_ESCAPE_MIN_DELTA_PX;
   return (
     distanceFromBottom(
@@ -263,6 +271,19 @@ export function pinnedFollowDelayMs(
   if (!Number.isFinite(heightDelta)) return 0;
   if (Math.abs(heightDelta) < mediaPx) return 0;
   return delayMs;
+}
+
+/**
+ * Aside / env-gutter width interpolation reflows the column every frame.
+ * Media delay would wait until the interpolation stops, then snap — the
+ * transcript jumps up, then back to the bottom. Follow immediately.
+ */
+export function pinnedFollowDelayForLayout(input: {
+  heightDelta: number;
+  viewportWidthChanged: boolean;
+}): number {
+  if (input.viewportWidthChanged) return 0;
+  return pinnedFollowDelayMs(input.heightDelta);
 }
 
 /**
